@@ -9,38 +9,17 @@ const Index = () => {
         style={{ backgroundImage: `url(${bgImage})` }}
       />
 
-      {/* Prime. text with diagonal blur effect */}
+      {/* Prime. text with blur trail effect */}
       <div className="relative z-10 select-none">
         <h1 className="font-inter font-black text-[clamp(8rem,20vw,18rem)] tracking-tighter text-white leading-none">
           <span className="inline-block relative">
-            {/* Diagonal blur effect on left side of P - strong blur bottom-left */}
+            {/* Blurred trail extending left from P */}
             <span 
-              className="absolute top-0 left-0 w-full h-full blur-[30px] opacity-40"
+              className="absolute top-0 left-0 w-full h-full blur-[20px]"
               style={{
-                clipPath: 'polygon(0% 30%, 12% 0%, 12% 100%, 0% 100%)',
-                transform: 'translate(-3%, 1%)'
-              }}
-            >
-              Prime.
-            </span>
-            
-            {/* Medium blur layer for gradient transition */}
-            <span 
-              className="absolute top-0 left-0 w-full h-full blur-[15px] opacity-35"
-              style={{
-                clipPath: 'polygon(0% 20%, 15% 0%, 15% 100%, 0% 100%)',
-                transform: 'translate(-1.5%, 0.5%)'
-              }}
-            >
-              Prime.
-            </span>
-            
-            {/* Light blur for smooth transition */}
-            <span 
-              className="absolute top-0 left-0 w-full h-full blur-[8px] opacity-25"
-              style={{
-                clipPath: 'polygon(0% 10%, 17% 0%, 17% 100%, 0% 100%)',
-                transform: 'translate(-0.5%, 0.2%)'
+                maskImage: 'linear-gradient(to right, transparent 0%, white 15%, transparent 15%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, white 15%, transparent 15%)',
+                transform: 'translateX(-10%)'
               }}
             >
               Prime.
