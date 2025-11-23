@@ -14,9 +14,9 @@ export const HighBar = () => {
   const [activeDomain, setActiveDomain] = useState("business");
 
   return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-30">
-      <div className="backdrop-blur-xl bg-white/5 rounded-full border border-white/10 px-6 py-3 shadow-2xl">
-        <div className="flex items-center gap-4">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-30">
+      <div className="backdrop-blur-xl bg-white/5 rounded-full border border-white/10 px-5 py-2 shadow-2xl">
+        <div className="flex items-center gap-5">
           {domains.map((domain) => {
             const Icon = domain.icon;
             const isActive = activeDomain === domain.id;
@@ -25,7 +25,7 @@ export const HighBar = () => {
               <button
                 key={domain.id}
                 onClick={() => setActiveDomain(domain.id)}
-                className={`relative w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 ${
+                className={`relative w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300 ${
                   isActive 
                     ? "bg-white/20 backdrop-blur-md" 
                     : "hover:bg-white/10"
@@ -33,7 +33,7 @@ export const HighBar = () => {
                 title={domain.label}
               >
                 <Icon 
-                  className={`w-5 h-5 transition-colors ${
+                  className={`w-4 h-4 transition-colors ${
                     isActive ? "text-white" : "text-white/60"
                   }`} 
                 />
