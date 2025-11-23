@@ -3,12 +3,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [isExiting, setIsExiting] = useState(false);
 
   const handleLogin = () => {
-    navigate("/accueil");
+    setIsExiting(true);
+    setTimeout(() => {
+      navigate("/accueil");
+    }, 1000);
   };
   return (
     <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
@@ -26,7 +31,9 @@ const Index = () => {
       </div>
 
       {/* Glassmorphism Login Card */}
-      <div className="relative z-20 w-full max-w-sm mx-4">
+      <div className={`relative z-20 w-full max-w-sm mx-4 transition-all duration-700 ease-in-out ${
+        isExiting ? '-translate-y-[150vh] opacity-0' : 'translate-y-0 opacity-100'
+      }`}>
         <div 
           className="relative rounded-3xl p-10 border border-white/20"
           style={{
