@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import bgImage from "@/assets/black-shapes-bg.jpg";
 import { ChevronLeft } from "lucide-react";
 import { HighBar } from "@/components/HighBar";
+import { Sidebar } from "@/components/Sidebar";
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -24,11 +25,14 @@ const Categories = () => {
         style={{ backgroundImage: `url(${bgImage})` }}
       />
       
+      {/* Sidebar */}
+      <Sidebar />
+      
       {/* High Bar Navigation */}
       <HighBar />
       
       {/* Main Content with slide animation */}
-      <div 
+      <div
         className={`relative z-10 px-8 pt-28 pb-8 transition-transform duration-300 ease-out ${
           isSliding ? "translate-x-full opacity-0" : "translate-x-0 opacity-100"
         }`}
