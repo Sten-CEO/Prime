@@ -1,4 +1,4 @@
-import bgImage from "@/assets/black-shapes-bg.jpeg";
+import bgImage from "@/assets/black-shapes-bg.jpg";
 
 const Index = () => {
   return (
