@@ -35,7 +35,7 @@ const Index = () => {
             WebkitBackdropFilter: 'blur(20px)',
           }}
         >
-          <h2 className="text-2xl font-semibold text-white mb-10">Bon retour chez Prime.</h2>
+          <h2 className="text-2xl font-semibold text-white mb-10">Connectez-vous à Prime.</h2>
           
           <div className="space-y-8">
             {/* Email Field */}
