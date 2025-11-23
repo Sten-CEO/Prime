@@ -2,8 +2,14 @@ import bgImage from "@/assets/black-shapes-bg.jpg";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    navigate("/accueil");
+  };
   return (
     <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
       {/* Background image */}
@@ -20,30 +26,30 @@ const Index = () => {
       </div>
 
       {/* Glassmorphism Login Card */}
-      <div className="relative z-20 w-full max-w-md mx-4">
+      <div className="relative z-20 w-full max-w-sm mx-4">
         <div 
-          className="relative rounded-3xl p-8 border border-white/20"
+          className="relative rounded-3xl p-10 border border-white/20"
           style={{
             background: 'rgba(255, 255, 255, 0.05)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
           }}
         >
-          <h2 className="text-2xl font-semibold text-white mb-8">Bienvenu</h2>
+          <h2 className="text-2xl font-semibold text-white mb-10">Bon retour chez Prime.</h2>
           
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Email Field */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-white/70 text-sm uppercase tracking-wider">
+            <div className="space-y-3">
+              <Label htmlFor="email" className="text-white/80 text-sm uppercase tracking-wider font-medium">
                 Email
               </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="natalia@email.com"
-                className="h-12 rounded-xl border-white/20 text-white placeholder:text-white/40"
+                className="h-12 rounded-xl border-white/30 text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-white/50"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
+                  background: 'rgba(255, 255, 255, 0.12)',
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
                 }}
@@ -51,17 +57,17 @@ const Index = () => {
             </div>
 
             {/* Password Field */}
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-white/70 text-sm uppercase tracking-wider">
+            <div className="space-y-3">
+              <Label htmlFor="password" className="text-white/80 text-sm uppercase tracking-wider font-medium">
                 Mot de passe
               </Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••••••••••"
-                className="h-12 rounded-xl border-white/20 text-white placeholder:text-white/40"
+                className="h-12 rounded-xl border-white/30 text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-white/50"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
+                  background: 'rgba(255, 255, 255, 0.12)',
                   backdropFilter: 'blur(10px)',
                   WebkitBackdropFilter: 'blur(10px)',
                 }}
@@ -70,14 +76,15 @@ const Index = () => {
 
             {/* Login Button */}
             <Button 
-              className="w-full h-12 rounded-xl mt-8 text-white font-medium"
+              onClick={handleLogin}
+              className="w-full h-12 rounded-xl mt-10 text-white font-medium active:scale-[0.98] transition-transform"
               style={{
                 background: 'rgba(255, 255, 255, 0.15)',
                 backdropFilter: 'blur(10px)',
                 WebkitBackdropFilter: 'blur(10px)',
               }}
             >
-              Connectez-vous
+              Connexion
             </Button>
           </div>
         </div>
