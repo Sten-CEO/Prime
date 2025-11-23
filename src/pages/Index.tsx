@@ -9,17 +9,47 @@ const Index = () => {
         style={{ backgroundImage: `url(${bgImage})` }}
       />
 
-      {/* Prime. text with blur trail effect */}
+      {/* Prime. text with blur dissolve effect */}
       <div className="relative z-10 select-none">
         <h1 className="font-inter font-black text-[clamp(8rem,20vw,18rem)] tracking-tighter text-white leading-none">
           <span className="inline-block relative">
-            {/* Blurred trail extending left from P */}
+            {/* Heavy blur layer - far left */}
             <span 
-              className="absolute top-0 left-0 w-full h-full blur-[20px]"
+              className="absolute inset-0 blur-[35px] opacity-30"
               style={{
-                maskImage: 'linear-gradient(to right, transparent 0%, white 15%, transparent 15%)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, white 15%, transparent 15%)',
-                transform: 'translateX(-10%)'
+                clipPath: 'inset(0 88% 0 0)'
+              }}
+            >
+              Prime.
+            </span>
+            
+            {/* Medium blur layer */}
+            <span 
+              className="absolute inset-0 blur-[20px] opacity-40"
+              style={{
+                clipPath: 'inset(0 85% 0 0)'
+              }}
+            >
+              Prime.
+            </span>
+            
+            {/* Light blur layer - closest to sharp text */}
+            <span 
+              className="absolute inset-0 blur-[10px] opacity-50"
+              style={{
+                clipPath: 'inset(0 82% 0 0)'
+              }}
+            >
+              Prime.
+            </span>
+            
+            {/* Bottom fade effect on P */}
+            <span 
+              className="absolute inset-0 blur-[5px] opacity-20"
+              style={{
+                clipPath: 'inset(75% 88% 0 0)',
+                maskImage: 'linear-gradient(to bottom, white, transparent)',
+                WebkitMaskImage: 'linear-gradient(to bottom, white, transparent)'
               }}
             >
               Prime.
