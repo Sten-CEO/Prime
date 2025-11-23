@@ -1,11 +1,13 @@
+import bgImage from "@/assets/black-shapes-bg.jpeg";
+
 const Index = () => {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-dark-bg texture-overlay flex items-center justify-center">
-      {/* Subtle gray reflections */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[20%] right-[30%] w-[400px] h-[300px] bg-gray-reflection/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[30%] left-[25%] w-[350px] h-[250px] bg-gray-reflection/8 rounded-full blur-[100px]" />
-      </div>
+    <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
+      {/* Background image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${bgImage})` }}
+      />
 
       {/* Prime. text with blur and distortion effect */}
       <div className="relative z-10 select-none">
