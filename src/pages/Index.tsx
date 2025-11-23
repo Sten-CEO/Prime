@@ -9,17 +9,25 @@ const Index = () => {
         style={{ backgroundImage: `url(${bgImage})` }}
       />
 
-      {/* Prime. text with blur and distortion effect */}
+      {/* Prime. text with blur effect */}
       <div className="relative z-10 select-none">
-        <h1 className="font-inter font-black text-[clamp(8rem,20vw,18rem)] tracking-tighter text-dark-fg leading-none">
+        <h1 className="font-inter font-black text-[clamp(8rem,20vw,18rem)] tracking-tighter text-white leading-none">
           <span className="inline-block relative">
-            {/* Blurred and stretched P and r */}
-            <span className="absolute inset-0 blur-[2px] opacity-70" style={{
-              transform: 'scale(1.05, 1.08) translateX(-2%) translateY(2%)',
-              transformOrigin: 'center left',
-              clipPath: 'ellipse(45% 100% at 20% 60%)'
+            {/* Blurred P extending to the left */}
+            <span className="absolute inset-0 blur-[8px] opacity-60" style={{
+              clipPath: 'polygon(0% 0%, 35% 0%, 35% 100%, 0% 100%)',
+              transform: 'translateX(-15%)'
             }}>
-              Pr
+              Prime.
+            </span>
+            
+            {/* Fade out effect at bottom of P */}
+            <span className="absolute inset-0 opacity-40" style={{
+              clipPath: 'polygon(0% 75%, 15% 75%, 15% 100%, 0% 100%)',
+              filter: 'blur(4px)',
+              background: 'linear-gradient(to bottom, white, transparent)'
+            }}>
+              Prime.
             </span>
             
             {/* Normal text */}
