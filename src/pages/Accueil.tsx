@@ -22,10 +22,11 @@ const Accueil = () => {
           <Separator className="w-10 bg-white/20 mb-8" />
           
           {/* Top Navigation - Home Icon */}
-          <div className="flex-none mb-8">
+          <div className="flex-none">
             <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
               <Home className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
+            <Separator className="w-10 bg-white/20 mx-auto my-4" />
           </div>
           
           {/* Middle Navigation Icons */}
@@ -39,6 +40,7 @@ const Accueil = () => {
             <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
               <Target className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
+            <Separator className="w-10 bg-white/20 mx-auto my-2" />
           </div>
           
           {/* Bottom Navigation Icons */}
