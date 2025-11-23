@@ -60,12 +60,6 @@ export default {
         "dark-bg": "hsl(var(--dark-bg))",
         "dark-fg": "hsl(var(--dark-fg))",
         "gray-reflection": "hsl(var(--gray-reflection))",
-        "glass-bg": "hsl(var(--glass-bg))",
-        "glass-border": "hsl(var(--glass-border))",
-        "accent-green": "hsl(var(--accent-green))",
-        "accent-red": "hsl(var(--accent-red))",
-        "accent-blue": "hsl(var(--accent-blue))",
-        "accent-violet": "hsl(var(--accent-violet))",
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],

@@ -4,18 +4,16 @@ import bgImage from "@/assets/black-shapes-bg.jpg";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { HighBar } from "@/components/HighBar";
 import { Sidebar } from "@/components/Sidebar";
-import { domains, metrics } from "@/data/mockData";
 
 const Categories = () => {
   const navigate = useNavigate();
   const { domainId } = useParams();
   const [isSliding, setIsSliding] = useState(false);
-  const domain = domains.find((d) => d.id === domainId) || domains[0];
 
   const handleNavigateBack = () => {
     setIsSliding(true);
     setTimeout(() => {
-      navigate(`/domaines?domain=${domainId}`);
+      navigate("/domaines");
     }, 300);
   };
 
@@ -61,7 +59,7 @@ const Categories = () => {
             <div className="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 p-10 shadow-2xl">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-white">Catégorie {domain.name}</h2>
+                  <h2 className="text-3xl font-bold text-white">Catégorie Business</h2>
                   <p className="text-white/60 text-sm mt-1">Stratégie & Croissance</p>
                 </div>
                 <div className="text-right">
@@ -93,17 +91,33 @@ const Categories = () => {
               <div className="backdrop-blur-xl bg-white/20 rounded-3xl border border-white/20 p-8 shadow-2xl h-56">
                 <h3 className="text-lg font-semibold text-white mb-6">Métriques Clés</h3>
                 <div className="space-y-3">
-                  {(metrics[domainId as keyof typeof metrics] || []).map((metric, idx) => (
-                    <div key={idx}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-white/70 text-sm">{metric.name}</span>
-                        <span className="text-white font-semibold">{metric.value}%</span>
-                      </div>
-                      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-accent-blue to-accent-violet rounded-full" style={{ width: `${metric.value}%` }} />
-                      </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white/70 text-sm">Chiffre d'affaires</span>
+                      <span className="text-white font-semibold">95%</span>
                     </div>
-                  ))}
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 rounded-full" style={{ width: '95%' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white/70 text-sm">Acquisitions clients</span>
+                      <span className="text-white font-semibold">88%</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 rounded-full" style={{ width: '88%' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white/70 text-sm">Innovation</span>
+                      <span className="text-white font-semibold">92%</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 rounded-full" style={{ width: '92%' }} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,117 +1,65 @@
-import { Home, Folder, BookOpen, Target, User, Settings } from "lucide-react";
-import { useState } from "react";
+import { Home, Award, BookOpen, Target, User, Settings } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import { useNavigate, useLocation } from "react-router-dom";
-import { HoverMenu } from "./HoverMenu";
-
-const navItems = [
-  { icon: Home, path: "/accueil", label: "Home" },
-  { 
-    icon: Folder, 
-    path: "/domaines", 
-    label: "Domaines",
-    submenu: [
-      { label: "Vue Domaine", path: "/domaines" },
-      { label: "Vue Catégories", path: "/categories/business" },
-    ]
-  },
-  { 
-    icon: BookOpen, 
-    path: "/journal", 
-    label: "Journal",
-    submenu: [
-      { label: "Journal général", path: "/journal" },
-      { label: "Journal par domaine", path: "/journal/business" },
-    ]
-  },
-  { 
-    icon: Target, 
-    path: "/prime-targets", 
-    label: "Prime Targets",
-    submenu: [
-      { label: "Objectifs actifs", path: "/prime-targets" },
-      { label: "Prime History", path: "/prime-history" },
-    ]
-  },
-  { icon: User, path: "/profil", label: "Profil" },
-  { icon: Settings, path: "/settings", label: "Paramètres" },
-];
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [hoveredItem, setHoveredItem] = useState<number | null>(null);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
-  const isActive = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(path);
-  };
-
-  const handleMouseEnter = (index: number, event: React.MouseEvent<HTMLButtonElement>) => {
-    if (navItems[index].submenu) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      setMenuPosition({
-        top: rect.top,
-        left: rect.right + 8,
-      });
-      setHoveredItem(index);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredItem(null);
-  };
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <>
-      <div className="fixed left-0 top-0 h-screen w-20 z-40 backdrop-blur-xl bg-white/5 border-r border-white/10 flex flex-col items-center py-8 gap-6">
-        {/* Logo */}
-        <div className="w-12 h-12 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center">
-          <span className="text-white font-bold text-xl">P</span>
+    <div className="fixed left-6 top-6 bottom-6 w-20 z-20">
+      <div className="h-full backdrop-blur-md bg-white/5 rounded-2xl border border-white/10 flex flex-col items-center py-6 px-3">
+        {/* Prime Logo */}
+        <div className="mb-4">
+          <span className="text-white font-bold text-lg tracking-tight">Prime.</span>
         </div>
-
-        {/* Separator */}
-        <div className="w-10 h-px bg-white/10" />
-
-        {/* Navigation */}
-        <div className="flex flex-col gap-4">
-          {navItems.map((item, index) => {
-            const Icon = item.icon;
-            const active = isActive(item.path);
-
-            return (
-              <button
-                key={index}
-                onClick={() => !item.submenu && navigate(item.path)}
-                onMouseEnter={(e) => handleMouseEnter(index, e)}
-                onMouseLeave={handleMouseLeave}
-                className={`relative w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-300 ${
-                  active
-                    ? "bg-white/20 backdrop-blur-md"
-                    : "hover:bg-white/10"
-                }`}
-                title={item.label}
-              >
-                <Icon
-                  className={`w-5 h-5 transition-colors ${
-                    active ? "text-white" : "text-white/60"
-                  }`}
-                />
-              </button>
-            );
-          })}
+        
+        <Separator className="w-10 bg-white/20 mb-8" />
+        
+        {/* Top Navigation - Home Icon */}
+        <div className="flex-none">
+          <button 
+            onClick={() => navigate("/accueil")}
+            className={`w-12 h-12 flex items-center justify-center rounded-xl transition-colors ${
+              isActive("/accueil") ? "bg-white/20" : "hover:bg-white/10"
+            }`}
+          >
+            <Home className={`w-5 h-5 ${isActive("/accueil") ? "text-white" : "text-gray-400 opacity-70"}`} />
+          </button>
+          <Separator className="w-10 bg-white/20 mx-auto my-4" />
+        </div>
+        
+        {/* Middle Navigation Icons */}
+        <div className="flex-1 flex flex-col gap-4">
+          <button 
+            onClick={() => navigate("/domaines")}
+            className={`w-12 h-12 flex items-center justify-center rounded-xl transition-colors ${
+              isActive("/domaines") || location.pathname.startsWith("/categories") ? "bg-white/20" : "hover:bg-white/10"
+            }`}
+          >
+            <Award className={`w-5 h-5 ${isActive("/domaines") || location.pathname.startsWith("/categories") ? "text-white" : "text-gray-400 opacity-70"}`} />
+          </button>
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+            <BookOpen className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+            <Target className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
+          <Separator className="w-10 bg-white/20 mx-auto my-2" />
+        </div>
+        
+        {/* Bottom Navigation Icons */}
+        <div className="flex-none flex flex-col gap-4 mt-8">
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+            <User className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+            <Settings className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
         </div>
       </div>
-
-      {/* Hover menus */}
-      {hoveredItem !== null && navItems[hoveredItem].submenu && (
-        <div onMouseEnter={() => setHoveredItem(hoveredItem)} onMouseLeave={handleMouseLeave}>
-          <HoverMenu
-            items={navItems[hoveredItem].submenu || []}
-            visible={true}
-            position={menuPosition}
-          />
-        </div>
-      )}
-    </>
+    </div>
   );
 };
