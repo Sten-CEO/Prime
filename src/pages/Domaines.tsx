@@ -1,18 +1,22 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import bgImage from "@/assets/black-shapes-bg.jpg";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { HighBar } from "@/components/HighBar";
 import { Sidebar } from "@/components/Sidebar";
+import { domains, performancesLibres, chartData } from "@/data/mockData";
 
 const Domaines = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isSliding, setIsSliding] = useState(false);
+  const selectedDomainId = searchParams.get("domain") || "business";
+  const selectedDomain = domains.find((d) => d.id === selectedDomainId) || domains[0];
 
   const handleNavigateToCategory = () => {
     setIsSliding(true);
     setTimeout(() => {
-      navigate("/categories/business");
+      navigate(`/categories/${selectedDomainId}`);
     }, 300);
   };
 
@@ -58,9 +62,9 @@ const Domaines = () => {
             <div className="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 p-10 shadow-2xl">
 
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-white">Business</h2>
+                <h2 className="text-3xl font-bold text-white">{selectedDomain.name}</h2>
                 <div className="text-right">
-                  <div className="text-5xl font-bold text-white mb-1">87</div>
+                  <div className="text-5xl font-bold text-white mb-1">{selectedDomain.score}</div>
                   <div className="text-sm text-white/60">Score Global</div>
                 </div>
               </div>
@@ -88,18 +92,12 @@ const Domaines = () => {
               <div className="backdrop-blur-xl bg-white/20 rounded-3xl border border-white/20 p-8 shadow-2xl h-56">
                 <h3 className="text-lg font-semibold text-white mb-6">Performances Libres</h3>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-white/70 text-sm">Productivité</span>
-                    <span className="text-white font-semibold">92%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-white/70 text-sm">Créativité</span>
-                    <span className="text-white font-semibold">85%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-white/70 text-sm">Leadership</span>
-                    <span className="text-white font-semibold">78%</span>
-                  </div>
+                  {(performancesLibres[selectedDomainId as keyof typeof performancesLibres] || []).map((perf, idx) => (
+                    <div key={idx} className="flex items-center justify-between">
+                      <span className="text-white/70 text-sm">{perf.name}</span>
+                      <span className="text-white font-semibold">{perf.score}%</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
