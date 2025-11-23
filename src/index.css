@@ -41,6 +41,20 @@ All colors MUST be HSL.
     --dark-bg: 0 0% 8%;
     --dark-fg: 0 0% 98%;
     --gray-reflection: 0 0% 20%;
+    
+    /* Prime glassmorphism colors */
+    --glass-bg: 0 0% 100%;
+    --glass-border: 0 0% 100%;
+    
+    /* Accent colors - VisionOS style */
+    --accent-green: 142 76% 36%;
+    --accent-red: 0 72% 51%;
+    --accent-blue: 221 83% 53%;
+    --accent-violet: 271 81% 56%;
+    
+    /* Glass effect */
+    --glass-opacity: 0.1;
+    --glass-blur: 24px;
 
     --sidebar-background: 0 0% 98%;
 
