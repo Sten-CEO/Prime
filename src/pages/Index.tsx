@@ -9,29 +9,38 @@ const Index = () => {
         style={{ backgroundImage: `url(${bgImage})` }}
       />
 
-      {/* Prime. text with blur effect like reference */}
+      {/* Prime. text with diagonal blur effect */}
       <div className="relative z-10 select-none">
         <h1 className="font-inter font-black text-[clamp(8rem,20vw,18rem)] tracking-tighter text-white leading-none">
           <span className="inline-block relative">
-            {/* Heavy blur extending left from P */}
+            {/* Diagonal blur effect on left side of P - strong blur bottom-left */}
             <span 
-              className="absolute top-0 left-0 w-full h-full blur-[25px] opacity-50"
+              className="absolute top-0 left-0 w-full h-full blur-[30px] opacity-40"
               style={{
-                clipPath: 'inset(0 85% 0 0)',
-                transform: 'translateX(-8%)'
+                clipPath: 'polygon(0% 30%, 12% 0%, 12% 100%, 0% 100%)',
+                transform: 'translate(-3%, 1%)'
               }}
             >
               Prime.
             </span>
             
-            {/* Fade/erase effect at bottom of P */}
+            {/* Medium blur layer for gradient transition */}
             <span 
-              className="absolute top-0 left-0 w-full h-full"
+              className="absolute top-0 left-0 w-full h-full blur-[15px] opacity-35"
               style={{
-                clipPath: 'inset(70% 92% 0 0)',
-                maskImage: 'linear-gradient(to bottom, white 0%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(to bottom, white 0%, transparent 100%)',
-                opacity: 0.3
+                clipPath: 'polygon(0% 20%, 15% 0%, 15% 100%, 0% 100%)',
+                transform: 'translate(-1.5%, 0.5%)'
+              }}
+            >
+              Prime.
+            </span>
+            
+            {/* Light blur for smooth transition */}
+            <span 
+              className="absolute top-0 left-0 w-full h-full blur-[8px] opacity-25"
+              style={{
+                clipPath: 'polygon(0% 10%, 17% 0%, 17% 100%, 0% 100%)',
+                transform: 'translate(-0.5%, 0.2%)'
               }}
             >
               Prime.
