@@ -30,6 +30,22 @@ const Domaines = () => {
       {/* High Bar Navigation */}
       <HighBar />
       
+      {/* Navigation Arrows - Above main content */}
+      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+        <button
+          onClick={() => {}}
+          className="text-white/70 hover:text-white transition-colors"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <button
+          onClick={handleNavigateToCategory}
+          className="text-white/70 hover:text-white transition-colors"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+
       {/* Main Content with slide animation */}
       <div
         className={`relative z-10 px-20 pt-24 pb-8 transition-transform duration-300 ease-out ${
@@ -40,21 +56,6 @@ const Domaines = () => {
           {/* Top Large Block - Score & Courbe */}
           <div className="mb-5 relative">
             <div className="backdrop-blur-xl bg-white/10 rounded-3xl border border-white/20 p-10 shadow-2xl">
-              {/* Navigation Arrows */}
-              <div className="absolute top-10 right-10 flex items-center gap-3">
-                <button
-                  onClick={handleNavigateToCategory}
-                  className="text-white/70 hover:text-white transition-colors"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={handleNavigateToCategory}
-                  className="text-white/70 hover:text-white transition-colors"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              </div>
 
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-3xl font-bold text-white">Business</h2>
