@@ -238,11 +238,11 @@ const Domaines = () => {
 
           {/* Performances + Metrics */}
           <div className="grid grid-cols-2 gap-8 mb-8">
+            <DomainMetrics domainName={domain.name} />
             <DomainPerformances
               domainName={domain.name}
               performances={domain.performances}
             />
-            <DomainMetrics domainName={domain.name} />
           </div>
 
           {/* Objectives */}
