@@ -44,7 +44,7 @@ const Accueil = () => {
       
       {/* Glass Sidebar */}
       <div className="fixed left-6 top-6 bottom-6 w-20 z-20">
-        <div className="h-full backdrop-blur-2xl bg-white/[0.02] rounded-2xl border border-white/[0.12] flex flex-col items-center py-6 px-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+        <div className="h-full backdrop-blur-2xl bg-white/[0.02] rounded-2xl border border-white/[0.08] flex flex-col items-center py-6 px-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
           <div className="mb-4">
             <span className="text-white font-bold text-lg tracking-tight">Prime.</span>
           </div>
