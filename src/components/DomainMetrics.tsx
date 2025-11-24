@@ -4,7 +4,6 @@ import { Switch } from "@/components/ui/switch";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { AddMetricModal } from "@/components/modals/AddMetricModal";
-import { RecordMetricModal } from "@/components/modals/RecordMetricModal";
 import { useToast } from "@/hooks/use-toast";
 import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns";
@@ -13,6 +12,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+type PerformanceLevel = "simple" | "advanced" | "exceptional" | null;
 
 interface Metric {
   id: string;
@@ -35,7 +36,9 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [recordingMetricId, setRecordingMetricId] = useState<string | null>(null);
   const [recordDate, setRecordDate] = useState<Date>(new Date());
-  const [recordScore, setRecordScore] = useState(50);
+  const [performanceLevel, setPerformanceLevel] = useState<PerformanceLevel>(null);
+  const [showManualAdjust, setShowManualAdjust] = useState(false);
+  const [manualScore, setManualScore] = useState<number | null>(null);
   const { toast } = useToast();
 
   const recordingMetric = metrics.find((m) => m.id === recordingMetricId);
@@ -46,18 +49,36 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
     );
   };
 
-  const toggleDay = (id: string, day: string) => {
-    setMetrics(prev =>
-      prev.map(m => {
-        if (m.id === id) {
-          const newDays = m.days.includes(day)
-            ? m.days.filter(d => d !== day)
-            : [...m.days, day];
-          return { ...m, days: newDays };
-        }
-        return m;
-      })
-    );
+  const getLevelScore = (level: PerformanceLevel): number => {
+    switch (level) {
+      case "simple":
+        return 20;
+      case "advanced":
+        return 50;
+      case "exceptional":
+        return 80;
+      default:
+        return 0;
+    }
+  };
+
+  const getFinalScore = (): number => {
+    if (manualScore !== null) return manualScore;
+    return getLevelScore(performanceLevel);
+  };
+
+  const isActiveDayToday = (metricDays: string[]): boolean => {
+    const dayMap: { [key: number]: string } = {
+      1: "L",
+      2: "M",
+      3: "M",
+      4: "J",
+      5: "V",
+      6: "S",
+      0: "D"
+    };
+    const today = new Date().getDay();
+    return metricDays.includes(dayMap[today]);
   };
 
   const handleAdd = (metric: { name: string; icon: string; days: string[] }) => {
@@ -72,18 +93,22 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
   };
 
   const handleRecordPerformance = () => {
-    if (!recordingMetric) return;
+    if (!recordingMetric || !performanceLevel) return;
+    
+    const finalScore = getFinalScore();
     
     toast({
       title: "Performance enregistrée",
-      description: `${recordingMetric.name}: ${recordScore}/100 le ${format(recordDate, "d MMMM yyyy", { locale: fr })}`,
+      description: `${recordingMetric.name}: ${finalScore}/100 le ${format(recordDate, "d MMMM yyyy", { locale: fr })}`,
     });
     
     // Reset
     setRecordingMetricId(null);
     setExpandedId(null);
     setRecordDate(new Date());
-    setRecordScore(50);
+    setPerformanceLevel(null);
+    setShowManualAdjust(false);
+    setManualScore(null);
   };
 
   const getScoreColor = (score: number) => {
@@ -127,12 +152,22 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-white text-xs font-medium">{metric.name}</p>
                     {metric.enabled && expandedId === metric.id ? (
                       <ChevronUp className="w-3 h-3 text-white/40" />
                     ) : metric.enabled ? (
                       <ChevronDown className="w-3 h-3 text-white/40" />
                     ) : null}
+                    <p className="text-white text-xs font-medium">{metric.name}</p>
+                  </div>
+                  <div className="flex items-center gap-1 mt-1.5">
+                    {metric.days.map((day) => (
+                      <span
+                        key={day}
+                        className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/[0.1] text-white/60"
+                      >
+                        {day}
+                      </span>
+                    ))}
                   </div>
                 </div>
                 <Switch
@@ -155,9 +190,10 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
                 className="ml-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.08] border-t-0 rounded-t-none animate-fade-in"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h4 className="text-xs text-white/80 font-medium mb-2">Noter la performance</h4>
+                <h4 className="text-xs text-white/80 font-medium mb-3">Enregistrer une performance</h4>
 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
+                  {/* Date Selector */}
                   <div>
                     <label className="text-[10px] text-white/60 mb-1 block">Date</label>
                     <Popover>
@@ -183,35 +219,110 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
                         />
                       </PopoverContent>
                     </Popover>
+                    {!isActiveDayToday(metric.days) && (
+                      <p className="text-[9px] text-white/40 mt-1">Jour non programmé pour cette métrique</p>
+                    )}
                   </div>
 
+                  {/* Performance Level Selector */}
                   <div>
-                    <label className="text-[10px] text-white/60 mb-1.5 block">Note (0-100)</label>
-                    <div className="flex items-center gap-2.5">
-                      <Slider
-                        value={[recordScore]}
-                        onValueChange={(value) => setRecordScore(value[0])}
-                        max={100}
-                        step={1}
-                        className="flex-1"
-                      />
-                      <span className={`text-xs font-bold w-8 text-right ${getScoreColor(recordScore)}`}>
-                        {recordScore}
-                      </span>
+                    <label className="text-[10px] text-white/60 mb-1.5 block">Niveau de performance</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        onClick={() => {
+                          setPerformanceLevel("simple");
+                          setManualScore(null);
+                        }}
+                        className={cn(
+                          "px-2 py-1.5 rounded text-[9px] font-medium transition-all",
+                          performanceLevel === "simple"
+                            ? "bg-white/[0.15] border-2 border-white/[0.3] text-white"
+                            : "bg-white/[0.05] border border-white/[0.1] text-white/60 hover:bg-white/[0.08]"
+                        )}
+                      >
+                        Simple
+                      </button>
+                      <button
+                        onClick={() => {
+                          setPerformanceLevel("advanced");
+                          setManualScore(null);
+                        }}
+                        className={cn(
+                          "px-2 py-1.5 rounded text-[9px] font-medium transition-all",
+                          performanceLevel === "advanced"
+                            ? "bg-white/[0.15] border-2 border-white/[0.3] text-white"
+                            : "bg-white/[0.05] border border-white/[0.1] text-white/60 hover:bg-white/[0.08]"
+                        )}
+                      >
+                        Avancée
+                      </button>
+                      <button
+                        onClick={() => {
+                          setPerformanceLevel("exceptional");
+                          setManualScore(null);
+                        }}
+                        className={cn(
+                          "px-2 py-1.5 rounded text-[9px] font-medium transition-all",
+                          performanceLevel === "exceptional"
+                            ? "bg-white/[0.15] border-2 border-white/[0.3] text-white"
+                            : "bg-white/[0.05] border border-white/[0.1] text-white/60 hover:bg-white/[0.08]"
+                        )}
+                      >
+                        Exceptionnelle
+                      </button>
                     </div>
-                    <div className="mt-1.5 h-1 rounded-full bg-white/[0.05] overflow-hidden">
-                      <div
-                        className={`h-full transition-all ${
-                          recordScore >= 80 ? "bg-success" : recordScore >= 50 ? "bg-yellow-500" : "bg-red-500"
-                        }`}
-                        style={{ width: `${recordScore}%` }}
-                      />
-                    </div>
+                    {performanceLevel && (
+                      <p className="text-[9px] text-white/70 mt-2">
+                        Cette performance sera enregistrée avec une note de{" "}
+                        <span className={`font-bold ${getScoreColor(getFinalScore())}`}>
+                          {getFinalScore()}/100
+                        </span>
+                      </p>
+                    )}
                   </div>
 
+                  {/* Manual Adjustment (Optional) */}
+                  <div>
+                    {!showManualAdjust ? (
+                      <button
+                        onClick={() => setShowManualAdjust(true)}
+                        className="text-[9px] text-white/50 hover:text-white/80 underline transition-colors"
+                      >
+                        Ajuster manuellement la note
+                      </button>
+                    ) : (
+                      <div className="space-y-2">
+                        <label className="text-[10px] text-white/60 block">Ajustement manuel</label>
+                        <div className="flex items-center gap-2.5">
+                          <Slider
+                            value={[manualScore ?? getLevelScore(performanceLevel)]}
+                            onValueChange={(value) => setManualScore(value[0])}
+                            max={100}
+                            step={1}
+                            className="flex-1"
+                          />
+                          <span className={`text-xs font-bold w-8 text-right ${getScoreColor(manualScore ?? getLevelScore(performanceLevel))}`}>
+                            {manualScore ?? getLevelScore(performanceLevel)}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setShowManualAdjust(false);
+                            setManualScore(null);
+                          }}
+                          className="text-[9px] text-white/50 hover:text-white/80 underline transition-colors"
+                        >
+                          Utiliser le niveau prédéfini
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Record Button */}
                   <Button
                     onClick={handleRecordPerformance}
-                    className="w-full bg-white/[0.15] border border-white/[0.2] text-white hover:bg-white/[0.2] h-8 text-[10px]"
+                    disabled={!performanceLevel}
+                    className="w-full bg-white/[0.15] border border-white/[0.2] text-white hover:bg-white/[0.2] h-8 text-[10px] disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     Enregistrer la performance
                   </Button>
