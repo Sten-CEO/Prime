@@ -236,6 +236,13 @@ const Domaines = () => {
           {/* High Bar */}
           <DomainHighBar currentDomain={slug || ""} />
 
+          {/* Domain Title */}
+          <div className="mb-8 mt-6">
+            <h1 className="text-4xl font-bold text-white tracking-tight">
+              {domain.name}
+            </h1>
+          </div>
+
           {/* Performances + Metrics */}
           <div className="grid grid-cols-2 gap-8 mb-8">
             <DomainMetrics domainName={domain.name} />
