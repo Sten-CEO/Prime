@@ -14,6 +14,10 @@ const domainData = {
     name: "Business",
     score: 85,
     variation: "+12% cette semaine",
+    categories: [
+      { id: "strategie", name: "Stratégie", color: "rgba(34, 211, 238, 0.8)", score: 88 },
+      { id: "execution", name: "Exécution", color: "rgba(16, 185, 129, 0.8)", score: 82 },
+    ],
     performances: [
       { id: "p1", name: "Productivité", score: 82 },
       { id: "p2", name: "Stratégie", score: 78 },
@@ -69,6 +73,10 @@ const domainData = {
     name: "Sport",
     score: 78,
     variation: "+8% cette semaine",
+    categories: [
+      { id: "entrainement", name: "Entraînement", color: "rgba(16, 185, 129, 0.8)", score: 78 },
+      { id: "nutrition", name: "Nutrition", color: "rgba(34, 211, 238, 0.8)", score: 85 },
+    ],
     performances: [
       { id: "p1", name: "Cardio", score: 85 },
       { id: "p2", name: "Force", score: 72 },
@@ -105,6 +113,10 @@ const domainData = {
     name: "Social",
     score: 69,
     variation: "-3% cette semaine",
+    categories: [
+      { id: "relations", name: "Relations", color: "rgba(244, 114, 182, 0.8)", score: 69 },
+      { id: "famille", name: "Famille", color: "rgba(168, 85, 247, 0.8)", score: 75 },
+    ],
     performances: [
       { id: "p1", name: "Connexions", score: 65 },
       { id: "p2", name: "Communication", score: 70 },
@@ -121,6 +133,10 @@ const domainData = {
     name: "Santé",
     score: 92,
     variation: "+15% cette semaine",
+    categories: [
+      { id: "bienetre", name: "Bien-être", color: "rgba(168, 85, 247, 0.8)", score: 92 },
+      { id: "sommeil", name: "Sommeil", color: "rgba(34, 211, 238, 0.8)", score: 88 },
+    ],
     performances: [
       { id: "p1", name: "Sommeil", score: 95 },
       { id: "p2", name: "Nutrition", score: 88 },
@@ -232,6 +248,7 @@ const Domaines = () => {
               domainName={domain.name}
               score={domain.score}
               variation={domain.variation}
+              categories={domain.categories}
             />
             <div className="w-[400px]">
               <DomainCategoryStats />
