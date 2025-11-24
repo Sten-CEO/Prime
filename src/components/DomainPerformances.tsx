@@ -1,7 +1,9 @@
 import { Card } from "@/components/ui/card";
-import { Pencil, Plus, GripVertical } from "lucide-react";
+import { GripVertical, Plus, Edit3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
+import { DomainPerformanceNoteDialog } from "./DomainPerformanceNoteDialog";
 
 interface Performance {
   id: string;
@@ -19,6 +21,8 @@ export const DomainPerformances = ({ domainName, performances: initialPerformanc
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<number>(0);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [noteDialogOpen, setNoteDialogOpen] = useState(false);
+  const [selectedPerformance, setSelectedPerformance] = useState<{ id: string; name: string } | null>(null);
 
   const handleEdit = (id: string, score: number) => {
     setEditingId(id);
@@ -30,6 +34,21 @@ export const DomainPerformances = ({ domainName, performances: initialPerformanc
       p.id === id ? { ...p, score: editValue } : p
     ));
     setEditingId(null);
+  };
+
+  const handleOpenNoteDialog = (performance: { id: string; name: string }) => {
+    setSelectedPerformance(performance);
+    setNoteDialogOpen(true);
+  };
+
+  const handleSaveNote = (score: number, note: string) => {
+    if (selectedPerformance) {
+      setPerformances(prev =>
+        prev.map(p =>
+          p.id === selectedPerformance.id ? { ...p, score } : p
+        )
+      );
+    }
   };
 
   const handleDragStart = (index: number) => {
@@ -104,18 +123,34 @@ export const DomainPerformances = ({ domainName, performances: initialPerformanc
                 <span className="text-sm font-medium text-white">
                   {perf.score}<span className="text-white/60">/100</span>
                 </span>
-                <button
-                  onClick={() => handleEdit(perf.id, perf.score)}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all opacity-0 group-hover:opacity-100"
-                  title="Modifier"
-                >
-                  <Pencil className="w-3.5 h-3.5 text-white/70" />
-                </button>
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => handleEdit(perf.id, perf.score)}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all"
+                    title="Modifier"
+                  >
+                    <GripVertical className="w-3.5 h-3.5 text-white/70" />
+                  </button>
+                  <button
+                    onClick={() => handleOpenNoteDialog({ id: perf.id, name: perf.name })}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all"
+                    title="Noter aujourd'hui"
+                  >
+                    <Edit3 className="w-3.5 h-3.5 text-white/70" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
         ))}
       </div>
+
+      <DomainPerformanceNoteDialog
+        open={noteDialogOpen}
+        onOpenChange={setNoteDialogOpen}
+        performanceName={selectedPerformance?.name || ""}
+        onSave={handleSaveNote}
+      />
     </Card>
   );
 };
