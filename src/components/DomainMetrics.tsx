@@ -126,32 +126,13 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex items-center gap-2">
                     <p className="text-white text-xs font-medium">{metric.name}</p>
                     {metric.enabled && expandedId === metric.id ? (
                       <ChevronUp className="w-3 h-3 text-white/40" />
                     ) : metric.enabled ? (
                       <ChevronDown className="w-3 h-3 text-white/40" />
                     ) : null}
-                  </div>
-                  <div className="flex gap-1">
-                    {["L", "M", "M", "J", "V", "S", "D"].map((day, idx) => (
-                      <button
-                        key={idx}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleDay(metric.id, day);
-                        }}
-                        disabled={!metric.enabled}
-                        className={`text-[10px] px-1.5 py-0.5 rounded transition-all ${
-                          metric.enabled && metric.days.includes(day)
-                            ? "bg-white/[0.15] border border-white/[0.3] text-white shadow-[0_0_4px_rgba(255,255,255,0.1)]"
-                            : "bg-white/[0.03] text-white/40 hover:bg-white/[0.05]"
-                        }`}
-                      >
-                        {day}
-                      </button>
-                    ))}
                   </div>
                 </div>
                 <Switch
