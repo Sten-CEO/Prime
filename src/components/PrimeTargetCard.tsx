@@ -5,18 +5,23 @@ import { useState } from "react";
 import { ChevronDown, GripVertical } from "lucide-react";
 
 interface PrimeTargetCardProps {
+  id: number;
   title: string;
   progress: number;
   deadline: string;
   status: "in-progress" | "completed" | "delayed";
   completed: boolean;
   onToggle?: () => void;
+  index: number;
+  onReorder: (dragIndex: number, dropIndex: number) => void;
 }
 
-export const PrimeTargetCard = ({ title, progress, deadline, status, completed, onToggle }: PrimeTargetCardProps) => {
+export const PrimeTargetCard = ({ id, title, progress, deadline, status, completed, onToggle, index, onReorder }: PrimeTargetCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isChecked, setIsChecked] = useState(completed);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const statusColors = {
     "in-progress": "bg-success shadow-[0_0_20px_rgba(16,185,129,0.6)]",
@@ -53,16 +58,58 @@ export const PrimeTargetCard = ({ title, progress, deadline, status, completed, 
     onToggle?.();
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    setIsDragging(true);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", index.toString());
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setDragOverIndex(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData("text/plain"));
+    if (dragIndex !== index) {
+      onReorder(dragIndex, index);
+    }
+    setDragOverIndex(null);
+  };
+
   return (
-    <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-5 hover:bg-white/[0.03] hover:border-white/[0.25] transition-all relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] group">
+    <Card 
+      className={`backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-5 hover:bg-white/[0.03] hover:border-white/[0.25] transition-all relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] group ${
+        isDragging ? "opacity-50" : ""
+      } ${
+        dragOverIndex === index ? "border-aura-cyan/50 bg-white/[0.05]" : ""
+      }`}
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {showAnimation && (
         <div className="absolute inset-0 bg-gradient-radial from-white/20 to-transparent animate-ping pointer-events-none" />
       )}
       
       <div className="flex items-start gap-3">
         {/* Drag handle */}
-        <div className="opacity-0 group-hover:opacity-50 transition-opacity cursor-grab active:cursor-grabbing mt-1">
-          <GripVertical className="w-4 h-4 text-white" />
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing mt-1">
+          <GripVertical className="w-4 h-4 text-white/70" />
         </div>
 
         <Checkbox 
