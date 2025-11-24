@@ -16,10 +16,10 @@ export const InsightCard = ({ text, date, highlightColor }: InsightCardProps) =>
   return (
     <Card className="backdrop-blur-xl bg-glass-bg/5 border-glass-border/10 rounded-2xl p-4 hover:bg-glass-bg/10 transition-all">
       <div className="space-y-2">
-        <p className={`text-sm text-foreground px-2 py-1 rounded-lg border ${highlightColors[highlightColor]}`}>
+        <p className={`text-sm text-white px-2 py-1 rounded-lg border ${highlightColors[highlightColor]}`}>
           {text}
         </p>
-        <p className="text-xs text-foreground/50">{date}</p>
+        <p className="text-xs text-white/50">{date}</p>
       </div>
     </Card>
   );
