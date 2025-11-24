@@ -1,5 +1,7 @@
 import { Card } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Button } from "@/components/ui/button";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
+import { useState, useMemo } from "react";
 
 const mockData = [
   { day: "Lun", Business: 8, Sport: 7, Social: 6, Santé: 9 },
@@ -11,74 +13,192 @@ const mockData = [
   { day: "Dim", Business: 8, Sport: 7, Social: 9, Santé: 8 },
 ];
 
+const domains = [
+  { key: "Business", color: "rgba(34, 211, 238, 0.6)", activeColor: "rgba(34, 211, 238, 0.9)" },
+  { key: "Sport", color: "rgba(16, 185, 129, 0.6)", activeColor: "rgba(16, 185, 129, 0.9)" },
+  { key: "Social", color: "rgba(244, 114, 182, 0.6)", activeColor: "rgba(244, 114, 182, 0.9)" },
+  { key: "Santé", color: "rgba(168, 85, 247, 0.6)", activeColor: "rgba(168, 85, 247, 0.9)" },
+];
+
+const periods = [
+  { label: "7j", value: "7d" },
+  { label: "30j", value: "30d" },
+  { label: "90j", value: "90d" },
+  { label: "12m", value: "12m" },
+];
+
 export const MultiDomainChart = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState("7d");
+  const [activeDomains, setActiveDomains] = useState<Record<string, boolean>>({
+    Business: true,
+    Sport: true,
+    Social: true,
+    Santé: true,
+  });
+  const [compareMode, setCompareMode] = useState(false);
+  const [comparedDomains, setComparedDomains] = useState<string[]>([]);
+  const [mouseX, setMouseX] = useState<number | null>(null);
+
+  const toggleDomain = (domain: string) => {
+    setActiveDomains(prev => ({ ...prev, [domain]: !prev[domain] }));
+  };
+
+  const toggleCompareMode = () => {
+    setCompareMode(!compareMode);
+    if (!compareMode) {
+      setComparedDomains([]);
+    }
+  };
+
+  const selectForCompare = (domain: string) => {
+    if (comparedDomains.includes(domain)) {
+      setComparedDomains(comparedDomains.filter(d => d !== domain));
+    } else if (comparedDomains.length < 2) {
+      setComparedDomains([...comparedDomains, domain]);
+    }
+  };
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="backdrop-blur-xl bg-white/[0.08] border border-white/[0.15] rounded-xl p-3 shadow-lg">
+          <p className="text-white text-xs font-medium mb-2">{label}</p>
+          {payload.map((entry: any) => (
+            <div key={entry.name} className="flex items-center justify-between gap-3 text-xs">
+              <span className="text-white/70">{entry.name}</span>
+              <span className="text-white font-semibold">{entry.value}/10</span>
+              <span className="text-success text-xs">+0.5</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card className="backdrop-blur-2xl bg-white/[0.02] border border-white/[0.12] rounded-2xl p-8 relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
-      {/* Aura effect - Soft white glow */}
+      {/* Aura effect */}
       <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/[0.05] rounded-full blur-3xl" />
       <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-aura-cyan/10 rounded-full blur-3xl" />
       
       <div className="relative z-10">
+        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-lg font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">Performance Multi-Domaines</h2>
-          <span className="text-sm text-success font-medium drop-shadow-[0_0_10px_rgba(16,185,129,0.6)]">+18% cette semaine</span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-success font-medium drop-shadow-[0_0_10px_rgba(16,185,129,0.6)]">+18% cette semaine</span>
+            
+            {/* Period selector */}
+            <div className="flex gap-1 backdrop-blur-xl bg-white/[0.04] border border-white/[0.1] rounded-lg p-1">
+              {periods.map((period) => (
+                <Button
+                  key={period.value}
+                  onClick={() => setSelectedPeriod(period.value)}
+                  variant="ghost"
+                  size="sm"
+                  className={`h-7 px-3 text-xs transition-all ${
+                    selectedPeriod === period.value
+                      ? "bg-white/[0.15] text-white"
+                      : "text-white/60 hover:text-white hover:bg-white/[0.08]"
+                  }`}
+                >
+                  {period.label}
+                </Button>
+              ))}
+            </div>
+
+            {/* Compare button */}
+            <Button
+              onClick={toggleCompareMode}
+              variant="ghost"
+              size="sm"
+              className={`h-7 px-3 text-xs transition-all ${
+                compareMode
+                  ? "bg-aura-cyan/20 text-aura-cyan border border-aura-cyan/40"
+                  : "text-white/60 hover:text-white hover:bg-white/[0.08]"
+              }`}
+            >
+              Comparer
+            </Button>
+          </div>
         </div>
         
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={mockData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--glass-border) / 0.1)" />
-            <XAxis 
-              dataKey="day" 
-              stroke="rgba(255, 255, 255, 0.6)"
-              style={{ fontSize: '12px', fill: 'white' }}
-            />
-            <YAxis 
-              stroke="rgba(255, 255, 255, 0.6)"
-              style={{ fontSize: '12px', fill: 'white' }}
-            />
-            <Tooltip 
-              contentStyle={{
-                backgroundColor: 'hsl(var(--glass-bg) / 0.9)',
-                border: '1px solid hsl(var(--glass-border) / 0.2)',
-                borderRadius: '12px',
-                backdropFilter: 'blur(12px)',
+        {/* Chart */}
+        <div onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          setMouseX(e.clientX - rect.left);
+        }} onMouseLeave={() => setMouseX(null)}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={mockData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--glass-border) / 0.1)" />
+              <XAxis 
+                dataKey="day" 
+                stroke="rgba(255, 255, 255, 0.6)"
+                style={{ fontSize: '12px', fill: 'white' }}
+              />
+              <YAxis 
+                stroke="rgba(255, 255, 255, 0.6)"
+                style={{ fontSize: '12px', fill: 'white' }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              {domains.map(({ key, color, activeColor }) => {
+                const isActive = activeDomains[key];
+                const isCompared = compareMode && comparedDomains.includes(key);
+                const opacity = compareMode 
+                  ? (isCompared ? 1 : 0.2)
+                  : (isActive ? 1 : 0.2);
+                const strokeColor = compareMode && isCompared ? activeColor : color;
+                
+                return isActive && (
+                  <Line 
+                    key={key}
+                    type="monotone" 
+                    dataKey={key}
+                    stroke={strokeColor}
+                    strokeWidth={2.5}
+                    opacity={opacity}
+                    dot={{ fill: strokeColor, r: 4, filter: `drop-shadow(0 0 4px ${strokeColor})` }}
+                    activeDot={{ r: 6 }}
+                  />
+                );
+              })}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Domain toggles */}
+        <div className="flex gap-3 mt-4 justify-center flex-wrap">
+          {domains.map(({ key, color }) => (
+            <button
+              key={key}
+              onClick={() => {
+                if (compareMode) {
+                  selectForCompare(key);
+                } else {
+                  toggleDomain(key);
+                }
               }}
-            />
-            <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="Business" 
-              stroke="rgba(34, 211, 238, 0.6)" 
-              strokeWidth={2.5}
-              dot={{ fill: 'rgba(34, 211, 238, 0.7)', r: 4, filter: 'drop-shadow(0 0 4px rgba(34, 211, 238, 0.4))' }}
-              activeDot={{ r: 6 }}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="Sport" 
-              stroke="rgba(16, 185, 129, 0.6)" 
-              strokeWidth={2.5}
-              dot={{ fill: 'rgba(16, 185, 129, 0.7)', r: 4, filter: 'drop-shadow(0 0 4px rgba(16, 185, 129, 0.4))' }}
-              activeDot={{ r: 6 }}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="Social" 
-              stroke="rgba(244, 114, 182, 0.6)" 
-              strokeWidth={2.5}
-              dot={{ fill: 'rgba(244, 114, 182, 0.7)', r: 4, filter: 'drop-shadow(0 0 4px rgba(244, 114, 182, 0.4))' }}
-              activeDot={{ r: 6 }}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="Santé" 
-              stroke="rgba(168, 85, 247, 0.6)" 
-              strokeWidth={2.5}
-              dot={{ fill: 'rgba(168, 85, 247, 0.7)', r: 4, filter: 'drop-shadow(0 0 4px rgba(168, 85, 247, 0.4))' }}
-              activeDot={{ r: 6 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
+                compareMode && comparedDomains.includes(key)
+                  ? "bg-white/[0.15] border border-white/[0.3]"
+                  : activeDomains[key]
+                  ? "bg-white/[0.08] border border-white/[0.15]"
+                  : "bg-white/[0.02] border border-white/[0.08] opacity-50"
+              }`}
+            >
+              <div 
+                className="w-3 h-3 rounded-full"
+                style={{ 
+                  backgroundColor: color,
+                  boxShadow: activeDomains[key] ? `0 0 8px ${color}` : 'none'
+                }}
+              />
+              <span className="text-white text-xs">{key}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </Card>
   );
