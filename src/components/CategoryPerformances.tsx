@@ -1,15 +1,18 @@
 import { Card } from "@/components/ui/card";
 import { Pencil, Plus, GripVertical, Star } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { AddPerformanceModal } from "@/components/modals/AddPerformanceModal";
 import { RatePerformanceModal } from "@/components/modals/RatePerformanceModal";
 import { useToast } from "@/hooks/use-toast";
 
+type PerformanceLevel = "simple" | "advanced" | "exceptional";
+
 interface Performance {
   id: string;
   name: string;
-  score: number;
+  level: PerformanceLevel;
+  impact: number;
   date?: string;
 }
 
@@ -27,14 +30,14 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
   const [ratingPerf, setRatingPerf] = useState<Performance | null>(null);
   const { toast } = useToast();
 
-  const handleEdit = (id: string, score: number) => {
+  const handleEdit = (id: string, impact: number) => {
     setEditingId(id);
-    setEditValue(score);
+    setEditValue(impact);
   };
 
   const handleSave = (id: string) => {
     setPerformances(performances.map(p => 
-      p.id === id ? { ...p, score: editValue } : p
+      p.id === id ? { ...p, impact: editValue } : p
     ));
     setEditingId(null);
   };
@@ -61,22 +64,23 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
     setDraggedIndex(null);
   };
 
-  const handleAdd = (performance: { name: string; icon: string; score: number; date: string }) => {
+  const handleAdd = (performance: { name: string; icon: string; level: PerformanceLevel; impact: number; date: string }) => {
     const newPerf = {
       id: `p${performances.length + 1}`,
       name: `${performance.icon} ${performance.name}`,
-      score: performance.score,
+      level: performance.level,
+      impact: performance.impact,
       date: performance.date
     };
     setPerformances([...performances, newPerf]);
     toast({ title: "Performance ajoutée", description: `${performance.name} a été ajoutée le ${performance.date}.` });
   };
 
-  const handleRate = (id: string, score: number, note: string) => {
+  const handleRate = (id: string, level: PerformanceLevel, impact: number, note: string) => {
     setPerformances(performances.map(p => 
-      p.id === id ? { ...p, score } : p
+      p.id === id ? { ...p, level, impact } : p
     ));
-    toast({ title: "Note enregistrée", description: `Votre note de ${score}/100 a été enregistrée.` });
+    toast({ title: "Impact enregistré", description: `Impact de ${impact} enregistré.` });
   };
 
   return (
@@ -110,16 +114,15 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
             
             {editingId === perf.id ? (
               <div className="flex items-center gap-3 flex-1 animate-fade-in">
-                <Slider
-                  value={[editValue]}
-                  onValueChange={(value) => setEditValue(value[0])}
-                  max={100}
-                  step={1}
-                  className="flex-1"
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={editValue}
+                  onChange={(e) => setEditValue(parseFloat(e.target.value) || 0)}
+                  className="w-20 bg-white/[0.05] border-white/[0.12] text-white h-7 text-xs"
                 />
-                <span className="text-sm font-medium text-white w-12 text-right">
-                  {editValue.toFixed(0)}
-                </span>
+                <span className="text-xs text-white/60">impact</span>
                 <button
                   onClick={() => handleSave(perf.id)}
                   className="px-3 py-1 rounded-lg bg-success/20 border border-success/40 text-success text-xs hover:bg-success/30 transition-all"
@@ -130,7 +133,7 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
             ) : (
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-white">
-                  {perf.score}<span className="text-white/60">/100</span>
+                  {perf.impact}<span className="text-white/60 text-xs ml-1">impact</span>
                 </span>
                 <button
                   onClick={() => setRatingPerf(perf)}
@@ -140,7 +143,7 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
                   <Star className="w-3.5 h-3.5 text-white/70" />
                 </button>
                 <button
-                  onClick={() => handleEdit(perf.id, perf.score)}
+                  onClick={() => handleEdit(perf.id, perf.impact)}
                   className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all opacity-0 group-hover:opacity-100"
                   title="Modifier"
                 >
@@ -163,7 +166,7 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
           open={!!ratingPerf}
           onOpenChange={() => setRatingPerf(null)}
           performanceName={ratingPerf.name}
-          onRate={(score, note) => handleRate(ratingPerf.id, score, note)}
+          onRate={(level, impact, note) => handleRate(ratingPerf.id, level, impact, note)}
         />
       )}
     </Card>

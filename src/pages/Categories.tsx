@@ -19,10 +19,13 @@ interface Metric {
   days: string[];
 }
 
+type PerformanceLevel = "simple" | "advanced" | "exceptional";
+
 interface Performance {
   id: string;
   name: string;
-  score: number;
+  level: PerformanceLevel;
+  impact: number;
 }
 
 interface CategoryData {
@@ -51,8 +54,8 @@ const initialCategoriesData: DomainCategories = {
         { id: "2", name: "Analyse marché", enabled: true, days: ["M", "J"] },
       ],
       performances: [
-        { id: "1", name: "Vision", score: 88 },
-        { id: "2", name: "Décision", score: 82 },
+        { id: "1", name: "Vision", level: "exceptional" as const, impact: 3 },
+        { id: "2", name: "Décision", level: "advanced" as const, impact: 2.5 },
       ],
     },
     {
@@ -66,9 +69,9 @@ const initialCategoriesData: DomainCategories = {
         { id: "3", name: "Planning quotidien", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
       ],
       performances: [
-        { id: "1", name: "Efficacité", score: 85 },
-        { id: "2", name: "Concentration", score: 78 },
-        { id: "3", name: "Organisation", score: 89 },
+        { id: "1", name: "Efficacité", level: "advanced" as const, impact: 2.5 },
+        { id: "2", name: "Concentration", level: "advanced" as const, impact: 2 },
+        { id: "3", name: "Organisation", level: "exceptional" as const, impact: 3 },
       ],
     },
   ],
@@ -84,9 +87,9 @@ const initialCategoriesData: DomainCategories = {
         { id: "3", name: "Étirements", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
       ],
       performances: [
-        { id: "1", name: "Endurance", score: 75 },
-        { id: "2", name: "Force", score: 82 },
-        { id: "3", name: "Souplesse", score: 70 },
+        { id: "1", name: "Endurance", level: "advanced" as const, impact: 2 },
+        { id: "2", name: "Force", level: "advanced" as const, impact: 2.5 },
+        { id: "3", name: "Souplesse", level: "simple" as const, impact: 1.5 },
       ],
     },
   ],
@@ -102,9 +105,9 @@ const initialCategoriesData: DomainCategories = {
         { id: "3", name: "Message quotidien", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
       ],
       performances: [
-        { id: "1", name: "Écoute", score: 72 },
-        { id: "2", name: "Présence", score: 65 },
-        { id: "3", name: "Empathie", score: 71 },
+        { id: "1", name: "Écoute", level: "advanced" as const, impact: 2 },
+        { id: "2", name: "Présence", level: "simple" as const, impact: 1.5 },
+        { id: "3", name: "Empathie", level: "advanced" as const, impact: 2 },
       ],
     },
   ],
@@ -120,9 +123,9 @@ const initialCategoriesData: DomainCategories = {
         { id: "3", name: "Méditation 10min", enabled: true, days: ["L", "M", "M", "J", "V"] },
       ],
       performances: [
-        { id: "1", name: "Énergie", score: 90 },
-        { id: "2", name: "Humeur", score: 95 },
-        { id: "3", name: "Vitalité", score: 91 },
+        { id: "1", name: "Énergie", level: "exceptional" as const, impact: 3 },
+        { id: "2", name: "Humeur", level: "exceptional" as const, impact: 3 },
+        { id: "3", name: "Vitalité", level: "exceptional" as const, impact: 3 },
       ],
     },
   ],
