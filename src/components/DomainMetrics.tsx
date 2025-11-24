@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { AddMetricModal } from "@/components/modals/AddMetricModal";
 import { useToast } from "@/hooks/use-toast";
@@ -92,6 +92,18 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
     toast({ title: "Métrique ajoutée", description: `${metric.name} a été ajoutée avec succès.` });
   };
 
+  const handleDelete = (id: string, name: string) => {
+    setMetrics(prev => prev.filter(m => m.id !== id));
+    if (expandedId === id) {
+      setExpandedId(null);
+      setRecordingMetricId(null);
+    }
+    toast({
+      title: "Métrique supprimée",
+      description: `${name} a été supprimée avec succès.`,
+    });
+  };
+
   const handleRecordPerformance = () => {
     if (!recordingMetric || !performanceLevel) return;
     
@@ -170,18 +182,30 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
                     ))}
                   </div>
                 </div>
-                <Switch
-                  checked={metric.enabled}
-                  onCheckedChange={(checked) => {
-                    toggleMetric(metric.id);
-                    if (!checked) {
-                      setExpandedId(null);
-                      setRecordingMetricId(null);
-                    }
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="ml-3 scale-90"
-                />
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(metric.id, metric.name);
+                    }}
+                    className="p-1.5 rounded-lg bg-white/[0.03] hover:bg-red-500/20 border border-white/[0.08] hover:border-red-500/30 transition-all group"
+                    title="Supprimer la métrique"
+                  >
+                    <Trash2 className="w-3 h-3 text-white/40 group-hover:text-red-400 transition-colors" />
+                  </button>
+                  <Switch
+                    checked={metric.enabled}
+                    onCheckedChange={(checked) => {
+                      toggleMetric(metric.id);
+                      if (!checked) {
+                        setExpandedId(null);
+                        setRecordingMetricId(null);
+                      }
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="scale-90"
+                  />
+                </div>
               </div>
             </div>
 
