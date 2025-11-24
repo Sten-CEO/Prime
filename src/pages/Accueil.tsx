@@ -11,7 +11,7 @@ import { NavigationButtons } from "@/components/NavigationButtons";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-const overviewItems = [
+const initialOverviewItems = [
   { name: "Business", icon: Briefcase, score: 8.5, trend: "+12%" },
   { name: "Sport", icon: Dumbbell, score: 7.8, trend: "+8%" },
   { name: "Social", icon: Users, score: 6.9, trend: "-3%" },
@@ -38,7 +38,19 @@ const allInsights = [
 const Accueil = () => {
   const [insightFilter, setInsightFilter] = useState<string>("Tous");
   const [currentPage, setCurrentPage] = useState(1);
+  const [overviewItems, setOverviewItems] = useState(initialOverviewItems);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const itemsPerPage = 5;
+
+  const handleToggleFavorite = (name: string) => {
+    setFavorites(prev => 
+      prev.includes(name) ? prev.filter(f => f !== name) : [...prev, name]
+    );
+  };
+
+  const handleReorderItems = (newOrder: typeof initialOverviewItems) => {
+    setOverviewItems(newOrder);
+  };
 
   const filters = ["Tous", "Business", "Sport", "Social", "Santé"];
 
@@ -107,7 +119,12 @@ const Accueil = () => {
           <div className="grid grid-cols-[1fr_auto] gap-8 mb-6">
             <MultiDomainChart />
             <div className="w-[400px]">
-              <OverviewCard items={overviewItems} />
+              <OverviewCard 
+                items={overviewItems} 
+                favorites={favorites}
+                onToggleFavorite={handleToggleFavorite}
+                onReorderItems={handleReorderItems}
+              />
             </div>
           </div>
           
