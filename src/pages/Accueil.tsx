@@ -19,10 +19,10 @@ const initialOverviewItems = [
 ];
 
 const targets = [
-  { title: "Lancer le nouveau produit", progress: 75, deadline: "30 Nov 2025", status: "in-progress" as const, completed: false },
-  { title: "Courir un marathon", progress: 45, deadline: "15 Déc 2025", status: "in-progress" as const, completed: false },
-  { title: "Méditer 30 jours consécutifs", progress: 90, deadline: "28 Nov 2025", status: "in-progress" as const, completed: false },
-  { title: "Lire 12 livres cette année", progress: 30, deadline: "31 Déc 2025", status: "delayed" as const, completed: false },
+  { id: 1, title: "Lancer le nouveau produit", progress: 75, deadline: "30 Nov 2025", status: "in-progress" as const, completed: false },
+  { id: 2, title: "Courir un marathon", progress: 45, deadline: "15 Déc 2025", status: "in-progress" as const, completed: false },
+  { id: 3, title: "Méditer 30 jours consécutifs", progress: 90, deadline: "28 Nov 2025", status: "in-progress" as const, completed: false },
+  { id: 4, title: "Lire 12 livres cette année", progress: 30, deadline: "31 Déc 2025", status: "delayed" as const, completed: false },
 ];
 
 const allInsights = [
@@ -41,6 +41,7 @@ const Accueil = () => {
   const [overviewItems, setOverviewItems] = useState(initialOverviewItems);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [insights, setInsights] = useState(allInsights);
+  const [primeTargets, setPrimeTargets] = useState(targets);
   const itemsPerPage = 5;
 
   const handleToggleFavorite = (name: string) => {
@@ -55,6 +56,13 @@ const Accueil = () => {
 
   const handleDeleteInsight = (index: number) => {
     setInsights(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleReorderTargets = (dragIndex: number, dropIndex: number) => {
+    const newTargets = [...primeTargets];
+    const [draggedItem] = newTargets.splice(dragIndex, 1);
+    newTargets.splice(dropIndex, 0, draggedItem);
+    setPrimeTargets(newTargets);
   };
 
   const filters = ["Tous", "Business", "Sport", "Social", "Santé"];
@@ -140,8 +148,13 @@ const Accueil = () => {
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold text-white ml-2">Prime Targets</h2>
                 <div className="space-y-3">
-                  {targets.map((target, index) => (
-                    <PrimeTargetCard key={index} {...target} />
+                  {primeTargets.map((target, index) => (
+                    <PrimeTargetCard 
+                      key={target.id} 
+                      {...target} 
+                      index={index}
+                      onReorder={handleReorderTargets}
+                    />
                   ))}
                 </div>
               </div>
