@@ -347,19 +347,12 @@ const Categories = () => {
             onDuplicateCategory={handleDuplicateCategory}
           />
           
-          <div className="grid grid-cols-[1fr_auto] gap-6 mb-6">
-            <CategoryScoreChart 
+          <div className="mb-6">
+            <CategoryStatsBlock
               categoryName={activeCategoryData.name}
-              score={activeCategoryData.score}
-              variation={activeCategoryData.variation}
+              domainName={domainNames[slug]}
+              stats={computeStats()}
             />
-            <div className="w-[400px]">
-              <CategoryStatsBlock
-                categoryName={activeCategoryData.name}
-                domainName={domainNames[slug]}
-                stats={computeStats()}
-              />
-            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
