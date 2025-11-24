@@ -5,7 +5,8 @@ import { Separator } from "@/components/ui/separator";
 import { DomainHighBar } from "@/components/DomainHighBar";
 import { DomainScoreChart } from "@/components/DomainScoreChart";
 import { DomainPerformances } from "@/components/DomainPerformances";
-import { DomainTrendsEnhanced } from "@/components/DomainTrendsEnhanced";
+import { DomainCategoryStats } from "@/components/DomainCategoryStats";
+import { DomainMetrics } from "@/components/DomainMetrics";
 import { DomainObjectives } from "@/components/DomainObjectives";
 
 const domainData = {
@@ -221,15 +222,11 @@ const Domaines = () => {
       
       {/* Content - scrollable */}
       <div className="relative z-10 ml-32 min-h-screen">
-        <div className="max-w-[1600px] mx-auto px-8 py-8 animate-fade-in">
+        <div className="max-w-[1600px] mx-auto px-8 py-8">
           {/* High Bar */}
-          <DomainHighBar 
-            currentDomain={slug || ""} 
-            showCategoryNavigation={true}
-            onNavigateToCategory={() => navigate(`/domaines/${slug}/categories/productivite`)}
-          />
+          <DomainHighBar currentDomain={slug || ""} />
 
-          {/* Score + Chart + Trends */}
+          {/* Score + Chart + Category Stats */}
           <div className="grid grid-cols-[1fr_auto] gap-8 mb-8">
             <DomainScoreChart
               domainName={domain.name}
@@ -237,16 +234,17 @@ const Domaines = () => {
               variation={domain.variation}
             />
             <div className="w-[400px]">
-              <DomainTrendsEnhanced trends={domain.trends} />
+              <DomainCategoryStats />
             </div>
           </div>
 
-          {/* Performances */}
-          <div className="mb-8">
+          {/* Performances + Metrics */}
+          <div className="grid grid-cols-2 gap-8 mb-8">
             <DomainPerformances
               domainName={domain.name}
               performances={domain.performances}
             />
+            <DomainMetrics domainName={domain.name} />
           </div>
 
           {/* Objectives */}
