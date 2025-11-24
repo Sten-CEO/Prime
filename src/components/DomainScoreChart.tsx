@@ -4,13 +4,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Download } from "lucide-react";
 import { useState } from "react";
 
+interface Category {
+  id: string;
+  name: string;
+  color?: string;
+  score: number;
+}
+
 interface DomainScoreChartProps {
   domainName: string;
   score: number;
   variation: string;
+  categories?: Category[];
 }
 
-const generateMockData = (days: number) => {
+const generateMockData = (days: number, categories?: Category[]) => {
   const data = [];
   const insights = [
     "Excellente productivité",
@@ -23,19 +31,38 @@ const generateMockData = (days: number) => {
   ];
   
   let prevScore = 85;
+  const categoryScores: { [key: string]: number } = {};
+  categories?.forEach(cat => {
+    categoryScores[cat.id] = cat.score;
+  });
+  
   for (let i = days; i >= 0; i--) {
     const hasData = Math.random() > 0.2;
     const scoreValue = hasData ? Math.max(50, Math.min(100, prevScore + (Math.random() - 0.5) * 10)) : null;
     if (scoreValue) prevScore = scoreValue;
     
-    data.push({
+    const dataPoint: any = {
       date: `J-${i}`,
       score: scoreValue,
       prevScore: hasData ? prevScore : null,
       hasData,
       variation: hasData && scoreValue ? `${scoreValue > prevScore ? '+' : ''}${((scoreValue - prevScore) / prevScore * 100).toFixed(1)}%` : null,
       insight: hasData ? insights[Math.floor(Math.random() * insights.length)] : "Jour non rempli"
+    };
+    
+    // Add category scores
+    categories?.forEach(cat => {
+      const catHasData = Math.random() > 0.2;
+      if (catHasData) {
+        const catScore = Math.max(50, Math.min(100, categoryScores[cat.id] + (Math.random() - 0.5) * 10));
+        categoryScores[cat.id] = catScore;
+        dataPoint[cat.id] = catScore;
+      } else {
+        dataPoint[cat.id] = null;
+      }
     });
+    
+    data.push(dataPoint);
   }
   
   const movingAvg = data.map((point, idx) => {
@@ -92,10 +119,26 @@ const downloadChart = () => {
   URL.revokeObjectURL(url);
 };
 
-export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreChartProps) => {
+const defaultCategoryColors: { [key: string]: string } = {
+  strategie: "rgba(34, 211, 238, 0.8)",
+  execution: "rgba(16, 185, 129, 0.8)",
+  entrainement: "rgba(16, 185, 129, 0.8)",
+  relations: "rgba(244, 114, 182, 0.8)",
+  bienetre: "rgba(168, 85, 247, 0.8)",
+};
+
+export const DomainScoreChart = ({ domainName, score, variation, categories = [] }: DomainScoreChartProps) => {
   const [period, setPeriod] = useState("7j");
+  const [activeCategories, setActiveCategories] = useState<Record<string, boolean>>(
+    categories.reduce((acc, cat) => ({ ...acc, [cat.id]: true }), {})
+  );
+  
   const days = period === "7j" ? 7 : period === "14j" ? 14 : period === "30j" ? 30 : period === "90j" ? 90 : 365;
-  const data = generateMockData(days);
+  const data = generateMockData(days, categories);
+
+  const toggleCategory = (categoryId: string) => {
+    setActiveCategories(prev => ({ ...prev, [categoryId]: !prev[categoryId] }));
+  };
 
   return (
     <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] hover:bg-white/[0.03] hover:border-white/[0.25] transition-all">
@@ -154,6 +197,7 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
               tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }}
             />
             <Tooltip content={<CustomTooltip />} />
+            {/* Moving average line */}
             <Line
               type="monotone"
               dataKey="movingAvg"
@@ -163,11 +207,51 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
               strokeDasharray="2 2"
               connectNulls={true}
             />
+            
+            {/* Category lines */}
+            {categories.map((cat) => {
+              const isActive = activeCategories[cat.id];
+              const color = cat.color || defaultCategoryColors[cat.id] || "rgba(100, 100, 100, 0.8)";
+              
+              return isActive && (
+                <Line
+                  key={cat.id}
+                  type="monotone"
+                  dataKey={cat.id}
+                  stroke={color}
+                  strokeWidth={2}
+                  dot={(props) => {
+                    const { cx, cy, payload } = props;
+                    if (!payload[cat.id]) {
+                      return null;
+                    }
+                    return (
+                      <circle
+                        cx={cx}
+                        cy={cy}
+                        r={3}
+                        fill={color}
+                        stroke={color}
+                        strokeWidth={1.5}
+                        style={{
+                          filter: `drop-shadow(0 0 4px ${color})`
+                        }}
+                      />
+                    );
+                  }}
+                  connectNulls={false}
+                  animationDuration={800}
+                  animationEasing="ease-in-out"
+                />
+              );
+            })}
+            
+            {/* Main domain line (white) */}
             <Line
               type="monotone"
               dataKey="score"
-              stroke="rgba(255,255,255,0.8)"
-              strokeWidth={2}
+              stroke="rgba(255,255,255,0.9)"
+              strokeWidth={3}
               dot={(props) => {
                 const { cx, cy, payload } = props;
                 if (!payload.hasData) {
@@ -187,13 +271,13 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
                   <circle
                     cx={cx}
                     cy={cy}
-                    r={4}
+                    r={5}
                     fill="rgba(255,255,255,0.9)"
                     stroke="rgba(255,255,255,0.3)"
                     strokeWidth={2}
                     className="cursor-pointer transition-all hover:r-6"
                     style={{
-                      filter: "drop-shadow(0 0 4px rgba(255,255,255,0.5))"
+                      filter: "drop-shadow(0 0 6px rgba(255,255,255,0.6))"
                     }}
                   />
                 );
@@ -205,6 +289,37 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
           </LineChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Category filters */}
+      {categories.length > 0 && (
+        <div className="flex gap-2 mt-4 justify-center flex-wrap">
+          {categories.map((cat) => {
+            const color = cat.color || defaultCategoryColors[cat.id] || "rgba(100, 100, 100, 0.8)";
+            const isActive = activeCategories[cat.id];
+            
+            return (
+              <button
+                key={cat.id}
+                onClick={() => toggleCategory(cat.id)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
+                  isActive
+                    ? "bg-white/[0.08] border border-white/[0.15]"
+                    : "bg-white/[0.02] border border-white/[0.08] opacity-50"
+                }`}
+              >
+                <div 
+                  className="w-3 h-3 rounded-full"
+                  style={{ 
+                    backgroundColor: color,
+                    boxShadow: isActive ? `0 0 8px ${color}` : 'none'
+                  }}
+                />
+                <span className="text-white text-xs">{cat.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </Card>
   );
 };
