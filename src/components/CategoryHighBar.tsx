@@ -46,11 +46,17 @@ export const CategoryHighBar = ({ currentDomain, currentCategory }: CategoryHigh
       <div className="flex items-center gap-2">
         <button
           onClick={() => navigate(`/domaines/${currentDomain}`)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg backdrop-blur-xl bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] text-white/60 hover:text-white transition-all text-xs"
-          title="Retour au domaine"
+          className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
+          title="Vers domaine"
         >
-          <ChevronLeft className="w-4 h-4" />
-          <span>Domaine</span>
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <button
+          onClick={() => navigate(`/domaines/${currentDomain}/categories/${currentCategory}`)}
+          className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
+          title="Rester sur catégorie"
+        >
+          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
     </div>
