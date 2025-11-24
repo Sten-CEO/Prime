@@ -44,18 +44,20 @@ export const DomainHighBar = ({ currentDomain }: DomainHighBarProps) => {
 
       <div className="flex items-center gap-2">
         <button
-          onClick={() => navigate(`/domaines/${currentDomain}`)}
-          className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
-          title="Rester sur domaine"
+          onClick={() => navigate(`/accueil`)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg backdrop-blur-xl bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] text-white/60 hover:text-white transition-all text-xs"
+          title="Retour à l'accueil"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4" />
+          <span>Accueil</span>
         </button>
         <button
-          onClick={() => navigate(`/domaines/${currentDomain}/categories/principale`)}
-          className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
-          title="Vers catégories"
+          onClick={() => navigate(`/domaines/${currentDomain}/categories/strategie`)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg backdrop-blur-xl bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] text-white/60 hover:text-white transition-all text-xs"
+          title="Voir les catégories"
         >
-          <ChevronRight className="w-5 h-5" />
+          <span>Catégories</span>
+          <ChevronRight className="w-4 h-4" />
         </button>
       </div>
     </div>
