@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Accueil from "./pages/Accueil";
 import Domaines from "./pages/Domaines";
+import Categories from "./pages/Categories";
 import Journal from "./pages/Journal";
 import PrimeHistory from "./pages/PrimeHistory";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/accueil" element={<Accueil />} />
           <Route path="/domaines" element={<Domaines />} />
           <Route path="/domaines/:slug" element={<Domaines />} />
+          <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
           <Route path="/journal" element={<Journal />} />
           <Route path="/prime-history" element={<PrimeHistory />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

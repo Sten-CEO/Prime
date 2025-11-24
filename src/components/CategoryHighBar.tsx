@@ -8,11 +8,12 @@ const domains = [
   { name: "sante", icon: Heart, label: "Santé" },
 ];
 
-interface DomainHighBarProps {
+interface CategoryHighBarProps {
   currentDomain: string;
+  currentCategory: string;
 }
 
-export const DomainHighBar = ({ currentDomain }: DomainHighBarProps) => {
+export const CategoryHighBar = ({ currentDomain, currentCategory }: CategoryHighBarProps) => {
   const navigate = useNavigate();
 
   return (
@@ -24,7 +25,7 @@ export const DomainHighBar = ({ currentDomain }: DomainHighBarProps) => {
           return (
             <button
               key={domain.name}
-              onClick={() => navigate(`/domaines/${domain.name}`)}
+              onClick={() => navigate(`/domaines/${domain.name}/categories/${currentCategory}`)}
               className={`group relative w-10 h-10 rounded-full backdrop-blur-xl transition-all ${
                 isActive
                   ? "bg-white/[0.15] border border-white/[0.3] shadow-[0_0_20px_rgba(255,255,255,0.3)]"
@@ -46,14 +47,14 @@ export const DomainHighBar = ({ currentDomain }: DomainHighBarProps) => {
         <button
           onClick={() => navigate(`/domaines/${currentDomain}`)}
           className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
-          title="Rester sur domaine"
+          title="Vers domaine"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
         <button
-          onClick={() => navigate(`/domaines/${currentDomain}/categories/principale`)}
+          onClick={() => navigate(`/domaines/${currentDomain}/categories/${currentCategory}`)}
           className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
-          title="Vers catégories"
+          title="Rester sur catégorie"
         >
           <ChevronRight className="w-5 h-5" />
         </button>

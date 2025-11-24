@@ -4,8 +4,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Download } from "lucide-react";
 import { useState } from "react";
 
-interface DomainScoreChartProps {
-  domainName: string;
+interface CategoryScoreChartProps {
+  categoryName: string;
   score: number;
   variation: string;
 }
@@ -13,13 +13,13 @@ interface DomainScoreChartProps {
 const generateMockData = (days: number) => {
   const data = [];
   const insights = [
-    "Excellente productivité",
-    "Bonne régularité",
-    "Légère baisse d'énergie",
-    "Performance optimale",
-    "Besoin de repos",
-    "Progression constante",
-    "Concentration au top"
+    "Excellente régularité",
+    "Bon rythme",
+    "Légère baisse",
+    "Performance stable",
+    "Besoin d'ajustement",
+    "Progression visible",
+    "Objectif atteint"
   ];
   
   for (let i = days; i >= 0; i--) {
@@ -62,7 +62,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreChartProps) => {
+export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryScoreChartProps) => {
   const [period, setPeriod] = useState("7j");
   const days = period === "7j" ? 7 : period === "30j" ? 30 : 90;
   const data = generateMockData(days);
@@ -72,7 +72,7 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
       <div className="flex items-start justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-white mb-1">
-            {domainName}
+            {categoryName}
           </h2>
           <div className="flex items-baseline gap-3">
             <span className="text-4xl font-bold text-white">{score}</span>
@@ -149,7 +149,6 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
                     fill="rgba(255,255,255,0.9)"
                     stroke="rgba(255,255,255,0.3)"
                     strokeWidth={2}
-                    className="hover:r-6 transition-all cursor-pointer"
                     style={{
                       filter: "drop-shadow(0 0 4px rgba(255,255,255,0.5))"
                     }}
