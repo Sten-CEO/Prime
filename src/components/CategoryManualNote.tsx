@@ -10,7 +10,7 @@ interface CategoryManualNoteProps {
 
 export const CategoryManualNote = ({ categoryName }: CategoryManualNoteProps) => {
   const [note, setNote] = useState("");
-  const [score, setScore] = useState([7.5]);
+  const [score, setScore] = useState([75]);
   const [impactsCurve, setImpactsCurve] = useState(true);
 
   return (
@@ -36,14 +36,14 @@ export const CategoryManualNote = ({ categoryName }: CategoryManualNoteProps) =>
               Note de performance
             </label>
             <span className="text-sm font-medium text-white">
-              {score[0].toFixed(1)}<span className="text-white/60">/10</span>
+              {score[0].toFixed(0)}<span className="text-white/60">/100</span>
             </span>
           </div>
           <Slider
             value={score}
             onValueChange={setScore}
-            max={10}
-            step={0.1}
+            max={100}
+            step={1}
             className="mb-1"
           />
         </div>

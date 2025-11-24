@@ -14,10 +14,10 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 const initialOverviewItems = [
-  { name: "Business", icon: Briefcase, score: 8.5, trend: "+12%" },
-  { name: "Sport", icon: Dumbbell, score: 7.8, trend: "+8%" },
-  { name: "Social", icon: Users, score: 6.9, trend: "-3%" },
-  { name: "Santé", icon: Heart, score: 9.2, trend: "+15%" },
+  { name: "Business", icon: Briefcase, score: 85, trend: "+12%" },
+  { name: "Sport", icon: Dumbbell, score: 78, trend: "+8%" },
+  { name: "Social", icon: Users, score: 69, trend: "-3%" },
+  { name: "Santé", icon: Heart, score: 92, trend: "+15%" },
 ];
 
 const targets = [

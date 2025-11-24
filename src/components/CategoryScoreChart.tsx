@@ -24,7 +24,7 @@ const generateMockData = (days: number) => {
   
   for (let i = days; i >= 0; i--) {
     const hasData = Math.random() > 0.3;
-    const scoreValue = hasData ? Math.random() * 3 + 7 : null;
+    const scoreValue = hasData ? Math.random() * 30 + 70 : null;
     data.push({
       date: `J-${i}`,
       score: scoreValue,
@@ -45,7 +45,7 @@ const CustomTooltip = ({ active, payload }: any) => {
         {data.hasData ? (
           <>
             <p className="text-white/80 text-xs">
-              Score: <span className="font-semibold text-white">{data.score?.toFixed(1)}/10</span>
+              Score: <span className="font-semibold text-white">{data.score?.toFixed(0)}/100</span>
             </p>
             <p className={`text-xs ${data.variation?.startsWith('+') ? 'text-success' : 'text-red-500'}`}>
               Variation: {data.variation}
@@ -76,7 +76,7 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
           </h2>
           <div className="flex items-baseline gap-3">
             <span className="text-4xl font-bold text-white">{score}</span>
-            <span className="text-sm text-white/60">/10</span>
+            <span className="text-sm text-white/60">/100</span>
             <span className={`text-sm font-medium ${
               variation.startsWith('-') ? 'text-red-500' : 'text-success'
             }`}>
@@ -116,7 +116,7 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
               tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }}
             />
             <YAxis
-              domain={[0, 10]}
+              domain={[0, 100]}
               stroke="rgba(255,255,255,0.3)"
               tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }}
             />

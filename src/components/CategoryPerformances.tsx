@@ -85,12 +85,12 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
                 <Slider
                   value={[editValue]}
                   onValueChange={(value) => setEditValue(value[0])}
-                  max={10}
-                  step={0.1}
+                  max={100}
+                  step={1}
                   className="flex-1"
                 />
                 <span className="text-sm font-medium text-white w-12 text-right">
-                  {editValue.toFixed(1)}
+                  {editValue.toFixed(0)}
                 </span>
                 <button
                   onClick={() => handleSave(perf.id)}
@@ -102,7 +102,7 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
             ) : (
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-white">
-                  {perf.score}<span className="text-white/60">/10</span>
+                  {perf.score}<span className="text-white/60">/100</span>
                 </span>
                 <button
                   onClick={() => handleEdit(perf.id, perf.score)}
