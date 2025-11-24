@@ -1,11 +1,12 @@
 import { Card } from "@/components/ui/card";
-import { LucideIcon, MoreVertical } from "lucide-react";
+import { LucideIcon, MoreVertical, Star, Move } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -83,12 +84,27 @@ export const OverviewCard = ({ items }: OverviewCardProps) => {
                     <DropdownMenuTrigger className="ml-2 opacity-0 group-hover:opacity-100 hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                       <MoreVertical className="w-4 h-4 text-white/50 hover:text-white" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="backdrop-blur-xl bg-black/80 border-white/[0.15]">
-                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); toggleFavorite(item.name); }}>
-                        {favorites.includes(item.name) ? '★' : '☆'} {favorites.includes(item.name) ? 'Retirer des favoris' : 'Mettre en favori'}
+                    <DropdownMenuContent 
+                      className="backdrop-blur-2xl bg-gradient-to-br from-aura-cyan/30 to-aura-blue/20 border border-white/[0.2] rounded-2xl p-1 shadow-[0_8px_32px_rgba(0,0,0,0.3)] z-50 min-w-[200px]"
+                      align="end"
+                      sideOffset={5}
+                    >
+                      <DropdownMenuItem 
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(item.name); }}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-white hover:bg-white/[0.15] transition-all focus:bg-white/[0.15] focus:text-white"
+                      >
+                        <Star className={`w-4 h-4 ${favorites.includes(item.name) ? 'fill-white' : ''}`} />
+                        <span>{favorites.includes(item.name) ? 'Retirer des favoris' : 'Mettre en favori'}</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                        Réorganiser
+                      
+                      <DropdownMenuSeparator className="my-1 bg-white/[0.1]" />
+                      
+                      <DropdownMenuItem 
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-white hover:bg-white/[0.15] transition-all focus:bg-white/[0.15] focus:text-white"
+                      >
+                        <Move className="w-4 h-4" />
+                        <span>Réorganiser</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
