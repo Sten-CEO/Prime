@@ -60,6 +60,27 @@ export default {
         "dark-bg": "hsl(var(--dark-bg))",
         "dark-fg": "hsl(var(--dark-fg))",
         "gray-reflection": "hsl(var(--gray-reflection))",
+        glass: {
+          bg: "hsl(var(--glass-bg))",
+          border: "hsl(var(--glass-border))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        aura: {
+          pink: "hsl(var(--aura-pink))",
+          purple: "hsl(var(--aura-purple))",
+          blue: "hsl(var(--aura-blue))",
+        },
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
