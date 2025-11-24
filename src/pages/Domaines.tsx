@@ -11,12 +11,12 @@ import { DomainObjectives } from "@/components/DomainObjectives";
 const domainData = {
   business: {
     name: "Business",
-    score: 8.5,
+    score: 85,
     variation: "+12% cette semaine",
     performances: [
-      { id: "p1", name: "Productivité", score: 8.2 },
-      { id: "p2", name: "Stratégie", score: 7.8 },
-      { id: "p3", name: "Focus", score: 9.1 },
+      { id: "p1", name: "Productivité", score: 82 },
+      { id: "p2", name: "Stratégie", score: 78 },
+      { id: "p3", name: "Focus", score: 91 },
     ],
     trends: [
       { period: "Semaine", value: "+12%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
@@ -66,12 +66,12 @@ const domainData = {
   },
   sport: {
     name: "Sport",
-    score: 7.8,
+    score: 78,
     variation: "+8% cette semaine",
     performances: [
-      { id: "p1", name: "Cardio", score: 8.5 },
-      { id: "p2", name: "Force", score: 7.2 },
-      { id: "p3", name: "Régularité", score: 7.6 },
+      { id: "p1", name: "Cardio", score: 85 },
+      { id: "p2", name: "Force", score: 72 },
+      { id: "p3", name: "Régularité", score: 76 },
     ],
     trends: [
       { period: "Semaine", value: "+8%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
@@ -102,12 +102,12 @@ const domainData = {
   },
   social: {
     name: "Social",
-    score: 6.9,
+    score: 69,
     variation: "-3% cette semaine",
     performances: [
-      { id: "p1", name: "Connexions", score: 6.5 },
-      { id: "p2", name: "Communication", score: 7.0 },
-      { id: "p3", name: "Empathie", score: 7.2 },
+      { id: "p1", name: "Connexions", score: 65 },
+      { id: "p2", name: "Communication", score: 70 },
+      { id: "p3", name: "Empathie", score: 72 },
     ],
     trends: [
       { period: "Semaine", value: "-3%", type: "down" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
@@ -118,12 +118,12 @@ const domainData = {
   },
   sante: {
     name: "Santé",
-    score: 9.2,
+    score: 92,
     variation: "+15% cette semaine",
     performances: [
-      { id: "p1", name: "Sommeil", score: 9.5 },
-      { id: "p2", name: "Nutrition", score: 8.8 },
-      { id: "p3", name: "Énergie", score: 9.3 },
+      { id: "p1", name: "Sommeil", score: 95 },
+      { id: "p2", name: "Nutrition", score: 88 },
+      { id: "p3", name: "Énergie", score: 93 },
     ],
     trends: [
       { period: "Semaine", value: "+15%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },

@@ -12,7 +12,7 @@ const categoryData = {
   business: {
     principale: {
       name: "Productivité",
-      score: 8.2,
+      score: 82,
       variation: "+6% cette semaine",
       metrics: [
         { id: "1", name: "Focus matinal", enabled: true, days: ["L", "M", "M", "J", "V"] },
@@ -20,16 +20,16 @@ const categoryData = {
         { id: "3", name: "Planning quotidien", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
       ],
       performances: [
-        { id: "1", name: "Efficacité", score: 8.5 },
-        { id: "2", name: "Concentration", score: 7.8 },
-        { id: "3", name: "Organisation", score: 8.9 },
+        { id: "1", name: "Efficacité", score: 85 },
+        { id: "2", name: "Concentration", score: 78 },
+        { id: "3", name: "Organisation", score: 89 },
       ],
     },
   },
   sport: {
     principale: {
       name: "Entraînement",
-      score: 7.8,
+      score: 78,
       variation: "+8% cette semaine",
       metrics: [
         { id: "1", name: "Cardio 30min", enabled: true, days: ["L", "M", "V"] },
@@ -37,16 +37,16 @@ const categoryData = {
         { id: "3", name: "Étirements", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
       ],
       performances: [
-        { id: "1", name: "Endurance", score: 7.5 },
-        { id: "2", name: "Force", score: 8.2 },
-        { id: "3", name: "Souplesse", score: 7.0 },
+        { id: "1", name: "Endurance", score: 75 },
+        { id: "2", name: "Force", score: 82 },
+        { id: "3", name: "Souplesse", score: 70 },
       ],
     },
   },
   social: {
     principale: {
       name: "Relations",
-      score: 6.9,
+      score: 69,
       variation: "-3% cette semaine",
       metrics: [
         { id: "1", name: "Appel famille", enabled: true, days: ["M", "S"] },
@@ -54,16 +54,16 @@ const categoryData = {
         { id: "3", name: "Message quotidien", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
       ],
       performances: [
-        { id: "1", name: "Écoute", score: 7.2 },
-        { id: "2", name: "Présence", score: 6.5 },
-        { id: "3", name: "Empathie", score: 7.1 },
+        { id: "1", name: "Écoute", score: 72 },
+        { id: "2", name: "Présence", score: 65 },
+        { id: "3", name: "Empathie", score: 71 },
       ],
     },
   },
   sante: {
     principale: {
       name: "Bien-être",
-      score: 9.2,
+      score: 92,
       variation: "+15% cette semaine",
       metrics: [
         { id: "1", name: "Sommeil 8h", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
@@ -71,9 +71,9 @@ const categoryData = {
         { id: "3", name: "Méditation 10min", enabled: true, days: ["L", "M", "M", "J", "V"] },
       ],
       performances: [
-        { id: "1", name: "Énergie", score: 9.0 },
-        { id: "2", name: "Humeur", score: 9.5 },
-        { id: "3", name: "Vitalité", score: 9.1 },
+        { id: "1", name: "Énergie", score: 90 },
+        { id: "2", name: "Humeur", score: 95 },
+        { id: "3", name: "Vitalité", score: 91 },
       ],
     },
   },

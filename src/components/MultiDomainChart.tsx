@@ -4,13 +4,13 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { useState, useMemo } from "react";
 
 const mockData = [
-  { day: "Lun", Business: 8, Sport: 7, Social: 6, Santé: 9 },
-  { day: "Mar", Business: 7, Sport: 8, Social: 7, Santé: 8 },
-  { day: "Mer", Business: 9, Sport: 6, Social: 8, Santé: 7 },
-  { day: "Jeu", Business: 8, Sport: 9, Social: 7, Santé: 9 },
-  { day: "Ven", Business: 9, Sport: 8, Social: 9, Santé: 8 },
-  { day: "Sam", Business: 7, Sport: 9, Social: 8, Santé: 9 },
-  { day: "Dim", Business: 8, Sport: 7, Social: 9, Santé: 8 },
+  { day: "Lun", Business: 80, Sport: 70, Social: 60, Santé: 90 },
+  { day: "Mar", Business: 70, Sport: 80, Social: 70, Santé: 80 },
+  { day: "Mer", Business: 90, Sport: 60, Social: 80, Santé: 70 },
+  { day: "Jeu", Business: 80, Sport: 90, Social: 70, Santé: 90 },
+  { day: "Ven", Business: 90, Sport: 80, Social: 90, Santé: 80 },
+  { day: "Sam", Business: 70, Sport: 90, Social: 80, Santé: 90 },
+  { day: "Dim", Business: 80, Sport: 70, Social: 90, Santé: 80 },
 ];
 
 const domains = [
@@ -68,8 +68,8 @@ export const MultiDomainChart = () => {
           {payload.map((entry: any) => (
             <div key={entry.name} className="flex items-center justify-between gap-3 text-xs">
               <span className="text-white/70">{entry.name}</span>
-              <span className="text-white font-semibold">{entry.value}/10</span>
-              <span className="text-success text-xs">+0.5</span>
+              <span className="text-white font-semibold">{entry.value}/100</span>
+              <span className="text-success text-xs">+5</span>
             </div>
           ))}
         </div>

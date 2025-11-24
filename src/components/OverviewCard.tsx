@@ -149,7 +149,7 @@ export const OverviewCard = ({ items, favorites, onToggleFavorite, onReorderItem
                 </TooltipTrigger>
                 <TooltipContent side="left" className="backdrop-blur-xl bg-black/80 border-white/[0.15] p-3">
                   <div className="space-y-1">
-                    <p className="text-white font-semibold">Score actuel: {item.score}/10</p>
+                    <p className="text-white font-semibold">Score actuel: {item.score}/100</p>
                     <p className="text-white/70 text-xs">Variation 7j: {item.trend}</p>
                     <p className="text-white/60 text-xs italic mt-2">Dernier insight: Excellente progression</p>
                   </div>
