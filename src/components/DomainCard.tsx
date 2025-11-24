@@ -18,9 +18,9 @@ export const DomainCard = ({ name, icon: Icon, score, trend, fillRate, status }:
   };
 
   return (
-    <Card className="min-w-[200px] backdrop-blur-xl bg-white/[0.03] border-white/[0.15] rounded-2xl p-6 hover:bg-white/[0.05] transition-all relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
+    <Card className="min-w-[200px] backdrop-blur-2xl bg-white/[0.02] border border-white/[0.12] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-white/[0.18] transition-all relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-white/[0.08] backdrop-blur-sm flex items-center justify-center border border-white/10">
+        <div className="w-12 h-12 rounded-xl bg-white/[0.06] backdrop-blur-md flex items-center justify-center border border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
           <Icon className="w-6 h-6 text-white" />
         </div>
         
@@ -39,15 +39,15 @@ export const DomainCard = ({ name, icon: Icon, score, trend, fillRate, status }:
             <span>Rempli</span>
             <span>{fillRate}%</span>
           </div>
-          <div className="h-1.5 bg-white/[0.08] rounded-full overflow-hidden backdrop-blur-sm border border-white/5">
+          <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden backdrop-blur-md border border-white/[0.08]">
             <div 
-              className={`h-full ${statusColors[status]} rounded-full transition-all shadow-lg`}
+              className={`h-full ${statusColors[status]} rounded-full transition-all`}
               style={{ width: `${fillRate}%` }}
             />
           </div>
         </div>
         
-        <div className={`w-2 h-2 rounded-full ${statusColors[status]} shadow-lg`} />
+        <div className={`w-2 h-2 rounded-full ${statusColors[status]}`} />
       </div>
     </Card>
   );

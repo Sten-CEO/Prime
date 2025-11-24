@@ -10,21 +10,21 @@ const recentEntries = [
 
 export const QuickJournalCard = () => {
   return (
-    <Card className="backdrop-blur-xl bg-white/[0.03] border-white/[0.15] rounded-2xl p-6 relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
+    <Card className="backdrop-blur-2xl bg-white/[0.02] border border-white/[0.12] rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Journal</h2>
           <Button 
             variant="ghost" 
             size="sm"
-            className="text-xs text-white/60 hover:text-white hover:bg-white/10"
+            className="text-xs text-white/60 hover:text-white hover:bg-white/[0.08]"
           >
             Voir tout
             <ArrowRight className="w-3 h-3 ml-1" />
           </Button>
         </div>
         
-        <Button className="w-full backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/20 text-white rounded-2xl h-12">
+        <Button className="w-full backdrop-blur-2xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.15] text-white rounded-2xl h-12 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
           <PenLine className="w-4 h-4 mr-2" />
           Écrire une entrée rapide
         </Button>
@@ -34,7 +34,7 @@ export const QuickJournalCard = () => {
           {recentEntries.map((entry) => (
             <div 
               key={entry.id}
-              className="p-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] backdrop-blur-sm border border-white/5 transition-all cursor-pointer"
+              className="p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] transition-all cursor-pointer"
             >
               <div className="flex items-start gap-3">
                 <span className="text-xs text-white/50 min-w-[50px]">{entry.date}</span>
