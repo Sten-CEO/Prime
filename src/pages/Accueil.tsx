@@ -61,7 +61,11 @@ const Accueil = () => {
   const handleReorderTargets = (dragIndex: number, dropIndex: number) => {
     const newTargets = [...primeTargets];
     const [draggedItem] = newTargets.splice(dragIndex, 1);
-    newTargets.splice(dropIndex, 0, draggedItem);
+    
+    // Adjust dropIndex if dragging from before the drop position
+    const adjustedDropIndex = dragIndex < dropIndex ? dropIndex - 1 : dropIndex;
+    
+    newTargets.splice(adjustedDropIndex, 0, draggedItem);
     setPrimeTargets(newTargets);
   };
 

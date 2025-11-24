@@ -61,40 +61,40 @@ export const PrimeTargetCard = ({ id, title, progress, deadline, status, complet
     setIsDragging(true);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("dragIndex", index.toString());
+    // Make drag image slightly transparent
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = "0.5";
+    }
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (e: React.DragEvent) => {
     setIsDragging(false);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const dragIndex = parseInt(e.dataTransfer.getData("dragIndex"));
-    if (dragIndex !== index) {
-      onReorder(dragIndex, index);
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = "1";
     }
   };
 
   return (
     <div className="relative">
-      {/* Drop zone indicator at the top */}
+      {/* Drop zone indicator at the top - only show on drag over */}
       <div 
-        className="absolute -top-2 left-0 right-0 h-1 rounded-full bg-aura-cyan/0 hover:bg-aura-cyan/50 transition-all z-10"
+        className="absolute -top-2 left-0 right-0 h-2 rounded-full transition-all z-10"
         onDragOver={(e) => {
           e.preventDefault();
           e.stopPropagation();
           e.dataTransfer.dropEffect = "move";
+          e.currentTarget.classList.add('bg-aura-cyan/50');
+        }}
+        onDragLeave={(e) => {
+          e.currentTarget.classList.remove('bg-aura-cyan/50');
         }}
         onDrop={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          e.currentTarget.classList.remove('bg-aura-cyan/50');
           const dragIndex = parseInt(e.dataTransfer.getData("dragIndex"));
-          if (dragIndex !== index && dragIndex !== index - 1) {
+          // Insert before this card
+          if (dragIndex !== index) {
             onReorder(dragIndex, index);
           }
         }}
@@ -107,8 +107,6 @@ export const PrimeTargetCard = ({ id, title, progress, deadline, status, complet
         draggable
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
       >
       {showAnimation && (
         <div className="absolute inset-0 bg-gradient-radial from-white/20 to-transparent animate-ping pointer-events-none" />
