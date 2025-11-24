@@ -10,6 +10,7 @@ interface Performance {
   id: string;
   name: string;
   score: number;
+  date?: string;
 }
 
 interface CategoryPerformancesProps {
@@ -60,14 +61,15 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
     setDraggedIndex(null);
   };
 
-  const handleAdd = (performance: { name: string; icon: string; score: number }) => {
+  const handleAdd = (performance: { name: string; icon: string; score: number; date: string }) => {
     const newPerf = {
       id: `p${performances.length + 1}`,
       name: `${performance.icon} ${performance.name}`,
-      score: performance.score
+      score: performance.score,
+      date: performance.date
     };
     setPerformances([...performances, newPerf]);
-    toast({ title: "Performance ajoutée", description: `${performance.name} a été ajoutée avec succès.` });
+    toast({ title: "Performance ajoutée", description: `${performance.name} a été ajoutée le ${performance.date}.` });
   };
 
   const handleRate = (id: string, score: number, note: string) => {
