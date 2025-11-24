@@ -10,10 +10,10 @@ const recentEntries = [
 
 export const QuickJournalCard = () => {
   return (
-    <Card className="backdrop-blur-2xl bg-white/[0.02] border border-white/[0.12] rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+    <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Journal</h2>
+          <h2 className="text-lg font-semibold text-white drop-shadow-lg">Journal</h2>
           <Button 
             variant="ghost" 
             size="sm"
@@ -24,7 +24,7 @@ export const QuickJournalCard = () => {
           </Button>
         </div>
         
-        <Button className="w-full backdrop-blur-2xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.15] text-white rounded-2xl h-12 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+        <Button className="w-full backdrop-blur-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.2] text-white rounded-2xl h-12 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.2)]">
           <PenLine className="w-4 h-4 mr-2" />
           Écrire une entrée rapide
         </Button>
@@ -34,7 +34,7 @@ export const QuickJournalCard = () => {
           {recentEntries.map((entry) => (
             <div 
               key={entry.id}
-              className="p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] transition-all cursor-pointer"
+              className="p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-2xl border border-white/[0.12] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]"
             >
               <div className="flex items-start gap-3">
                 <span className="text-xs text-white/50 min-w-[50px]">{entry.date}</span>
