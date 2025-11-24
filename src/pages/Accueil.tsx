@@ -1,6 +1,7 @@
 import bgImage from "@/assets/black-shapes-bg.jpg";
 import { Home, Award, BookOpen, Target, User, Settings, Briefcase, Dumbbell, Users, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
 import { PrimeTargetCard } from "@/components/PrimeTargetCard";
 import { DropZone } from "@/components/DropZone";
 import { InsightCard } from "@/components/InsightCard";
@@ -37,6 +38,7 @@ const allInsights = [
 ];
 
 const Accueil = () => {
+  const navigate = useNavigate();
   const [insightFilter, setInsightFilter] = useState<string>("Tous");
   const [currentPage, setCurrentPage] = useState(1);
   const [overviewItems, setOverviewItems] = useState(initialOverviewItems);
@@ -123,7 +125,10 @@ const Accueil = () => {
           </div>
           
           <div className="flex-1 flex flex-col gap-4">
-            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
+            <button 
+              onClick={() => navigate("/domaines/business")}
+              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+            >
               <Award className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
             <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
