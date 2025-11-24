@@ -1,15 +1,18 @@
 import { Card } from "@/components/ui/card";
-import { Pencil, Plus, GripVertical, Star } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import { Trash2, Plus } from "lucide-react";
 import { useState } from "react";
-import { AddPerformanceModal } from "@/components/modals/AddPerformanceModal";
-import { RatePerformanceModal } from "@/components/modals/RatePerformanceModal";
+import { AddFreePerformanceModal } from "@/components/modals/AddFreePerformanceModal";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface Performance {
   id: string;
-  name: string;
+  title: string;
+  date: string;
+  description?: string;
   score: number;
+  impact: "positive" | "neutral" | "negative";
 }
 
 interface DomainPerformancesProps {
@@ -19,67 +22,47 @@ interface DomainPerformancesProps {
 
 export const DomainPerformances = ({ domainName, performances: initialPerformances }: DomainPerformancesProps) => {
   const [performances, setPerformances] = useState(initialPerformances);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState<number>(0);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [ratingPerf, setRatingPerf] = useState<Performance | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleEdit = (id: string, score: number) => {
-    setEditingId(id);
-    setEditValue(score);
-  };
-
-  const handleSave = (id: string) => {
-    setPerformances(performances.map(p => 
-      p.id === id ? { ...p, score: editValue } : p
-    ));
-    setEditingId(null);
-  };
-
-  const handleDragStart = (index: number) => {
-    setDraggedIndex(index);
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
-    e.preventDefault();
-    if (draggedIndex === null) return;
-    
-    const newPerformances = [...performances];
-    const draggedItem = newPerformances[draggedIndex];
-    
-    newPerformances.splice(draggedIndex, 1);
-    newPerformances.splice(targetIndex, 0, draggedItem);
-    
-    setPerformances(newPerformances);
-    setDraggedIndex(null);
-  };
-
-  const handleAdd = (performance: { name: string; icon: string; score: number }) => {
-    const newPerf = {
-      id: `p${performances.length + 1}`,
-      name: `${performance.icon} ${performance.name}`,
-      score: performance.score
+  const handleAdd = (performance: {
+    title: string;
+    date: string;
+    description?: string;
+    score: number;
+    impact: "positive" | "neutral" | "negative";
+  }) => {
+    const newPerf: Performance = {
+      id: `fp${Date.now()}`,
+      title: performance.title,
+      date: performance.date,
+      description: performance.description,
+      score: performance.score,
+      impact: performance.impact,
     };
-    setPerformances([...performances, newPerf]);
-    toast({ title: "Performance ajoutée", description: `${performance.name} a été ajoutée avec succès.` });
-  };
-
-  const handleRate = (id: string, score: number, note: string) => {
-    setPerformances(performances.map(p => 
-      p.id === id ? { ...p, score } : p
-    ));
-    toast({ title: "Note enregistrée", description: `Votre note de ${score}/100 a été enregistrée.` });
+    setPerformances([newPerf, ...performances]);
+    toast({
+      title: "Performance libre ajoutée",
+      description: `${performance.title} a été enregistrée pour le ${format(new Date(performance.date), "d MMMM yyyy", { locale: fr })}.`,
+    });
   };
 
   const handleDelete = (id: string) => {
-    setPerformances(performances.filter(p => p.id !== id));
+    setPerformances(performances.filter((p) => p.id !== id));
     toast({ title: "Performance supprimée", description: "La performance a été supprimée." });
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-success";
+    if (score >= 50) return "text-yellow-500";
+    return "text-red-500";
+  };
+
+  const getScoreBgColor = (score: number) => {
+    if (score >= 80) return "bg-success/20";
+    if (score >= 50) return "bg-yellow-500/20";
+    return "bg-red-500/20";
   };
 
   return (
@@ -96,79 +79,65 @@ export const DomainPerformances = ({ domainName, performances: initialPerformanc
       </div>
       
       <div className="space-y-3">
-        {performances.map((perf, index) => (
-          <div
-            key={perf.id}
-            draggable
-            onDragStart={() => handleDragStart(index)}
-            onDragOver={(e) => handleDragOver(e, index)}
-            onDrop={(e) => handleDrop(e, index)}
-            className={`flex items-center gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.04] transition-all group cursor-move ${
-              draggedIndex === index ? 'opacity-50' : ''
-            }`}
-          >
-            <GripVertical className="w-4 h-4 text-white/40 flex-shrink-0" />
-            
-            <span className="text-sm text-white/80 flex-1">{perf.name}</span>
-            
-            {editingId === perf.id ? (
-              <div className="flex items-center gap-3 flex-1 animate-fade-in">
-                <Slider
-                  value={[editValue]}
-                  onValueChange={(value) => setEditValue(value[0])}
-                  max={100}
-                  step={1}
-                  className="flex-1"
-                />
-                <span className="text-sm font-medium text-white w-12 text-right">
-                  {editValue.toFixed(0)}
-                </span>
-                <button
-                  onClick={() => handleSave(perf.id)}
-                  className="px-3 py-1 rounded-lg bg-success/20 border border-success/40 text-success text-xs hover:bg-success/30 transition-all"
-                >
-                  ✓
-                </button>
+        {performances.length === 0 ? (
+          <p className="text-white/40 text-sm text-center py-8">Aucune performance libre enregistrée</p>
+        ) : (
+          performances.map((perf) => (
+            <div key={perf.id} className="space-y-0">
+              <div
+                onClick={() => setExpandedId(expandedId === perf.id ? null : perf.id)}
+                className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.04] transition-all cursor-pointer group"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm text-white/90 font-medium truncate">{perf.title}</p>
+                      {perf.impact === "positive" && <span className="text-xs">✅</span>}
+                      {perf.impact === "neutral" && <span className="text-xs">➖</span>}
+                      {perf.impact === "negative" && <span className="text-xs">⚠️</span>}
+                    </div>
+                    <p className="text-xs text-white/50">
+                      {format(new Date(perf.date), "d MMMM yyyy", { locale: fr })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`px-3 py-1.5 rounded-lg ${getScoreBgColor(perf.score)} flex items-center gap-1.5`}>
+                      <span className={`text-sm font-bold ${getScoreColor(perf.score)}`}>
+                        {perf.score}
+                      </span>
+                      <span className="text-xs text-white/40">/100</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-white">
-                  {perf.score}<span className="text-white/60">/100</span>
-                </span>
-                <button
-                  onClick={() => setRatingPerf(perf)}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all opacity-0 group-hover:opacity-100"
-                  title="Noter aujourd'hui"
-                >
-                  <Star className="w-3.5 h-3.5 text-white/70" />
-                </button>
-                <button
-                  onClick={() => handleEdit(perf.id, perf.score)}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all opacity-0 group-hover:opacity-100"
-                  title="Modifier"
-                >
-                  <Pencil className="w-3.5 h-3.5 text-white/70" />
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+
+              {expandedId === perf.id && (
+                <div className="ml-4 p-4 rounded-lg bg-white/[0.02] border border-white/[0.08] border-t-0 rounded-t-none animate-fade-in">
+                  {perf.description && (
+                    <p className="text-xs text-white/60 mb-3">{perf.description}</p>
+                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(perf.id);
+                    }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs hover:bg-red-500/20 transition-all"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Supprimer
+                  </button>
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
-      <AddPerformanceModal
+      <AddFreePerformanceModal
         open={showAddModal}
         onOpenChange={setShowAddModal}
         onAdd={handleAdd}
       />
-
-      {ratingPerf && (
-        <RatePerformanceModal
-          open={!!ratingPerf}
-          onOpenChange={() => setRatingPerf(null)}
-          performanceName={ratingPerf.name}
-          onRate={(score, note) => handleRate(ratingPerf.id, score, note)}
-        />
-      )}
     </Card>
   );
 };

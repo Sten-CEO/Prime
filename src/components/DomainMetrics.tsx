@@ -4,7 +4,15 @@ import { Switch } from "@/components/ui/switch";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { AddMetricModal } from "@/components/modals/AddMetricModal";
+import { RecordMetricModal } from "@/components/modals/RecordMetricModal";
 import { useToast } from "@/hooks/use-toast";
+import { Slider } from "@/components/ui/slider";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Metric {
   id: string;
@@ -19,12 +27,18 @@ interface DomainMetricsProps {
 
 export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
   const [metrics, setMetrics] = useState<Metric[]>([
-    { id: "m1", name: "Hydratation", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
-    { id: "m2", name: "10k pas", enabled: true, days: ["L", "M", "M", "J", "V"] },
-    { id: "m3", name: "Lecture 20min", enabled: false, days: ["L", "M", "J", "V"] },
+    { id: "m1", name: "💧 Hydratation", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
+    { id: "m2", name: "👟 10k pas", enabled: true, days: ["L", "M", "M", "J", "V"] },
+    { id: "m3", name: "📖 Lecture 20min", enabled: false, days: ["L", "M", "J", "V"] },
   ]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [recordingMetricId, setRecordingMetricId] = useState<string | null>(null);
+  const [recordDate, setRecordDate] = useState<Date>(new Date());
+  const [recordScore, setRecordScore] = useState(50);
   const { toast } = useToast();
+
+  const recordingMetric = metrics.find((m) => m.id === recordingMetricId);
 
   const toggleMetric = (id: string) => {
     setMetrics(prev =>
@@ -51,10 +65,31 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
       id: `m${metrics.length + 1}`,
       name: `${metric.icon} ${metric.name}`,
       enabled: true,
-      days: metric.days
+      days: metric.days,
     };
     setMetrics([...metrics, newMetric]);
     toast({ title: "Métrique ajoutée", description: `${metric.name} a été ajoutée avec succès.` });
+  };
+
+  const handleRecordPerformance = () => {
+    if (!recordingMetric) return;
+    
+    toast({
+      title: "Performance enregistrée",
+      description: `${recordingMetric.name}: ${recordScore}/100 le ${format(recordDate, "d MMMM yyyy", { locale: fr })}`,
+    });
+    
+    // Reset
+    setRecordingMetricId(null);
+    setExpandedId(null);
+    setRecordDate(new Date());
+    setRecordScore(50);
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-success";
+    if (score >= 50) return "text-yellow-500";
+    return "text-red-500";
   };
 
   return (
@@ -72,33 +107,136 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
 
       <div className="space-y-4">
         {metrics.map((metric) => (
-          <div
-            key={metric.id}
-            className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.04] transition-all"
-          >
-            <div className="flex-1">
-              <p className="text-white text-sm font-medium mb-2">{metric.name}</p>
-              <div className="flex gap-1">
-                {["L", "M", "M", "J", "V", "S", "D"].map((day, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => toggleDay(metric.id, day)}
-                    className={`text-xs px-2 py-1 rounded transition-all ${
-                      metric.enabled && metric.days.includes(day)
-                        ? "bg-white/[0.15] border border-white/[0.3] text-white shadow-[0_0_6px_rgba(255,255,255,0.15)]"
-                        : "bg-white/[0.03] text-white/40 hover:bg-white/[0.05]"
-                    }`}
-                  >
-                    {day}
-                  </button>
-                ))}
+          <div key={metric.id} className="space-y-0">
+            <div
+              onClick={() => {
+                if (metric.enabled) {
+                  if (expandedId === metric.id) {
+                    setExpandedId(null);
+                    setRecordingMetricId(null);
+                  } else {
+                    setExpandedId(metric.id);
+                    setRecordingMetricId(metric.id);
+                  }
+                }
+              }}
+              className={`p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] transition-all ${
+                metric.enabled ? "hover:bg-white/[0.04] cursor-pointer" : "opacity-50"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <p className="text-white text-sm font-medium">{metric.name}</p>
+                    {metric.enabled && expandedId === metric.id ? (
+                      <ChevronUp className="w-4 h-4 text-white/40" />
+                    ) : metric.enabled ? (
+                      <ChevronDown className="w-4 h-4 text-white/40" />
+                    ) : null}
+                  </div>
+                  <div className="flex gap-1">
+                    {["L", "M", "M", "J", "V", "S", "D"].map((day, idx) => (
+                      <button
+                        key={idx}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleDay(metric.id, day);
+                        }}
+                        disabled={!metric.enabled}
+                        className={`text-xs px-2 py-1 rounded transition-all ${
+                          metric.enabled && metric.days.includes(day)
+                            ? "bg-white/[0.15] border border-white/[0.3] text-white shadow-[0_0_6px_rgba(255,255,255,0.15)]"
+                            : "bg-white/[0.03] text-white/40 hover:bg-white/[0.05]"
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <Switch
+                  checked={metric.enabled}
+                  onCheckedChange={(checked) => {
+                    toggleMetric(metric.id);
+                    if (!checked) {
+                      setExpandedId(null);
+                      setRecordingMetricId(null);
+                    }
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="ml-4"
+                />
               </div>
             </div>
-            <Switch
-              checked={metric.enabled}
-              onCheckedChange={() => toggleMetric(metric.id)}
-              className="ml-4"
-            />
+
+            {expandedId === metric.id && recordingMetricId === metric.id && (
+              <div
+                className="ml-4 p-4 rounded-lg bg-white/[0.02] border border-white/[0.08] border-t-0 rounded-t-none animate-fade-in"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h4 className="text-sm text-white/80 font-medium mb-3">Noter la performance</h4>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs text-white/60 mb-1 block">Date</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal bg-white/[0.05] border-white/[0.12] text-white hover:bg-white/[0.08] h-9 text-xs",
+                            !recordDate && "text-white/60"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-3 w-3" />
+                          {recordDate ? format(recordDate, "d MMMM yyyy", { locale: fr }) : <span>Date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-black/95 backdrop-blur-xl border-white/[0.12]" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={recordDate}
+                          onSelect={(date) => date && setRecordDate(date)}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-white/60 mb-2 block">Note (0-100)</label>
+                    <div className="flex items-center gap-3">
+                      <Slider
+                        value={[recordScore]}
+                        onValueChange={(value) => setRecordScore(value[0])}
+                        max={100}
+                        step={1}
+                        className="flex-1"
+                      />
+                      <span className={`text-sm font-bold w-10 text-right ${getScoreColor(recordScore)}`}>
+                        {recordScore}
+                      </span>
+                    </div>
+                    <div className="mt-2 h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+                      <div
+                        className={`h-full transition-all ${
+                          recordScore >= 80 ? "bg-success" : recordScore >= 50 ? "bg-yellow-500" : "bg-red-500"
+                        }`}
+                        style={{ width: `${recordScore}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={handleRecordPerformance}
+                    className="w-full bg-white/[0.15] border border-white/[0.2] text-white hover:bg-white/[0.2] h-9 text-xs"
+                  >
+                    Enregistrer la performance
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
