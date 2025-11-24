@@ -1,10 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Plus, BarChart3 } from "lucide-react";
+import { Plus, BarChart3, PenSquare } from "lucide-react";
 import { useState } from "react";
 import { AddMetricModal } from "@/components/modals/AddMetricModal";
 import { MetricStatsPanel } from "@/components/modals/MetricStatsPanel";
+import { RecordMetricModal } from "@/components/modals/RecordMetricModal";
 import { useToast } from "@/hooks/use-toast";
 
 interface Metric {
@@ -25,6 +26,7 @@ export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProp
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [statsMetric, setStatsMetric] = useState<Metric | null>(null);
+  const [recordingMetric, setRecordingMetric] = useState<Metric | null>(null);
   const { toast } = useToast();
 
   const toggleMetric = (id: string) => {
@@ -56,6 +58,13 @@ export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProp
     toast({ title: "Métrique ajoutée", description: `${metric.name} a été ajoutée avec succès.` });
   };
 
+  const handleRecord = (data: { date: string; score: number; note?: string }) => {
+    toast({ 
+      title: "Score enregistré", 
+      description: `Score de ${data.score}/100 enregistré pour le ${data.date}.` 
+    });
+  };
+
   return (
     <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] hover:bg-white/[0.03] hover:border-white/[0.25] transition-all">
       <div className="flex items-center justify-between mb-4">
@@ -76,6 +85,13 @@ export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProp
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <p className="text-sm text-white/80">{metric.name}</p>
+                  <button
+                    onClick={() => setRecordingMetric(metric)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-white/[0.05]"
+                    title="Noter aujourd'hui"
+                  >
+                    <PenSquare className="w-3.5 h-3.5 text-white/60" />
+                  </button>
                   <button
                     onClick={() => setStatsMetric(metric)}
                     className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-white/[0.05]"
@@ -134,6 +150,15 @@ export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProp
           open={!!statsMetric}
           onOpenChange={() => setStatsMetric(null)}
           metricName={statsMetric.name}
+        />
+      )}
+
+      {recordingMetric && (
+        <RecordMetricModal
+          open={!!recordingMetric}
+          onOpenChange={() => setRecordingMetric(null)}
+          metricName={recordingMetric.name}
+          onRecord={handleRecord}
         />
       )}
     </Card>

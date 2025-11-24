@@ -3,30 +3,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { format } from "date-fns";
 
-interface AddPerformanceModalProps {
+interface RecordMetricModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: (performance: { name: string; icon: string; score: number; date: string }) => void;
+  metricName: string;
+  onRecord: (data: { date: string; score: number; note?: string }) => void;
 }
 
-const iconOptions = ["🎯", "⚡", "💪", "🧠", "❤️", "🔥", "✨", "🚀", "📈", "🎨"];
-
-export const AddPerformanceModal = ({ open, onOpenChange, onAdd }: AddPerformanceModalProps) => {
-  const [name, setName] = useState("");
-  const [selectedIcon, setSelectedIcon] = useState("🎯");
-  const [score, setScore] = useState(50);
+export const RecordMetricModal = ({ open, onOpenChange, metricName, onRecord }: RecordMetricModalProps) => {
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [score, setScore] = useState(50);
+  const [note, setNote] = useState("");
 
-  const handleAdd = () => {
-    if (!name.trim()) return;
-    onAdd({ name, icon: selectedIcon, score, date });
-    setName("");
-    setSelectedIcon("🎯");
-    setScore(50);
+  const handleRecord = () => {
+    onRecord({ date, score, note: note.trim() || undefined });
     setDate(format(new Date(), "yyyy-MM-dd"));
+    setScore(50);
+    setNote("");
     onOpenChange(false);
   };
 
@@ -34,39 +31,10 @@ export const AddPerformanceModal = ({ open, onOpenChange, onAdd }: AddPerformanc
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="backdrop-blur-3xl bg-black/95 border border-white/[0.18] text-white">
         <DialogHeader>
-          <DialogTitle className="text-white">Ajouter une Performance Libre</DialogTitle>
+          <DialogTitle className="text-white">Enregistrer : {metricName}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 mt-4">
-          <div>
-            <Label className="text-white/80 text-sm">Titre</Label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ex: Créativité"
-              className="bg-white/[0.05] border-white/[0.12] text-white mt-1"
-            />
-          </div>
-
-          <div>
-            <Label className="text-white/80 text-sm mb-2 block">Icône</Label>
-            <div className="flex gap-2 flex-wrap">
-              {iconOptions.map((icon) => (
-                <button
-                  key={icon}
-                  onClick={() => setSelectedIcon(icon)}
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg transition-all ${
-                    selectedIcon === icon
-                      ? "bg-white/[0.15] border-2 border-white/[0.3] shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                      : "bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08]"
-                  }`}
-                >
-                  {icon}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div>
             <Label className="text-white/80 text-sm">Date</Label>
             <Input
@@ -78,7 +46,7 @@ export const AddPerformanceModal = ({ open, onOpenChange, onAdd }: AddPerformanc
           </div>
 
           <div>
-            <Label className="text-white/80 text-sm">Score (0-100)</Label>
+            <Label className="text-white/80 text-sm">Score du jour (0-100)</Label>
             <div className="flex items-center gap-4 mt-2">
               <Slider
                 value={[score]}
@@ -91,6 +59,16 @@ export const AddPerformanceModal = ({ open, onOpenChange, onAdd }: AddPerformanc
             </div>
           </div>
 
+          <div>
+            <Label className="text-white/80 text-sm">Note rapide (optionnel)</Label>
+            <Textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Ex: Très bonne session, beaucoup d'énergie"
+              className="bg-white/[0.05] border-white/[0.12] text-white mt-1 resize-none h-20"
+            />
+          </div>
+
           <div className="flex gap-2 pt-4">
             <Button
               onClick={() => onOpenChange(false)}
@@ -100,11 +78,10 @@ export const AddPerformanceModal = ({ open, onOpenChange, onAdd }: AddPerformanc
               Annuler
             </Button>
             <Button
-              onClick={handleAdd}
-              disabled={!name.trim()}
+              onClick={handleRecord}
               className="flex-1 bg-white/[0.15] border border-white/[0.2] text-white hover:bg-white/[0.2]"
             >
-              Ajouter
+              Enregistrer
             </Button>
           </div>
         </div>

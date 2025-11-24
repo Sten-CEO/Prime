@@ -348,11 +348,21 @@ const Categories = () => {
           />
           
           <div className="mb-6">
-            <CategoryStatsBlock
-              categoryName={activeCategoryData.name}
-              domainName={domainNames[slug]}
-              stats={computeStats()}
+            <CategoryScoreChart
+              categoryName={`${domainNames[slug]} – ${activeCategoryData.name}`}
+              score={activeCategoryData.score}
+              variation={activeCategoryData.variation}
             />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="lg:col-span-2">
+              <CategoryStatsBlock
+                categoryName={activeCategoryData.name}
+                domainName={domainNames[slug]}
+                stats={computeStats()}
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
