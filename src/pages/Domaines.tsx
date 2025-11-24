@@ -225,22 +225,24 @@ const Domaines = () => {
           {/* High Bar */}
           <DomainHighBar currentDomain={slug || ""} />
 
-          {/* Score + Chart */}
-          <div className="mb-8">
+          {/* Score + Chart + Trends */}
+          <div className="grid grid-cols-[1fr_auto] gap-8 mb-8">
             <DomainScoreChart
               domainName={domain.name}
               score={domain.score}
               variation={domain.variation}
             />
+            <div className="w-[400px]">
+              <DomainTrends trends={domain.trends} />
+            </div>
           </div>
 
-          {/* Performances + Trends */}
-          <div className="grid grid-cols-2 gap-8 mb-8">
+          {/* Performances */}
+          <div className="mb-8">
             <DomainPerformances
               domainName={domain.name}
               performances={domain.performances}
             />
-            <DomainTrends trends={domain.trends} />
           </div>
 
           {/* Objectives */}
