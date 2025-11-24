@@ -37,7 +37,11 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
           <div className="flex items-baseline gap-3">
             <span className="text-4xl font-bold text-white">{score}</span>
             <span className="text-sm text-white/60">/10</span>
-            <span className="text-sm text-success font-medium">{variation}</span>
+            <span className={`text-sm font-medium ${
+              variation.startsWith('-') ? 'text-red-500' : 'text-success'
+            }`}>
+              {variation}
+            </span>
           </div>
         </div>
 
