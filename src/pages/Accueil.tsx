@@ -1,19 +1,19 @@
 import bgImage from "@/assets/black-shapes-bg.jpg";
 import { Home, Award, BookOpen, Target, User, Settings, Briefcase, Dumbbell, Users, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { DomainCard } from "@/components/DomainCard";
 import { PrimeTargetCard } from "@/components/PrimeTargetCard";
 import { InsightCard } from "@/components/InsightCard";
 import { MultiDomainChart } from "@/components/MultiDomainChart";
 import { QuickJournalCard } from "@/components/QuickJournalCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { OverviewCard } from "@/components/OverviewCard";
+import { NavigationButtons } from "@/components/NavigationButtons";
 
-const domains = [
-  { name: "Business", icon: Briefcase, score: 8.5, trend: "+12%", fillRate: 85, status: "success" as const },
-  { name: "Sport", icon: Dumbbell, score: 7.8, trend: "+8%", fillRate: 78, status: "success" as const },
-  { name: "Social", icon: Users, score: 6.9, trend: "-3%", fillRate: 69, status: "warning" as const },
-  { name: "Santé", icon: Heart, score: 9.2, trend: "+15%", fillRate: 92, status: "success" as const },
+const overviewItems = [
+  { name: "Business", icon: Briefcase, score: 8.5, trend: "+12%" },
+  { name: "Sport", icon: Dumbbell, score: 7.8, trend: "+8%" },
+  { name: "Social", icon: Users, score: 6.9, trend: "-3%" },
+  { name: "Santé", icon: Heart, score: 9.2, trend: "+15%" },
 ];
 
 const targets = [
@@ -85,38 +85,32 @@ const Accueil = () => {
       {/* Content - scrollable */}
       <div className="relative z-10 ml-32 min-h-screen">
         <div className="max-w-[1600px] mx-auto px-8 py-8">
-          {/* Multi-Domain Chart - Premier bloc */}
-          <div className="mb-8">
+          {/* Top Row: Multi-Domain Chart + Overview */}
+          <div className="grid grid-cols-[1fr_auto] gap-8 mb-6">
             <MultiDomainChart />
+            <div className="w-[400px]">
+              <OverviewCard items={overviewItems} />
+            </div>
           </div>
           
-          {/* Domain Cards - Horizontal Scroll */}
-          <div className="mb-8">
-            <ScrollArea className="w-full whitespace-nowrap">
-              <div className="flex gap-4 pb-4">
-                {domains.map((domain) => (
-                  <DomainCard key={domain.name} {...domain} />
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-          
-          {/* Grid Layout - Targets, Insights, Journal */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Prime Targets */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-white ml-2">Prime Targets</h2>
-              <div className="space-y-3">
-                {targets.map((target, index) => (
-                  <PrimeTargetCard key={index} {...target} />
-                ))}
+          {/* Left Column: Navigation Buttons + Prime Targets */}
+          <div className="grid grid-cols-[1fr_auto] gap-8 mb-8">
+            <div className="space-y-6">
+              <NavigationButtons />
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold text-white ml-2">Prime Targets</h2>
+                <div className="space-y-3">
+                  {targets.map((target, index) => (
+                    <PrimeTargetCard key={index} {...target} />
+                  ))}
+                </div>
               </div>
             </div>
             
-            {/* Insights */}
-            <div className="space-y-4">
+            {/* Right Column: Insights */}
+            <div className="w-[400px] space-y-4">
               <h2 className="text-xl font-semibold text-white ml-2">Insights</h2>
-              <ScrollArea className="h-[400px] pr-4">
+              <ScrollArea className="h-[500px] pr-4">
                 <div className="space-y-3">
                   {insights.map((insight, index) => (
                     <InsightCard key={index} {...insight} />
@@ -126,7 +120,7 @@ const Accueil = () => {
             </div>
           </div>
           
-          {/* Quick Journal */}
+          {/* Quick Journal - Full Width */}
           <div className="mb-8">
             <QuickJournalCard />
           </div>
