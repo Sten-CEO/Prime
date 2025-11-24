@@ -1,0 +1,26 @@
+import { Card } from "@/components/ui/card";
+
+interface InsightCardProps {
+  text: string;
+  date: string;
+  highlightColor: "pink" | "purple" | "blue";
+}
+
+export const InsightCard = ({ text, date, highlightColor }: InsightCardProps) => {
+  const highlightColors = {
+    pink: "bg-aura-pink/20 border-aura-pink/30",
+    purple: "bg-aura-purple/20 border-aura-purple/30",
+    blue: "bg-aura-blue/20 border-aura-blue/30",
+  };
+
+  return (
+    <Card className="backdrop-blur-xl bg-glass-bg/20 border-glass-border/10 rounded-2xl p-4 hover:bg-glass-bg/25 transition-all">
+      <div className="space-y-2">
+        <p className={`text-sm text-foreground px-2 py-1 rounded-lg border ${highlightColors[highlightColor]}`}>
+          {text}
+        </p>
+        <p className="text-xs text-foreground/50">{date}</p>
+      </div>
+    </Card>
+  );
+};
