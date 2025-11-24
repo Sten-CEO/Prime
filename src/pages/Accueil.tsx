@@ -1,7 +1,7 @@
 import bgImage from "@/assets/black-shapes-bg.jpg";
 import { Home, Award, BookOpen, Target, User, Settings, Briefcase, Dumbbell, Users, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { PrimeTargetCard } from "@/components/PrimeTargetCard";
 import { DropZone } from "@/components/DropZone";
 import { InsightCard } from "@/components/InsightCard";
@@ -39,6 +39,7 @@ const allInsights = [
 
 const Accueil = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [insightFilter, setInsightFilter] = useState<string>("Tous");
   const [currentPage, setCurrentPage] = useState(1);
   const [overviewItems, setOverviewItems] = useState(initialOverviewItems);
