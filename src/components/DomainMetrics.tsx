@@ -1,11 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { AddMetricModal } from "@/components/modals/AddMetricModal";
 import { useToast } from "@/hooks/use-toast";
-import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
@@ -38,7 +38,7 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
   const [recordDate, setRecordDate] = useState<Date>(new Date());
   const [performanceLevel, setPerformanceLevel] = useState<PerformanceLevel>(null);
   const [showManualAdjust, setShowManualAdjust] = useState(false);
-  const [manualScore, setManualScore] = useState<number | null>(null);
+  const [manualImpact, setManualImpact] = useState<number | null>(null);
   const { toast } = useToast();
 
   const recordingMetric = metrics.find((m) => m.id === recordingMetricId);
@@ -49,22 +49,35 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
     );
   };
 
-  const getLevelScore = (level: PerformanceLevel): number => {
+  const getLevelImpact = (level: PerformanceLevel): number => {
     switch (level) {
       case "simple":
-        return 20;
+        return 1;
       case "advanced":
-        return 50;
+        return 2;
       case "exceptional":
-        return 80;
+        return 3;
       default:
         return 0;
     }
   };
 
-  const getFinalScore = (): number => {
-    if (manualScore !== null) return manualScore;
-    return getLevelScore(performanceLevel);
+  const getLevelLabel = (level: PerformanceLevel): string => {
+    switch (level) {
+      case "simple":
+        return "Impact léger";
+      case "advanced":
+        return "Impact important";
+      case "exceptional":
+        return "Impact exceptionnel";
+      default:
+        return "";
+    }
+  };
+
+  const getFinalImpact = (): number => {
+    if (manualImpact !== null) return manualImpact;
+    return getLevelImpact(performanceLevel);
   };
 
   const isActiveDayToday = (metricDays: string[]): boolean => {
@@ -107,11 +120,11 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
   const handleRecordPerformance = () => {
     if (!recordingMetric || !performanceLevel) return;
     
-    const finalScore = getFinalScore();
+    const finalImpact = getFinalImpact();
     
     toast({
       title: "Performance enregistrée",
-      description: `${recordingMetric.name}: ${finalScore}/100 le ${format(recordDate, "d MMMM yyyy", { locale: fr })}`,
+      description: `${recordingMetric.name}: impact ${finalImpact} le ${format(recordDate, "d MMMM yyyy", { locale: fr })}`,
     });
     
     // Reset
@@ -120,13 +133,13 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
     setRecordDate(new Date());
     setPerformanceLevel(null);
     setShowManualAdjust(false);
-    setManualScore(null);
+    setManualImpact(null);
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-success";
-    if (score >= 50) return "text-yellow-500";
-    return "text-red-500";
+  const getImpactColor = (impact: number) => {
+    if (impact >= 3) return "text-success";
+    if (impact >= 2) return "text-yellow-500";
+    return "text-white/70";
   };
 
   return (
@@ -255,7 +268,7 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
                       <button
                         onClick={() => {
                           setPerformanceLevel("simple");
-                          setManualScore(null);
+                          setManualImpact(null);
                         }}
                         className={cn(
                           "px-2 py-1.5 rounded text-[9px] font-medium transition-all",
@@ -269,7 +282,7 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
                       <button
                         onClick={() => {
                           setPerformanceLevel("advanced");
-                          setManualScore(null);
+                          setManualImpact(null);
                         }}
                         className={cn(
                           "px-2 py-1.5 rounded text-[9px] font-medium transition-all",
@@ -283,7 +296,7 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
                       <button
                         onClick={() => {
                           setPerformanceLevel("exceptional");
-                          setManualScore(null);
+                          setManualImpact(null);
                         }}
                         className={cn(
                           "px-2 py-1.5 rounded text-[9px] font-medium transition-all",
@@ -297,10 +310,10 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
                     </div>
                     {performanceLevel && (
                       <p className="text-[9px] text-white/70 mt-2">
-                        Cette performance sera enregistrée avec une note de{" "}
-                        <span className={`font-bold ${getScoreColor(getFinalScore())}`}>
-                          {getFinalScore()}/100
+                        <span className={`font-bold ${getImpactColor(getFinalImpact())}`}>
+                          {getLevelLabel(performanceLevel)}
                         </span>
+                        {manualImpact !== null && ` (impact: ${manualImpact})`}
                       </p>
                     )}
                   </div>
@@ -312,27 +325,28 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
                         onClick={() => setShowManualAdjust(true)}
                         className="text-[9px] text-white/50 hover:text-white/80 underline transition-colors"
                       >
-                        Ajuster manuellement la note
+                        Définir un impact personnalisé
                       </button>
                     ) : (
                       <div className="space-y-2">
-                        <label className="text-[10px] text-white/60 block">Ajustement manuel</label>
+                        <label className="text-[10px] text-white/60 block">Impact personnalisé</label>
                         <div className="flex items-center gap-2.5">
-                          <Slider
-                            value={[manualScore ?? getLevelScore(performanceLevel)]}
-                            onValueChange={(value) => setManualScore(value[0])}
-                            max={100}
-                            step={1}
-                            className="flex-1"
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.1"
+                            value={manualImpact ?? getLevelImpact(performanceLevel)}
+                            onChange={(e) => setManualImpact(parseFloat(e.target.value) || 0)}
+                            className="flex-1 bg-white/[0.05] border-white/[0.12] text-white h-7 text-xs"
                           />
-                          <span className={`text-xs font-bold w-8 text-right ${getScoreColor(manualScore ?? getLevelScore(performanceLevel))}`}>
-                            {manualScore ?? getLevelScore(performanceLevel)}
+                          <span className={`text-xs font-bold ${getImpactColor(manualImpact ?? getLevelImpact(performanceLevel))}`}>
+                            impact
                           </span>
                         </div>
                         <button
                           onClick={() => {
                             setShowManualAdjust(false);
-                            setManualScore(null);
+                            setManualImpact(null);
                           }}
                           className="text-[9px] text-white/50 hover:text-white/80 underline transition-colors"
                         >

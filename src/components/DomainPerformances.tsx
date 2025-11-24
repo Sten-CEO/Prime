@@ -6,13 +6,16 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
+type PerformanceLevel = "simple" | "advanced" | "exceptional";
+
 interface Performance {
   id: string;
   title: string;
   date: string;
   description?: string;
-  score: number;
-  impact: "positive" | "neutral" | "negative";
+  level: PerformanceLevel;
+  impact: number;
+  impactType: "positive" | "neutral" | "negative";
 }
 
 interface DomainPerformancesProps {
@@ -30,16 +33,18 @@ export const DomainPerformances = ({ domainName, performances: initialPerformanc
     title: string;
     date: string;
     description?: string;
-    score: number;
-    impact: "positive" | "neutral" | "negative";
+    level: PerformanceLevel;
+    impact: number;
+    impactType: "positive" | "neutral" | "negative";
   }) => {
     const newPerf: Performance = {
       id: `fp${Date.now()}`,
       title: performance.title,
       date: performance.date,
       description: performance.description,
-      score: performance.score,
+      level: performance.level,
       impact: performance.impact,
+      impactType: performance.impactType,
     };
     setPerformances([newPerf, ...performances]);
     toast({
@@ -53,16 +58,16 @@ export const DomainPerformances = ({ domainName, performances: initialPerformanc
     toast({ title: "Performance supprimée", description: "La performance a été supprimée." });
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-success";
-    if (score >= 50) return "text-yellow-500";
-    return "text-red-500";
+  const getImpactColor = (impact: number) => {
+    if (impact >= 3) return "text-success";
+    if (impact >= 2) return "text-yellow-500";
+    return "text-white/70";
   };
 
-  const getScoreBgColor = (score: number) => {
-    if (score >= 80) return "bg-success/20";
-    if (score >= 50) return "bg-yellow-500/20";
-    return "bg-red-500/20";
+  const getImpactBgColor = (impact: number) => {
+    if (impact >= 3) return "bg-success/20";
+    if (impact >= 2) return "bg-yellow-500/20";
+    return "bg-white/10";
   };
 
   return (
@@ -92,20 +97,20 @@ export const DomainPerformances = ({ domainName, performances: initialPerformanc
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <p className="text-xs text-white/90 font-medium truncate">{perf.title}</p>
-                      {perf.impact === "positive" && <span className="text-[10px]">✅</span>}
-                      {perf.impact === "neutral" && <span className="text-[10px]">➖</span>}
-                      {perf.impact === "negative" && <span className="text-[10px]">⚠️</span>}
+                      {perf.impactType === "positive" && <span className="text-[10px]">✅</span>}
+                      {perf.impactType === "neutral" && <span className="text-[10px]">➖</span>}
+                      {perf.impactType === "negative" && <span className="text-[10px]">⚠️</span>}
                     </div>
                     <p className="text-[10px] text-white/50">
                       {format(new Date(perf.date), "d MMM yyyy", { locale: fr })}
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className={`px-2.5 py-1 rounded-lg ${getScoreBgColor(perf.score)} flex items-center gap-1`}>
-                      <span className={`text-xs font-bold ${getScoreColor(perf.score)}`}>
-                        {perf.score}
+                    <div className={`px-2.5 py-1 rounded-lg ${getImpactBgColor(perf.impact)} flex items-center gap-1`}>
+                      <span className={`text-xs font-bold ${getImpactColor(perf.impact)}`}>
+                        {perf.impact}
                       </span>
-                      <span className="text-[10px] text-white/40">/100</span>
+                      <span className="text-[10px] text-white/40">impact</span>
                     </div>
                   </div>
                 </div>

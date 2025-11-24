@@ -19,8 +19,8 @@ const domainData = {
       { id: "execution", name: "Exécution", color: "rgba(16, 185, 129, 0.8)", score: 82 },
     ],
     performances: [
-      { id: "fp1", title: "🚀 Deep Work 3h imprévues", date: "2025-11-23", score: 95, impact: "positive" as const },
-      { id: "fp2", title: "💡 Idée révolutionnaire", date: "2025-11-22", description: "Nouvelle stratégie marketing", score: 88, impact: "positive" as const },
+      { id: "fp1", title: "🚀 Deep Work 3h imprévues", date: "2025-11-23", level: "exceptional" as const, impact: 3, impactType: "positive" as const },
+      { id: "fp2", title: "💡 Idée révolutionnaire", date: "2025-11-22", description: "Nouvelle stratégie marketing", level: "exceptional" as const, impact: 3, impactType: "positive" as const },
     ],
     trends: [
       { period: "Semaine", value: "+12%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
@@ -77,7 +77,7 @@ const domainData = {
       { id: "nutrition", name: "Nutrition", color: "rgba(34, 211, 238, 0.8)", score: 85 },
     ],
     performances: [
-      { id: "fp1", title: "🏃 10km course spontanée", date: "2025-11-24", score: 85, impact: "positive" as const },
+      { id: "fp1", title: "🏃 10km course spontanée", date: "2025-11-24", level: "advanced" as const, impact: 2.5, impactType: "positive" as const },
     ],
     trends: [
       { period: "Semaine", value: "+8%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
@@ -115,7 +115,7 @@ const domainData = {
       { id: "famille", name: "Famille", color: "rgba(168, 85, 247, 0.8)", score: 75 },
     ],
     performances: [
-      { id: "fp1", title: "💬 Longue conversation de qualité", date: "2025-11-23", score: 72, impact: "positive" as const },
+      { id: "fp1", title: "💬 Longue conversation de qualité", date: "2025-11-23", level: "advanced" as const, impact: 2, impactType: "positive" as const },
     ],
     trends: [
       { period: "Semaine", value: "-3%", type: "down" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
@@ -133,8 +133,8 @@ const domainData = {
       { id: "sommeil", name: "Sommeil", color: "rgba(34, 211, 238, 0.8)", score: 88 },
     ],
     performances: [
-      { id: "fp1", title: "🧘 Méditation 45min spontanée", date: "2025-11-24", score: 96, impact: "positive" as const },
-      { id: "fp2", title: "🥗 Repas équilibré maison", date: "2025-11-23", description: "Préparation complète fait-maison, très satisfaisant", score: 90, impact: "positive" as const },
+      { id: "fp1", title: "🧘 Méditation 45min spontanée", date: "2025-11-24", level: "exceptional" as const, impact: 3, impactType: "positive" as const },
+      { id: "fp2", title: "🥗 Repas équilibré maison", date: "2025-11-23", description: "Préparation complète fait-maison, très satisfaisant", level: "exceptional" as const, impact: 3, impactType: "positive" as const },
     ],
     trends: [
       { period: "Semaine", value: "+15%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },

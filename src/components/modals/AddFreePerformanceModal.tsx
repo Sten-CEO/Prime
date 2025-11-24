@@ -2,7 +2,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
@@ -12,6 +11,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+type PerformanceLevel = "simple" | "advanced" | "exceptional";
+
 interface AddFreePerformanceModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -19,8 +20,9 @@ interface AddFreePerformanceModalProps {
     title: string;
     date: string;
     description?: string;
-    score: number;
-    impact: "positive" | "neutral" | "negative";
+    level: PerformanceLevel;
+    impact: number;
+    impactType: "positive" | "neutral" | "negative";
   }) => void;
 }
 
@@ -31,8 +33,37 @@ export const AddFreePerformanceModal = ({ open, onOpenChange, onAdd }: AddFreePe
   const [selectedIcon, setSelectedIcon] = useState("🎯");
   const [date, setDate] = useState<Date>(new Date());
   const [description, setDescription] = useState("");
-  const [score, setScore] = useState(50);
-  const [impact, setImpact] = useState<"positive" | "neutral" | "negative">("positive");
+  const [performanceLevel, setPerformanceLevel] = useState<PerformanceLevel>("advanced");
+  const [impactType, setImpactType] = useState<"positive" | "neutral" | "negative">("positive");
+  const [showManualImpact, setShowManualImpact] = useState(false);
+  const [manualImpact, setManualImpact] = useState<number | null>(null);
+
+  const getLevelImpact = (level: PerformanceLevel): number => {
+    switch (level) {
+      case "simple":
+        return 1;
+      case "advanced":
+        return 2;
+      case "exceptional":
+        return 3;
+    }
+  };
+
+  const getLevelLabel = (level: PerformanceLevel): string => {
+    switch (level) {
+      case "simple":
+        return "Impact léger";
+      case "advanced":
+        return "Impact important";
+      case "exceptional":
+        return "Impact exceptionnel";
+    }
+  };
+
+  const getFinalImpact = (): number => {
+    if (manualImpact !== null) return manualImpact;
+    return getLevelImpact(performanceLevel);
+  };
 
   const handleAdd = () => {
     if (!title.trim()) return;
@@ -40,16 +71,19 @@ export const AddFreePerformanceModal = ({ open, onOpenChange, onAdd }: AddFreePe
       title: `${selectedIcon} ${title}`,
       date: format(date, "yyyy-MM-dd"),
       description: description.trim() || undefined,
-      score,
-      impact,
+      level: performanceLevel,
+      impact: getFinalImpact(),
+      impactType,
     });
     // Reset
     setTitle("");
     setSelectedIcon("🎯");
     setDate(new Date());
     setDescription("");
-    setScore(50);
-    setImpact("positive");
+    setPerformanceLevel("advanced");
+    setImpactType("positive");
+    setShowManualImpact(false);
+    setManualImpact(null);
     onOpenChange(false);
   };
 
@@ -128,34 +162,97 @@ export const AddFreePerformanceModal = ({ open, onOpenChange, onAdd }: AddFreePe
           </div>
 
           <div>
-            <Label className="text-white/80 text-sm">Note (0-100)</Label>
-            <div className="flex items-center gap-4 mt-2">
-              <Slider
-                value={[score]}
-                onValueChange={(value) => setScore(value[0])}
-                max={100}
-                step={1}
-                className="flex-1"
-              />
-              <span className="text-white font-medium w-12 text-right">{score}</span>
+            <Label className="text-white/80 text-sm mb-2 block">Niveau de performance</Label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setPerformanceLevel("simple");
+                  setManualImpact(null);
+                }}
+                className={cn(
+                  "px-3 py-2 rounded text-xs font-medium transition-all",
+                  performanceLevel === "simple"
+                    ? "bg-white/[0.15] border-2 border-white/[0.3] text-white"
+                    : "bg-white/[0.05] border border-white/[0.1] text-white/60 hover:bg-white/[0.08]"
+                )}
+              >
+                Simple
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setPerformanceLevel("advanced");
+                  setManualImpact(null);
+                }}
+                className={cn(
+                  "px-3 py-2 rounded text-xs font-medium transition-all",
+                  performanceLevel === "advanced"
+                    ? "bg-white/[0.15] border-2 border-white/[0.3] text-white"
+                    : "bg-white/[0.05] border border-white/[0.1] text-white/60 hover:bg-white/[0.08]"
+                )}
+              >
+                Avancée
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setPerformanceLevel("exceptional");
+                  setManualImpact(null);
+                }}
+                className={cn(
+                  "px-3 py-2 rounded text-xs font-medium transition-all",
+                  performanceLevel === "exceptional"
+                    ? "bg-white/[0.15] border-2 border-white/[0.3] text-white"
+                    : "bg-white/[0.05] border border-white/[0.1] text-white/60 hover:bg-white/[0.08]"
+                )}
+              >
+                Exceptionnelle
+              </button>
             </div>
-            <div className="mt-2 h-2 rounded-full bg-white/[0.05] overflow-hidden">
-              <div
-                className={`h-full transition-all ${
-                  score >= 80
-                    ? "bg-success"
-                    : score >= 50
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
-                }`}
-                style={{ width: `${score}%` }}
-              />
-            </div>
+            <p className="text-xs text-white/70 mt-2">
+              {getLevelLabel(performanceLevel)}
+              {manualImpact !== null && ` (impact: ${manualImpact})`}
+            </p>
           </div>
 
           <div>
-            <Label className="text-white/80 text-sm">Impact</Label>
-            <Select value={impact} onValueChange={(value: any) => setImpact(value)}>
+            {!showManualImpact ? (
+              <button
+                type="button"
+                onClick={() => setShowManualImpact(true)}
+                className="text-xs text-white/50 hover:text-white/80 underline transition-colors"
+              >
+                Définir un impact personnalisé
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <Label className="text-white/80 text-sm">Impact personnalisé</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={manualImpact ?? getLevelImpact(performanceLevel)}
+                  onChange={(e) => setManualImpact(parseFloat(e.target.value) || 0)}
+                  className="bg-white/[0.05] border-white/[0.12] text-white"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowManualImpact(false);
+                    setManualImpact(null);
+                  }}
+                  className="text-xs text-white/50 hover:text-white/80 underline transition-colors"
+                >
+                  Utiliser le niveau prédéfini
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <Label className="text-white/80 text-sm">Type d'impact</Label>
+            <Select value={impactType} onValueChange={(value: any) => setImpactType(value)}>
               <SelectTrigger className="w-full bg-white/[0.05] border-white/[0.12] text-white mt-1">
                 <SelectValue />
               </SelectTrigger>
