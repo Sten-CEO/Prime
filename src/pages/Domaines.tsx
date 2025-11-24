@@ -5,7 +5,8 @@ import { Separator } from "@/components/ui/separator";
 import { DomainHighBar } from "@/components/DomainHighBar";
 import { DomainScoreChart } from "@/components/DomainScoreChart";
 import { DomainPerformances } from "@/components/DomainPerformances";
-import { DomainTrends } from "@/components/DomainTrends";
+import { DomainCategoryStats } from "@/components/DomainCategoryStats";
+import { DomainMetrics } from "@/components/DomainMetrics";
 import { DomainObjectives } from "@/components/DomainObjectives";
 
 const domainData = {
@@ -225,7 +226,7 @@ const Domaines = () => {
           {/* High Bar */}
           <DomainHighBar currentDomain={slug || ""} />
 
-          {/* Score + Chart + Trends */}
+          {/* Score + Chart + Category Stats */}
           <div className="grid grid-cols-[1fr_auto] gap-8 mb-8">
             <DomainScoreChart
               domainName={domain.name}
@@ -233,16 +234,17 @@ const Domaines = () => {
               variation={domain.variation}
             />
             <div className="w-[400px]">
-              <DomainTrends trends={domain.trends} />
+              <DomainCategoryStats />
             </div>
           </div>
 
-          {/* Performances */}
-          <div className="mb-8">
+          {/* Performances + Metrics */}
+          <div className="grid grid-cols-2 gap-8 mb-8">
             <DomainPerformances
               domainName={domain.name}
               performances={domain.performances}
             />
+            <DomainMetrics domainName={domain.name} />
           </div>
 
           {/* Objectives */}
