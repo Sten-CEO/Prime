@@ -236,19 +236,6 @@ const Domaines = () => {
           {/* High Bar */}
           <DomainHighBar currentDomain={slug || ""} />
 
-          {/* Score + Chart + Category Stats */}
-          <div className="grid grid-cols-[1fr_auto] gap-8 mb-8">
-            <DomainScoreChart
-              domainName={domain.name}
-              score={domain.score}
-              variation={domain.variation}
-              categories={domain.categories}
-            />
-            <div className="w-[400px]">
-              <DomainCategoryStats />
-            </div>
-          </div>
-
           {/* Performances + Metrics */}
           <div className="grid grid-cols-2 gap-8 mb-8">
             <DomainPerformances
@@ -260,8 +247,23 @@ const Domaines = () => {
 
           {/* Objectives */}
           {domain.objectives.length > 0 && (
-            <DomainObjectives objectives={domain.objectives} />
+            <div className="mb-8">
+              <DomainObjectives objectives={domain.objectives} />
+            </div>
           )}
+
+          {/* Score + Chart + Category Stats */}
+          <div className="grid grid-cols-[1fr_auto] gap-8">
+            <DomainScoreChart
+              domainName={domain.name}
+              score={domain.score}
+              variation={domain.variation}
+              categories={domain.categories}
+            />
+            <div className="w-[400px]">
+              <DomainCategoryStats />
+            </div>
+          </div>
         </div>
       </div>
     </div>
