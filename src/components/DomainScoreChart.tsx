@@ -64,7 +64,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreChartProps) => {
   const [period, setPeriod] = useState("7j");
-  const days = period === "7j" ? 7 : period === "30j" ? 30 : 90;
+  const days = period === "7j" ? 7 : period === "30j" ? 30 : period === "90j" ? 90 : 365;
   const data = generateMockData(days);
 
   return (
@@ -94,6 +94,7 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
               <SelectItem value="7j" className="text-white/80">7j</SelectItem>
               <SelectItem value="30j" className="text-white/80">30j</SelectItem>
               <SelectItem value="90j" className="text-white/80">90j</SelectItem>
+              <SelectItem value="12m" className="text-white/80">12m</SelectItem>
             </SelectContent>
           </Select>
           
