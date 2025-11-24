@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { AddMetricModal } from "@/components/modals/AddMetricModal";
+import { useToast } from "@/hooks/use-toast";
 
 interface Metric {
   id: string;
@@ -21,11 +23,38 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
     { id: "m2", name: "10k pas", enabled: true, days: ["L", "M", "M", "J", "V"] },
     { id: "m3", name: "Lecture 20min", enabled: false, days: ["L", "M", "J", "V"] },
   ]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const { toast } = useToast();
 
   const toggleMetric = (id: string) => {
     setMetrics(prev =>
       prev.map(m => (m.id === id ? { ...m, enabled: !m.enabled } : m))
     );
+  };
+
+  const toggleDay = (id: string, day: string) => {
+    setMetrics(prev =>
+      prev.map(m => {
+        if (m.id === id) {
+          const newDays = m.days.includes(day)
+            ? m.days.filter(d => d !== day)
+            : [...m.days, day];
+          return { ...m, days: newDays };
+        }
+        return m;
+      })
+    );
+  };
+
+  const handleAdd = (metric: { name: string; icon: string; days: string[] }) => {
+    const newMetric = {
+      id: `m${metrics.length + 1}`,
+      name: `${metric.icon} ${metric.name}`,
+      enabled: true,
+      days: metric.days
+    };
+    setMetrics([...metrics, newMetric]);
+    toast({ title: "Métrique ajoutée", description: `${metric.name} a été ajoutée avec succès.` });
   };
 
   return (
@@ -34,6 +63,7 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
         <h3 className="text-lg font-semibold text-white">Métriques</h3>
         <Button
           size="sm"
+          onClick={() => setShowAddModal(true)}
           className="backdrop-blur-xl bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all text-white h-8 px-3"
         >
           <Plus className="w-4 h-4" />
@@ -49,17 +79,18 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
             <div className="flex-1">
               <p className="text-white text-sm font-medium mb-2">{metric.name}</p>
               <div className="flex gap-1">
-                {metric.days.map((day, idx) => (
-                  <span
+                {["L", "M", "M", "J", "V", "S", "D"].map((day, idx) => (
+                  <button
                     key={idx}
-                    className={`text-xs px-2 py-1 rounded ${
-                      metric.enabled
-                        ? "bg-white/[0.1] text-white/80"
-                        : "bg-white/[0.03] text-white/40"
+                    onClick={() => toggleDay(metric.id, day)}
+                    className={`text-xs px-2 py-1 rounded transition-all ${
+                      metric.enabled && metric.days.includes(day)
+                        ? "bg-white/[0.15] border border-white/[0.3] text-white shadow-[0_0_6px_rgba(255,255,255,0.15)]"
+                        : "bg-white/[0.03] text-white/40 hover:bg-white/[0.05]"
                     }`}
                   >
                     {day}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -71,6 +102,12 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
           </div>
         ))}
       </div>
+
+      <AddMetricModal
+        open={showAddModal}
+        onOpenChange={setShowAddModal}
+        onAdd={handleAdd}
+      />
     </Card>
   );
 };

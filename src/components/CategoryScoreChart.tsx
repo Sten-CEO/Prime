@@ -22,18 +22,29 @@ const generateMockData = (days: number) => {
     "Objectif atteint"
   ];
   
+  let prevScore = 82;
   for (let i = days; i >= 0; i--) {
-    const hasData = Math.random() > 0.3;
-    const scoreValue = hasData ? Math.random() * 30 + 70 : null;
+    const hasData = Math.random() > 0.2;
+    const scoreValue = hasData ? Math.max(50, Math.min(100, prevScore + (Math.random() - 0.5) * 10)) : null;
+    if (scoreValue) prevScore = scoreValue;
+    
     data.push({
       date: `J-${i}`,
       score: scoreValue,
+      prevScore: hasData ? prevScore : null,
       hasData,
-      variation: hasData ? (Math.random() > 0.5 ? `+${(Math.random() * 0.5).toFixed(1)}` : `-${(Math.random() * 0.3).toFixed(1)}`) : null,
+      variation: hasData && scoreValue ? `${scoreValue > prevScore ? '+' : ''}${((scoreValue - prevScore) / prevScore * 100).toFixed(1)}%` : null,
       insight: hasData ? insights[Math.floor(Math.random() * insights.length)] : "Jour non rempli"
     });
   }
-  return data;
+  
+  const movingAvg = data.map((point, idx) => {
+    const window = data.slice(Math.max(0, idx - 2), idx + 1).filter(p => p.hasData);
+    const avg = window.length > 0 ? window.reduce((sum, p) => sum + (p.score || 0), 0) / window.length : null;
+    return { ...point, movingAvg: avg };
+  });
+  
+  return movingAvg;
 };
 
 const CustomTooltip = ({ active, payload }: any) => {
@@ -47,14 +58,19 @@ const CustomTooltip = ({ active, payload }: any) => {
             <p className="text-white/80 text-xs">
               Score: <span className="font-semibold text-white">{data.score?.toFixed(0)}/100</span>
             </p>
-            <p className={`text-xs ${data.variation?.startsWith('+') ? 'text-success' : 'text-red-500'}`}>
+            {data.prevScore && (
+              <p className="text-white/60 text-xs">
+                Score précédent: <span className="font-medium">{data.prevScore.toFixed(0)}</span>
+              </p>
+            )}
+            <p className={`text-xs font-medium ${data.variation?.startsWith('+') ? 'text-success' : data.variation?.startsWith('-') ? 'text-red-500' : 'text-white/60'}`}>
               Variation: {data.variation}
             </p>
             <p className="text-white/60 text-xs mt-1 italic">{data.insight}</p>
             <p className="text-success text-xs mt-1">✓ Rempli</p>
           </>
         ) : (
-          <p className="text-white/40 text-xs">Non rempli</p>
+          <p className="text-white/40 text-xs">❌ Non rempli</p>
         )}
       </div>
     );
@@ -62,9 +78,23 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
+const downloadChart = () => {
+  const svg = document.querySelector('.recharts-surface');
+  if (!svg) return;
+  
+  const svgData = new XMLSerializer().serializeToString(svg as Element);
+  const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'chart.svg';
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
 export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryScoreChartProps) => {
   const [period, setPeriod] = useState("7j");
-  const days = period === "7j" ? 7 : period === "30j" ? 30 : 90;
+  const days = period === "7j" ? 7 : period === "14j" ? 14 : period === "30j" ? 30 : period === "90j" ? 90 : 365;
   const data = generateMockData(days);
 
   return (
@@ -92,12 +122,15 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
             </SelectTrigger>
             <SelectContent className="bg-black/95 backdrop-blur-xl border-white/[0.12]">
               <SelectItem value="7j" className="text-white/80">7j</SelectItem>
+              <SelectItem value="14j" className="text-white/80">14j</SelectItem>
               <SelectItem value="30j" className="text-white/80">30j</SelectItem>
               <SelectItem value="90j" className="text-white/80">90j</SelectItem>
+              <SelectItem value="12m" className="text-white/80">12 mois</SelectItem>
             </SelectContent>
           </Select>
           
           <button 
+            onClick={downloadChart}
             className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all group"
             title="Exporter les données"
           >
@@ -106,7 +139,7 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
         </div>
       </div>
 
-      <div className="animate-fade-in">
+      <div className="animate-fade-in transition-all duration-500">
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -123,10 +156,18 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
             <Tooltip content={<CustomTooltip />} />
             <Line
               type="monotone"
+              dataKey="movingAvg"
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth={1}
+              dot={false}
+              strokeDasharray="2 2"
+              connectNulls={true}
+            />
+            <Line
+              type="monotone"
               dataKey="score"
               stroke="rgba(255,255,255,0.8)"
               strokeWidth={2}
-              strokeDasharray="5 5"
               dot={(props) => {
                 const { cx, cy, payload } = props;
                 if (!payload.hasData) {
@@ -138,6 +179,7 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
                       fill="transparent"
                       stroke="rgba(255,255,255,0.4)"
                       strokeWidth={1.5}
+                      strokeDasharray="2 2"
                     />
                   );
                 }
@@ -149,6 +191,7 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
                     fill="rgba(255,255,255,0.9)"
                     stroke="rgba(255,255,255,0.3)"
                     strokeWidth={2}
+                    className="cursor-pointer transition-all hover:r-6"
                     style={{
                       filter: "drop-shadow(0 0 4px rgba(255,255,255,0.5))"
                     }}
@@ -156,6 +199,8 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
                 );
               }}
               connectNulls={false}
+              animationDuration={800}
+              animationEasing="ease-in-out"
             />
           </LineChart>
         </ResponsiveContainer>
