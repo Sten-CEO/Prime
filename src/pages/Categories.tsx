@@ -136,7 +136,7 @@ const domainNames: { [key: string]: string } = {
 };
 
 const Categories = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug, category } = useParams<{ slug: string; category: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -149,10 +149,16 @@ const Categories = () => {
   const currentDomainCategories = slug ? categoriesData[slug] || [] : [];
 
   useEffect(() => {
-    if (currentDomainCategories.length > 0 && !activeCategory) {
-      setActiveCategory(currentDomainCategories[0].id);
+    if (currentDomainCategories.length > 0) {
+      // Si un paramètre category existe dans l'URL, l'utiliser
+      if (category && currentDomainCategories.find(c => c.id === category)) {
+        setActiveCategory(category);
+      } else if (!activeCategory) {
+        // Sinon, utiliser la première catégorie par défaut
+        setActiveCategory(currentDomainCategories[0].id);
+      }
     }
-  }, [slug, currentDomainCategories.length]);
+  }, [slug, category, currentDomainCategories.length]);
 
   const activeCategoryData = currentDomainCategories.find(c => c.id === activeCategory);
 
@@ -166,6 +172,7 @@ const Categories = () => {
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
+    navigate(`/domaines/${slug}/categories/${categoryId}`);
   };
 
   const handleAddCategory = () => {
