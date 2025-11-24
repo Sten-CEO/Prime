@@ -13,7 +13,7 @@ const mockData = [
 
 export const MultiDomainChart = () => {
   return (
-    <Card className="backdrop-blur-xl bg-glass-bg/5 border-glass-border/10 rounded-2xl p-8 relative overflow-hidden">
+    <Card className="backdrop-blur-2xl bg-white/[0.02] border border-white/[0.12] rounded-2xl p-8 relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
       {/* Aura effect */}
       <div className="absolute -top-20 -right-20 w-64 h-64 bg-aura-purple/20 rounded-full blur-3xl" />
       <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-aura-blue/20 rounded-full blur-3xl" />

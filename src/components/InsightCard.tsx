@@ -8,15 +8,15 @@ interface InsightCardProps {
 
 export const InsightCard = ({ text, date, highlightColor }: InsightCardProps) => {
   const highlightColors = {
-    pink: "bg-aura-pink/20 border-aura-pink/40 shadow-[0_0_15px_rgba(244,114,182,0.3)]",
-    purple: "bg-aura-purple/20 border-aura-purple/40 shadow-[0_0_15px_rgba(168,85,247,0.3)]",
-    blue: "bg-aura-blue/20 border-aura-blue/40 shadow-[0_0_15px_rgba(96,165,250,0.3)]",
+    pink: "bg-aura-pink/15 border-aura-pink/30",
+    purple: "bg-aura-purple/15 border-aura-purple/30",
+    blue: "bg-aura-blue/15 border-aura-blue/30",
   };
 
   return (
-    <Card className="backdrop-blur-xl bg-white/[0.03] border-white/[0.15] rounded-2xl p-4 hover:bg-white/[0.05] transition-all relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
+    <Card className="backdrop-blur-2xl bg-white/[0.02] border border-white/[0.12] rounded-2xl p-4 hover:bg-white/[0.04] hover:border-white/[0.18] transition-all relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
       <div className="space-y-2">
-        <p className={`text-sm text-white px-2 py-1 rounded-lg border backdrop-blur-sm ${highlightColors[highlightColor]}`}>
+        <p className={`text-sm text-white px-2 py-1 rounded-lg border backdrop-blur-md ${highlightColors[highlightColor]}`}>
           {text}
         </p>
         <p className="text-xs text-white/50">{date}</p>

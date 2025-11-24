@@ -24,7 +24,7 @@ export const PrimeTargetCard = ({ title, progress, deadline, status, completed }
   };
 
   return (
-    <Card className="backdrop-blur-xl bg-white/[0.03] border-white/[0.15] rounded-2xl p-5 hover:bg-white/[0.05] transition-all relative overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
+    <Card className="backdrop-blur-2xl bg-white/[0.02] border border-white/[0.12] rounded-2xl p-5 hover:bg-white/[0.04] hover:border-white/[0.18] transition-all relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
       <div className="flex items-start gap-3">
         <Checkbox 
           checked={completed}
@@ -49,9 +49,9 @@ export const PrimeTargetCard = ({ title, progress, deadline, status, completed }
               <span>Progression</span>
               <span>{progress}%</span>
             </div>
-            <div className="h-2 bg-white/[0.08] rounded-full overflow-hidden backdrop-blur-sm border border-white/5">
+            <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden backdrop-blur-md border border-white/[0.08]">
               <div 
-                className={`h-full ${statusColors[status]} rounded-full transition-all shadow-lg`}
+                className={`h-full ${statusColors[status]} rounded-full transition-all`}
                 style={{ width: `${progress}%` }}
               />
             </div>
