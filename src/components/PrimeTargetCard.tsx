@@ -78,20 +78,20 @@ export const PrimeTargetCard = ({ id, title, progress, deadline, status, complet
     <div className="relative">
       {/* Drop zone indicator at the top - only show on drag over */}
       <div 
-        className="absolute -top-2 left-0 right-0 h-2 rounded-full transition-all z-10"
+        className="absolute -top-2 left-0 right-0 h-0.5 rounded-full transition-all z-10"
         onDragOver={(e) => {
           e.preventDefault();
           e.stopPropagation();
           e.dataTransfer.dropEffect = "move";
-          e.currentTarget.classList.add('bg-aura-cyan/50');
+          e.currentTarget.classList.add('bg-white/60');
         }}
         onDragLeave={(e) => {
-          e.currentTarget.classList.remove('bg-aura-cyan/50');
+          e.currentTarget.classList.remove('bg-white/60');
         }}
         onDrop={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          e.currentTarget.classList.remove('bg-aura-cyan/50');
+          e.currentTarget.classList.remove('bg-white/60');
           const dragIndex = parseInt(e.dataTransfer.getData("dragIndex"));
           // Insert before this card
           if (dragIndex !== index) {
