@@ -24,7 +24,7 @@ export const PrimeTargetCard = ({ title, progress, deadline, status, completed }
   };
 
   return (
-    <Card className="backdrop-blur-xl bg-glass-bg/20 border-glass-border/10 rounded-3xl p-5 hover:bg-glass-bg/25 transition-all">
+    <Card className="backdrop-blur-xl bg-glass-bg/5 border-glass-border/10 rounded-2xl p-5 hover:bg-glass-bg/10 transition-all">
       <div className="flex items-start gap-3">
         <Checkbox 
           checked={completed}
