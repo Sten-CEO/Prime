@@ -15,7 +15,7 @@ export const NavigationButtons = () => {
         return (
           <Card 
             key={button.label}
-            className="flex-1 backdrop-blur-3xl bg-white/[0.01] border border-white/[0.08] rounded-2xl px-6 py-3 hover:bg-white/[0.03] hover:border-white/[0.12] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]"
+            className="flex-1 backdrop-blur-xl bg-white/[0.01] border border-white/[0.08] rounded-2xl px-6 py-3 hover:bg-white/[0.02] hover:border-white/[0.12] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
           >
             <div className="flex items-center justify-center gap-2">
               <Icon className="w-4 h-4 text-white/70" />
