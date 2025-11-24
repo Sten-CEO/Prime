@@ -2,6 +2,7 @@ import bgImage from "@/assets/black-shapes-bg.jpg";
 import { Home, Award, BookOpen, Target, User, Settings, Briefcase, Dumbbell, Users, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { PrimeTargetCard } from "@/components/PrimeTargetCard";
+import { DropZone } from "@/components/DropZone";
 import { InsightCard } from "@/components/InsightCard";
 import { MultiDomainChart } from "@/components/MultiDomainChart";
 import { QuickJournalCard } from "@/components/QuickJournalCard";
@@ -42,6 +43,7 @@ const Accueil = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [insights, setInsights] = useState(allInsights);
   const [primeTargets, setPrimeTargets] = useState(targets);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const itemsPerPage = 5;
 
   const handleToggleFavorite = (name: string) => {
@@ -58,15 +60,30 @@ const Accueil = () => {
     setInsights(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleReorderTargets = (dragIndex: number, dropIndex: number) => {
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  const handleDrop = (targetIndex: number) => {
+    if (draggedIndex === null) return;
+    
     const newTargets = [...primeTargets];
-    const [draggedItem] = newTargets.splice(dragIndex, 1);
+    const draggedItem = newTargets[draggedIndex];
     
-    // Adjust dropIndex if dragging from before the drop position
-    const adjustedDropIndex = dragIndex < dropIndex ? dropIndex - 1 : dropIndex;
+    // Remove the dragged item
+    newTargets.splice(draggedIndex, 1);
     
-    newTargets.splice(adjustedDropIndex, 0, draggedItem);
+    // Insert at the new position
+    // If we're dropping after the original position, we need to adjust
+    const insertIndex = draggedIndex < targetIndex ? targetIndex - 1 : targetIndex;
+    newTargets.splice(insertIndex, 0, draggedItem);
+    
     setPrimeTargets(newTargets);
+    setDraggedIndex(null);
   };
 
   const filters = ["Tous", "Business", "Sport", "Social", "Santé"];
@@ -151,15 +168,20 @@ const Accueil = () => {
               <NavigationButtons />
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold text-white ml-2">Prime Targets</h2>
-                <div className="space-y-3">
+                <div className="space-y-1">
                   {primeTargets.map((target, index) => (
-                    <PrimeTargetCard 
-                      key={target.id} 
-                      {...target} 
-                      index={index}
-                      onReorder={handleReorderTargets}
-                    />
+                    <div key={target.id}>
+                      <DropZone index={index} onDrop={handleDrop} />
+                      <PrimeTargetCard 
+                        {...target} 
+                        index={index}
+                        onDragStart={handleDragStart}
+                        onDragEnd={handleDragEnd}
+                        isDragging={draggedIndex === index}
+                      />
+                    </div>
                   ))}
+                  <DropZone index={primeTargets.length} onDrop={handleDrop} />
                 </div>
               </div>
             </div>
