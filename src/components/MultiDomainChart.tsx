@@ -38,6 +38,8 @@ export const MultiDomainChart = () => {
   const [compareMode, setCompareMode] = useState(false);
   const [comparedDomains, setComparedDomains] = useState<string[]>([]);
   const [mouseX, setMouseX] = useState<number | null>(null);
+  
+  const weekVariation = "+18% cette semaine";
 
   const toggleDomain = (domain: string) => {
     setActiveDomains(prev => ({ ...prev, [domain]: !prev[domain] }));
@@ -87,7 +89,13 @@ export const MultiDomainChart = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-lg font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">Performance Multi-Domaines</h2>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-success font-medium drop-shadow-[0_0_10px_rgba(16,185,129,0.6)]">+18% cette semaine</span>
+            <span className={`text-sm font-medium ${
+              weekVariation.startsWith('-') 
+                ? 'text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.6)]' 
+                : 'text-success drop-shadow-[0_0_10px_rgba(16,185,129,0.6)]'
+            }`}>
+              {weekVariation}
+            </span>
             
             {/* Period selector */}
             <div className="flex gap-1 backdrop-blur-xl bg-white/[0.04] border border-white/[0.1] rounded-lg p-1">

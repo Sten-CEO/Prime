@@ -118,7 +118,7 @@ const Accueil = () => {
           <Separator className="w-10 bg-white/20 mb-8" />
           
           <div className="flex-none">
-            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
+            <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/[0.08] transition-colors">
               <Home className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
             <Separator className="w-10 bg-white/20 mx-auto my-4" />
