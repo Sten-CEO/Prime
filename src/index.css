@@ -46,18 +46,21 @@ All colors MUST be HSL.
     --glass-bg: 0 0% 100%;
     --glass-border: 0 0% 100%;
     
-    /* Status colors - Vibrant modern palette */
-    --success: 142 76% 48%;
+    /* Status colors - Neon vibrant palette */
+    --success: 142 90% 55%;
     --success-foreground: 0 0% 100%;
-    --warning: 25 95% 58%;
+    --warning: 25 100% 60%;
     --warning-foreground: 0 0% 100%;
-    --info: 217 91% 60%;
+    --info: 195 100% 60%;
     --info-foreground: 0 0% 100%;
     
-    /* Aura colors - Enhanced vibrant colors */
-    --aura-pink: 330 85% 65%;
-    --aura-purple: 271 91% 68%;
-    --aura-blue: 217 91% 65%;
+    /* Aura colors - Neon glow colors */
+    --aura-pink: 330 100% 70%;
+    --aura-purple: 271 100% 72%;
+    --aura-blue: 195 100% 65%;
+    --aura-cyan: 180 100% 60%;
+    --aura-green: 142 90% 55%;
+    --aura-orange: 25 100% 60%;
 
     --sidebar-background: 0 0% 98%;
 

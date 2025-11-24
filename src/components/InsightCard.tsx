@@ -8,9 +8,9 @@ interface InsightCardProps {
 
 export const InsightCard = ({ text, date, highlightColor }: InsightCardProps) => {
   const highlightColors = {
-    pink: "bg-aura-pink/15 border-aura-pink/30",
-    purple: "bg-aura-purple/15 border-aura-purple/30",
-    blue: "bg-aura-blue/15 border-aura-blue/30",
+    pink: "bg-aura-pink/20 border-aura-pink/40 shadow-[0_0_20px_rgba(244,114,182,0.4)]",
+    purple: "bg-aura-purple/20 border-aura-purple/40 shadow-[0_0_20px_rgba(168,85,247,0.4)]",
+    blue: "bg-aura-cyan/20 border-aura-cyan/40 shadow-[0_0_20px_rgba(34,211,238,0.4)]",
   };
 
   return (

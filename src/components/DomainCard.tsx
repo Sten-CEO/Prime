@@ -12,16 +12,16 @@ interface DomainCardProps {
 
 export const DomainCard = ({ name, icon: Icon, score, trend, fillRate, status }: DomainCardProps) => {
   const statusColors = {
-    success: "bg-success",
-    warning: "bg-warning",
-    danger: "bg-destructive",
+      success: "bg-success shadow-[0_0_20px_rgba(16,185,129,0.6)]",
+      warning: "bg-warning shadow-[0_0_20px_rgba(251,146,60,0.6)]",
+      danger: "bg-destructive shadow-[0_0_20px_rgba(239,68,68,0.6)]",
   };
 
   return (
     <Card className="min-w-[200px] backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 hover:bg-white/[0.03] hover:border-white/[0.25] transition-all relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-white/[0.04] backdrop-blur-lg flex items-center justify-center border border-white/[0.15] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]">
-          <Icon className="w-6 h-6 text-white drop-shadow-lg" />
+        <div className="w-12 h-12 rounded-xl bg-white/[0.04] backdrop-blur-lg flex items-center justify-center border border-white/[0.15] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_0_20px_rgba(255,255,255,0.1)]">
+          <Icon className="w-6 h-6 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]" />
         </div>
         
         <div className="text-center">
@@ -41,13 +41,13 @@ export const DomainCard = ({ name, icon: Icon, score, trend, fillRate, status }:
           </div>
           <div className="h-1.5 bg-white/[0.04] rounded-full overflow-hidden backdrop-blur-lg border border-white/[0.12] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
             <div 
-              className={`h-full ${statusColors[status]} rounded-full transition-all drop-shadow-lg`}
+              className={`h-full ${statusColors[status]} rounded-full transition-all`}
               style={{ width: `${fillRate}%` }}
             />
           </div>
         </div>
         
-        <div className={`w-2 h-2 rounded-full ${statusColors[status]} drop-shadow-[0_0_4px_rgba(255,255,255,0.5)]`} />
+        <div className={`w-2 h-2 rounded-full ${statusColors[status]}`} />
       </div>
     </Card>
   );
