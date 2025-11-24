@@ -24,8 +24,44 @@ const domainData = {
       { period: "Année", value: "+15%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 365 jours" },
     ],
     objectives: [
-      { id: 1, title: "Lancer le nouveau produit", progress: 75, deadline: "30 Nov 2025", status: "in-progress" as const, completed: false },
-      { id: 2, title: "Atteindre 10k utilisateurs", progress: 45, deadline: "15 Déc 2025", status: "in-progress" as const, completed: false },
+      { 
+        id: 1, 
+        title: "Lancer le nouveau produit", 
+        progress: 75, 
+        deadline: "30 Nov 2025", 
+        status: "in-progress" as const, 
+        completed: false,
+        notes: "Sprint final en cours. Besoin de finaliser les tests avant le lancement.",
+        subObjectives: [
+          "Finaliser les tests utilisateurs",
+          "Préparer le plan marketing",
+          "Former l'équipe support"
+        ],
+        history: [
+          { date: "20 Nov", progress: 65 },
+          { date: "18 Nov", progress: 55 },
+          { date: "15 Nov", progress: 50 }
+        ]
+      },
+      { 
+        id: 2, 
+        title: "Atteindre 10k utilisateurs", 
+        progress: 45, 
+        deadline: "15 Déc 2025", 
+        status: "in-progress" as const, 
+        completed: false,
+        notes: "Croissance régulière. Focus sur l'acquisition organique.",
+        subObjectives: [
+          "Optimiser le SEO",
+          "Lancer campagne réseaux sociaux",
+          "Programme de parrainage"
+        ],
+        history: [
+          { date: "20 Nov", progress: 40 },
+          { date: "15 Nov", progress: 35 },
+          { date: "10 Nov", progress: 30 }
+        ]
+      },
     ],
   },
   sport: {
@@ -43,7 +79,25 @@ const domainData = {
       { period: "Année", value: "+10%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 365 jours" },
     ],
     objectives: [
-      { id: 1, title: "Courir un marathon", progress: 45, deadline: "15 Déc 2025", status: "in-progress" as const, completed: false },
+      { 
+        id: 1, 
+        title: "Courir un marathon", 
+        progress: 45, 
+        deadline: "15 Déc 2025", 
+        status: "in-progress" as const, 
+        completed: false,
+        notes: "Entraînement régulier 4x/semaine. Attention aux blessures.",
+        subObjectives: [
+          "Augmenter distance hebdomadaire",
+          "Travail spécifique vitesse",
+          "Nutrition adaptée"
+        ],
+        history: [
+          { date: "20 Nov", progress: 42 },
+          { date: "15 Nov", progress: 38 },
+          { date: "10 Nov", progress: 35 }
+        ]
+      },
     ],
   },
   social: {
@@ -77,7 +131,25 @@ const domainData = {
       { period: "Année", value: "+18%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 365 jours" },
     ],
     objectives: [
-      { id: 1, title: "Méditer 30 jours consécutifs", progress: 90, deadline: "28 Nov 2025", status: "in-progress" as const, completed: false },
+      { 
+        id: 1, 
+        title: "Méditer 30 jours consécutifs", 
+        progress: 90, 
+        deadline: "28 Nov 2025", 
+        status: "in-progress" as const, 
+        completed: false,
+        notes: "Excellent progrès. Méditation quotidienne ancrée dans la routine.",
+        subObjectives: [
+          "Maintenir la régularité",
+          "Approfondir la pratique",
+          "Varier les techniques"
+        ],
+        history: [
+          { date: "20 Nov", progress: 87 },
+          { date: "15 Nov", progress: 80 },
+          { date: "10 Nov", progress: 73 }
+        ]
+      },
     ],
   },
 };

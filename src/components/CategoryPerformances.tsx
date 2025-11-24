@@ -9,12 +9,12 @@ interface Performance {
   score: number;
 }
 
-interface DomainPerformancesProps {
-  domainName: string;
+interface CategoryPerformancesProps {
+  categoryName: string;
   performances: Performance[];
 }
 
-export const DomainPerformances = ({ domainName, performances: initialPerformances }: DomainPerformancesProps) => {
+export const CategoryPerformances = ({ categoryName, performances: initialPerformances }: CategoryPerformancesProps) => {
   const [performances, setPerformances] = useState(initialPerformances);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<number>(0);
