@@ -1,12 +1,12 @@
 import { Card } from "@/components/ui/card";
-import { Target, BookOpen, Clock } from "lucide-react";
+import { Award, BookOpen, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const NavigationButtons = () => {
   const navigate = useNavigate();
   
   const buttons = [
-    { label: "Domaines", icon: Target, path: "/domaines" },
+    { label: "Domaines", icon: Award, path: "/domaines/business" },
     { label: "Journal", icon: BookOpen, path: "/journal" },
     { label: "Prime History", icon: Clock, path: "/prime-history" },
   ];
