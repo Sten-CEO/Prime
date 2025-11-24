@@ -33,8 +33,8 @@ export const PrimeTargetCard = ({ title, progress, deadline, status, completed }
         
         <div className="flex-1 space-y-3">
           <div>
-            <h3 className="text-sm font-medium text-foreground mb-1">{title}</h3>
-            <div className="flex items-center gap-2 text-xs text-foreground/60">
+            <h3 className="text-sm font-medium text-white mb-1">{title}</h3>
+            <div className="flex items-center gap-2 text-xs text-white/60">
               <span>{deadline}</span>
               <span>•</span>
               <span className="flex items-center gap-1">
@@ -45,7 +45,7 @@ export const PrimeTargetCard = ({ title, progress, deadline, status, completed }
           </div>
           
           <div className="space-y-2">
-            <div className="flex justify-between text-xs text-foreground/60">
+            <div className="flex justify-between text-xs text-white/60">
               <span>Progression</span>
               <span>{progress}%</span>
             </div>

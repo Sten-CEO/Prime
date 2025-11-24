@@ -1,7 +1,6 @@
 import bgImage from "@/assets/black-shapes-bg.jpg";
-import { Home, Award, BookOpen, Target, User, Settings, Briefcase, Dumbbell, Users, Heart, FileText, History } from "lucide-react";
+import { Home, Award, BookOpen, Target, User, Settings, Briefcase, Dumbbell, Users, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DomainCard } from "@/components/DomainCard";
 import { PrimeTargetCard } from "@/components/PrimeTargetCard";
@@ -44,64 +43,47 @@ const Accueil = () => {
       />
       
       {/* Glass Sidebar */}
-      <div className="fixed left-6 top-6 bottom-6 w-64 z-20">
-        <div className="h-full backdrop-blur-xl bg-glass-bg/10 rounded-2xl border border-glass-border/10 flex flex-col p-6">
-          <div className="mb-8">
-            <span className="text-foreground font-bold text-2xl tracking-tight">Prime.</span>
+      <div className="fixed left-6 top-6 bottom-6 w-20 z-20">
+        <div className="h-full backdrop-blur-xl bg-glass-bg/10 rounded-2xl border border-glass-border/10 flex flex-col items-center py-6 px-3">
+          <div className="mb-4">
+            <span className="text-white font-bold text-lg tracking-tight">Prime.</span>
           </div>
           
-          <Separator className="bg-glass-border/20 mb-6" />
+          <Separator className="w-10 bg-white/20 mb-8" />
           
-          {/* Navigation Buttons */}
-          <div className="space-y-3 mb-8">
-            <Button variant="ghost" className="w-full justify-start backdrop-blur-xl bg-glass-bg/20 hover:bg-glass-bg/30 border border-glass-border/10 rounded-xl text-foreground">
-              <FileText className="w-4 h-4 mr-3" />
-              Domaines
-            </Button>
-            <Button variant="ghost" className="w-full justify-start backdrop-blur-xl bg-glass-bg/20 hover:bg-glass-bg/30 border border-glass-border/10 rounded-xl text-foreground">
-              <BookOpen className="w-4 h-4 mr-3" />
-              Journal
-            </Button>
-            <Button variant="ghost" className="w-full justify-start backdrop-blur-xl bg-glass-bg/20 hover:bg-glass-bg/30 border border-glass-border/10 rounded-xl text-foreground">
-              <History className="w-4 h-4 mr-3" />
-              Prime History
-            </Button>
+          <div className="flex-none">
+            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+              <Home className="w-5 h-5 text-gray-400 opacity-70" />
+            </button>
+            <Separator className="w-10 bg-white/20 mx-auto my-4" />
           </div>
           
-          <Separator className="bg-glass-border/20 mb-6" />
-          
-          <div className="flex-1 flex flex-col gap-3">
-            <button className="w-full h-12 flex items-center justify-start px-4 rounded-xl hover:bg-glass-bg/20 transition-colors">
-              <Home className="w-5 h-5 text-gray-400 opacity-70 mr-3" />
-              <span className="text-sm text-foreground/70">Accueil</span>
+          <div className="flex-1 flex flex-col gap-4">
+            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+              <Award className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
-            <button className="w-full h-12 flex items-center justify-start px-4 rounded-xl hover:bg-glass-bg/20 transition-colors">
-              <Award className="w-5 h-5 text-gray-400 opacity-70 mr-3" />
-              <span className="text-sm text-foreground/70">Objectifs</span>
+            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+              <BookOpen className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
-            <button className="w-full h-12 flex items-center justify-start px-4 rounded-xl hover:bg-glass-bg/20 transition-colors">
-              <Target className="w-5 h-5 text-gray-400 opacity-70 mr-3" />
-              <span className="text-sm text-foreground/70">Progression</span>
+            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+              <Target className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
+            <Separator className="w-10 bg-white/20 mx-auto my-2" />
           </div>
           
-          <Separator className="bg-glass-border/20 my-6" />
-          
-          <div className="flex-none flex flex-col gap-3">
-            <button className="w-full h-12 flex items-center justify-start px-4 rounded-xl hover:bg-glass-bg/20 transition-colors">
-              <User className="w-5 h-5 text-gray-400 opacity-70 mr-3" />
-              <span className="text-sm text-foreground/70">Profil</span>
+          <div className="flex-none flex flex-col gap-4 mt-8">
+            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+              <User className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
-            <button className="w-full h-12 flex items-center justify-start px-4 rounded-xl hover:bg-glass-bg/20 transition-colors">
-              <Settings className="w-5 h-5 text-gray-400 opacity-70 mr-3" />
-              <span className="text-sm text-foreground/70">Paramètres</span>
+            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors">
+              <Settings className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
           </div>
         </div>
       </div>
       
       {/* Content - scrollable */}
-      <div className="relative z-10 ml-80 min-h-screen">
+      <div className="relative z-10 ml-32 min-h-screen">
         <div className="max-w-[1600px] mx-auto px-8 py-8">
           {/* Multi-Domain Chart - Premier bloc */}
           <div className="mb-8">
@@ -123,7 +105,7 @@ const Accueil = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Prime Targets */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground ml-2">Prime Targets</h2>
+              <h2 className="text-xl font-semibold text-white ml-2">Prime Targets</h2>
               <div className="space-y-3">
                 {targets.map((target, index) => (
                   <PrimeTargetCard key={index} {...target} />
@@ -133,7 +115,7 @@ const Accueil = () => {
             
             {/* Insights */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground ml-2">Insights</h2>
+              <h2 className="text-xl font-semibold text-white ml-2">Insights</h2>
               <ScrollArea className="h-[400px] pr-4">
                 <div className="space-y-3">
                   {insights.map((insight, index) => (

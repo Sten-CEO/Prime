@@ -20,7 +20,7 @@ export const MultiDomainChart = () => {
       
       <div className="relative z-10">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold text-foreground">Performance Multi-Domaines</h2>
+          <h2 className="text-lg font-semibold text-white">Performance Multi-Domaines</h2>
           <span className="text-sm text-success font-medium">+18% cette semaine</span>
         </div>
         
@@ -29,12 +29,12 @@ export const MultiDomainChart = () => {
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--glass-border) / 0.1)" />
             <XAxis 
               dataKey="day" 
-              stroke="hsl(var(--foreground) / 0.6)"
-              style={{ fontSize: '12px' }}
+              stroke="rgba(255, 255, 255, 0.6)"
+              style={{ fontSize: '12px', fill: 'white' }}
             />
             <YAxis 
-              stroke="hsl(var(--foreground) / 0.6)"
-              style={{ fontSize: '12px' }}
+              stroke="rgba(255, 255, 255, 0.6)"
+              style={{ fontSize: '12px', fill: 'white' }}
             />
             <Tooltip 
               contentStyle={{
