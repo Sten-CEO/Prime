@@ -13,14 +13,27 @@ interface PrimeTargetCardProps {
   completed: boolean;
   onToggle?: () => void;
   index: number;
-  onReorder: (dragIndex: number, dropIndex: number) => void;
+  onDragStart: (index: number) => void;
+  onDragEnd: () => void;
+  isDragging: boolean;
 }
 
-export const PrimeTargetCard = ({ id, title, progress, deadline, status, completed, onToggle, index, onReorder }: PrimeTargetCardProps) => {
+export const PrimeTargetCard = ({ 
+  id, 
+  title, 
+  progress, 
+  deadline, 
+  status, 
+  completed, 
+  onToggle, 
+  index, 
+  onDragStart,
+  onDragEnd,
+  isDragging
+}: PrimeTargetCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isChecked, setIsChecked] = useState(completed);
   const [showAnimation, setShowAnimation] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
 
   const statusColors = {
     "in-progress": "bg-success shadow-[0_0_20px_rgba(16,185,129,0.6)]",
@@ -34,7 +47,6 @@ export const PrimeTargetCard = ({ id, title, progress, deadline, status, complet
     "delayed": "En retard",
   };
 
-  // Calculate auto tag based on deadline
   const getAutoTag = () => {
     const deadlineDate = new Date(deadline);
     const today = new Date();
@@ -58,56 +70,19 @@ export const PrimeTargetCard = ({ id, title, progress, deadline, status, complet
   };
 
   const handleDragStart = (e: React.DragEvent) => {
-    setIsDragging(true);
     e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("dragIndex", index.toString());
-    // Make drag image slightly transparent
-    if (e.currentTarget instanceof HTMLElement) {
-      e.currentTarget.style.opacity = "0.5";
-    }
-  };
-
-  const handleDragEnd = (e: React.DragEvent) => {
-    setIsDragging(false);
-    if (e.currentTarget instanceof HTMLElement) {
-      e.currentTarget.style.opacity = "1";
-    }
+    onDragStart(index);
   };
 
   return (
-    <div className="relative">
-      {/* Drop zone indicator at the top - only show on drag over */}
-      <div 
-        className="absolute -top-2 left-0 right-0 h-0.5 rounded-full transition-all z-10"
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          e.dataTransfer.dropEffect = "move";
-          e.currentTarget.classList.add('bg-white/60');
-        }}
-        onDragLeave={(e) => {
-          e.currentTarget.classList.remove('bg-white/60');
-        }}
-        onDrop={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          e.currentTarget.classList.remove('bg-white/60');
-          const dragIndex = parseInt(e.dataTransfer.getData("dragIndex"));
-          // Insert before this card
-          if (dragIndex !== index) {
-            onReorder(dragIndex, index);
-          }
-        }}
-      />
-      
-      <Card 
-        className={`backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-5 hover:bg-white/[0.03] hover:border-white/[0.25] transition-all relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] group ${
-          isDragging ? "opacity-30 scale-95" : ""
-        }`}
-        draggable
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
+    <Card 
+      className={`backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-5 hover:bg-white/[0.03] hover:border-white/[0.25] transition-all relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] group ${
+        isDragging ? "opacity-30 scale-95" : ""
+      }`}
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={onDragEnd}
+    >
       {showAnimation && (
         <div className="absolute inset-0 bg-gradient-radial from-white/20 to-transparent animate-ping pointer-events-none" />
       )}
@@ -142,7 +117,6 @@ export const PrimeTargetCard = ({ id, title, progress, deadline, status, complet
             </div>
           </div>
           
-          {/* Expanded details */}
           {isExpanded && (
             <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.08] space-y-2 animate-accordion-down">
               <p className="text-xs text-white/70">
@@ -175,6 +149,5 @@ export const PrimeTargetCard = ({ id, title, progress, deadline, status, complet
         </div>
       </div>
     </Card>
-    </div>
   );
 };
