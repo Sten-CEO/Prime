@@ -8,6 +8,8 @@ import { QuickJournalCard } from "@/components/QuickJournalCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { OverviewCard } from "@/components/OverviewCard";
 import { NavigationButtons } from "@/components/NavigationButtons";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const overviewItems = [
   { name: "Business", icon: Briefcase, score: 8.5, trend: "+12%" },
@@ -23,16 +25,32 @@ const targets = [
   { title: "Lire 12 livres cette année", progress: 30, deadline: "31 Déc 2025", status: "delayed" as const, completed: false },
 ];
 
-const insights = [
-  { text: "La régularité est la clé du succès à long terme", date: "24 Nov", highlightColor: "purple" as const },
-  { text: "Excellente synergie entre sport et productivité", date: "23 Nov", highlightColor: "blue" as const },
-  { text: "Besoin de plus de temps pour les relations sociales", date: "22 Nov", highlightColor: "pink" as const },
-  { text: "Les matinées sont mes moments les plus productifs", date: "21 Nov", highlightColor: "purple" as const },
-  { text: "La méditation améliore ma concentration", date: "20 Nov", highlightColor: "blue" as const },
+const allInsights = [
+  { text: "La régularité est la clé du succès à long terme", date: "24 Nov", highlightColor: "purple" as const, category: "Business" },
+  { text: "Excellente synergie entre sport et productivité", date: "23 Nov", highlightColor: "blue" as const, category: "Sport" },
+  { text: "Besoin de plus de temps pour les relations sociales", date: "22 Nov", highlightColor: "pink" as const, category: "Social" },
+  { text: "Les matinées sont mes moments les plus productifs", date: "21 Nov", highlightColor: "purple" as const, category: "Business" },
+  { text: "La méditation améliore ma concentration", date: "20 Nov", highlightColor: "blue" as const, category: "Santé" },
+  { text: "Importance de l'équilibre vie pro/perso", date: "19 Nov", highlightColor: "pink" as const, category: "Social" },
+  { text: "Mes performances sportives s'améliorent", date: "18 Nov", highlightColor: "blue" as const, category: "Sport" },
 ];
 
 const Accueil = () => {
-  const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const [insightFilter, setInsightFilter] = useState<string>("Tous");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const filters = ["Tous", "Business", "Sport", "Social", "Santé"];
+
+  const filteredInsights = insightFilter === "Tous" 
+    ? allInsights 
+    : allInsights.filter(insight => insight.category === insightFilter);
+
+  const totalPages = Math.ceil(filteredInsights.length / itemsPerPage);
+  const paginatedInsights = filteredInsights.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="relative min-h-screen w-full bg-black">
@@ -109,14 +127,66 @@ const Accueil = () => {
             
             {/* Right Column: Insights */}
             <div className="w-[400px] space-y-4">
-              <h2 className="text-xl font-semibold text-white ml-2">Insights</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-white ml-2">Insights</h2>
+              </div>
+              
+              {/* Filter buttons */}
+              <div className="flex gap-2 flex-wrap">
+                {filters.map((filter) => (
+                  <Button
+                    key={filter}
+                    onClick={() => {
+                      setInsightFilter(filter);
+                      setCurrentPage(1);
+                    }}
+                    variant="ghost"
+                    size="sm"
+                    className={`text-xs transition-all ${
+                      insightFilter === filter
+                        ? "bg-white/[0.15] text-white border border-white/[0.2]"
+                        : "text-white/60 hover:text-white hover:bg-white/[0.08]"
+                    }`}
+                  >
+                    {filter}
+                  </Button>
+                ))}
+              </div>
+
               <ScrollArea className="h-[500px] pr-4">
                 <div className="space-y-3">
-                  {insights.map((insight, index) => (
+                  {paginatedInsights.map((insight, index) => (
                     <InsightCard key={index} {...insight} />
                   ))}
                 </div>
               </ScrollArea>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 pt-2">
+                  <Button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/60 hover:text-white disabled:opacity-30"
+                  >
+                    ←
+                  </Button>
+                  <span className="text-white/60 text-xs">
+                    {currentPage} / {totalPages}
+                  </span>
+                  <Button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/60 hover:text-white disabled:opacity-30"
+                  >
+                    →
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           

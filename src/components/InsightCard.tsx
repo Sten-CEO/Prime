@@ -1,12 +1,16 @@
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 
 interface InsightCardProps {
   text: string;
   date: string;
   highlightColor: "pink" | "purple" | "blue";
+  category?: string;
 }
 
-export const InsightCard = ({ text, date, highlightColor }: InsightCardProps) => {
+export const InsightCard = ({ text, date, highlightColor, category = "Business" }: InsightCardProps) => {
   const highlightColors = {
     pink: "bg-aura-pink/20 border-aura-pink/40 shadow-[0_0_20px_rgba(244,114,182,0.4)]",
     purple: "bg-aura-purple/20 border-aura-purple/40 shadow-[0_0_20px_rgba(168,85,247,0.4)]",
@@ -14,13 +18,46 @@ export const InsightCard = ({ text, date, highlightColor }: InsightCardProps) =>
   };
 
   return (
-    <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-4 hover:bg-white/[0.03] hover:border-white/[0.25] transition-all relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
-      <div className="space-y-2">
-        <p className={`text-sm text-white px-2 py-1 rounded-lg border backdrop-blur-lg shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] ${highlightColors[highlightColor]}`}>
-          {text}
-        </p>
-        <p className="text-xs text-white/50">{date}</p>
-      </div>
-    </Card>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-4 hover:bg-white/[0.03] hover:border-white/[0.25] transition-all relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] cursor-pointer">
+          <div className="space-y-2">
+            <p className={`text-sm text-white px-2 py-1 rounded-lg border backdrop-blur-lg shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] ${highlightColors[highlightColor]}`}>
+              {text}
+            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-white/50">{date}</p>
+              <span className="text-xs text-white/40">{category}</span>
+            </div>
+          </div>
+        </Card>
+      </DialogTrigger>
+      <DialogContent className="backdrop-blur-xl bg-black/90 border-white/[0.15] text-white">
+        <DialogHeader>
+          <DialogTitle className="text-white">Insight complet</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className={`p-4 rounded-lg border ${highlightColors[highlightColor]}`}>
+            <p className="text-white">{text}</p>
+          </div>
+          <div className="space-y-2">
+            <p className="text-white/70 text-sm">
+              Cette réflexion a été notée le {date} dans votre journal. Elle fait partie de vos observations 
+              les plus importantes concernant votre développement personnel dans le domaine {category}.
+            </p>
+            <p className="text-white/60 text-sm italic">
+              "Continuer à cultiver cette prise de conscience pour progresser durablement."
+            </p>
+          </div>
+          <Button 
+            className="w-full backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
+            onClick={() => window.location.href = '/journal'}
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Voir dans Journal
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
