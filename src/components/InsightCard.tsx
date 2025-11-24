@@ -1,16 +1,17 @@
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Trash2 } from "lucide-react";
 
 interface InsightCardProps {
   text: string;
   date: string;
   highlightColor: "pink" | "purple" | "blue";
   category?: string;
+  onDelete?: () => void;
 }
 
-export const InsightCard = ({ text, date, highlightColor, category = "Business" }: InsightCardProps) => {
+export const InsightCard = ({ text, date, highlightColor, category = "Business", onDelete }: InsightCardProps) => {
   const highlightColors = {
     pink: "bg-aura-pink/20 border-aura-pink/40 shadow-[0_0_20px_rgba(244,114,182,0.4)]",
     purple: "bg-aura-purple/20 border-aura-purple/40 shadow-[0_0_20px_rgba(168,85,247,0.4)]",
@@ -49,13 +50,23 @@ export const InsightCard = ({ text, date, highlightColor, category = "Business" 
               "Continuer à cultiver cette prise de conscience pour progresser durablement."
             </p>
           </div>
-          <Button 
-            className="w-full backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
-            onClick={() => window.location.href = '/journal'}
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Voir dans Journal
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              className="flex-1 backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
+              onClick={() => window.location.href = '/journal'}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Voir dans Journal
+            </Button>
+            <Button 
+              onClick={onDelete}
+              variant="ghost"
+              size="icon"
+              className="text-white/60 hover:text-warning hover:bg-warning/10 transition-all"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

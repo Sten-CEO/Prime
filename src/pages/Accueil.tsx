@@ -40,6 +40,7 @@ const Accueil = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [overviewItems, setOverviewItems] = useState(initialOverviewItems);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [insights, setInsights] = useState(allInsights);
   const itemsPerPage = 5;
 
   const handleToggleFavorite = (name: string) => {
@@ -52,11 +53,15 @@ const Accueil = () => {
     setOverviewItems(newOrder);
   };
 
+  const handleDeleteInsight = (index: number) => {
+    setInsights(prev => prev.filter((_, i) => i !== index));
+  };
+
   const filters = ["Tous", "Business", "Sport", "Social", "Santé"];
 
   const filteredInsights = insightFilter === "Tous" 
-    ? allInsights 
-    : allInsights.filter(insight => insight.category === insightFilter);
+    ? insights 
+    : insights.filter(insight => insight.category === insightFilter);
 
   const totalPages = Math.ceil(filteredInsights.length / itemsPerPage);
   const paginatedInsights = filteredInsights.slice(
@@ -172,9 +177,18 @@ const Accueil = () => {
 
               <ScrollArea className="h-[500px] pr-4">
                 <div className="space-y-3">
-                  {paginatedInsights.map((insight, index) => (
-                    <InsightCard key={index} {...insight} />
-                  ))}
+                  {paginatedInsights.map((insight, index) => {
+                    const originalIndex = insights.findIndex(i => 
+                      i.text === insight.text && i.date === insight.date
+                    );
+                    return (
+                      <InsightCard 
+                        key={originalIndex} 
+                        {...insight} 
+                        onDelete={() => handleDeleteInsight(originalIndex)}
+                      />
+                    );
+                  })}
                 </div>
               </ScrollArea>
 
