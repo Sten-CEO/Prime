@@ -4,7 +4,6 @@ import bgImage from "@/assets/black-shapes-bg.jpg";
 import { Home, Award, BookOpen, Target, User, Settings } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { CategoryHighBar } from "@/components/CategoryHighBar";
-import { CategoryScoreChart } from "@/components/CategoryScoreChart";
 import { CategoryMetrics } from "@/components/CategoryMetrics";
 import { CategoryPerformances } from "@/components/CategoryPerformances";
 import { CategoryManualNote } from "@/components/CategoryManualNote";
@@ -347,14 +346,6 @@ const Categories = () => {
             onDuplicateCategory={handleDuplicateCategory}
           />
           
-          <div className="mb-6">
-            <CategoryScoreChart
-              categoryName={`${domainNames[slug]} – ${activeCategoryData.name}`}
-              score={activeCategoryData.score}
-              variation={activeCategoryData.variation}
-            />
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <div className="lg:col-span-2">
               <CategoryStatsBlock
