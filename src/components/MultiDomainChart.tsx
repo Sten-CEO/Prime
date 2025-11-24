@@ -48,34 +48,34 @@ export const MultiDomainChart = () => {
             <Line 
               type="monotone" 
               dataKey="Business" 
-              stroke="hsl(var(--aura-cyan))" 
-              strokeWidth={3}
-              dot={{ fill: 'hsl(var(--aura-cyan))', r: 5, filter: 'drop-shadow(0 0 8px hsl(var(--aura-cyan)))' }}
-              activeDot={{ r: 7 }}
+              stroke="rgba(34, 211, 238, 0.6)" 
+              strokeWidth={2.5}
+              dot={{ fill: 'rgba(34, 211, 238, 0.7)', r: 4, filter: 'drop-shadow(0 0 4px rgba(34, 211, 238, 0.4))' }}
+              activeDot={{ r: 6 }}
             />
             <Line 
               type="monotone" 
               dataKey="Sport" 
-              stroke="hsl(var(--aura-green))" 
-              strokeWidth={3}
-              dot={{ fill: 'hsl(var(--aura-green))', r: 5, filter: 'drop-shadow(0 0 8px hsl(var(--aura-green)))' }}
-              activeDot={{ r: 7 }}
+              stroke="rgba(16, 185, 129, 0.6)" 
+              strokeWidth={2.5}
+              dot={{ fill: 'rgba(16, 185, 129, 0.7)', r: 4, filter: 'drop-shadow(0 0 4px rgba(16, 185, 129, 0.4))' }}
+              activeDot={{ r: 6 }}
             />
             <Line 
               type="monotone" 
               dataKey="Social" 
-              stroke="hsl(var(--aura-pink))" 
-              strokeWidth={3}
-              dot={{ fill: 'hsl(var(--aura-pink))', r: 5, filter: 'drop-shadow(0 0 8px hsl(var(--aura-pink)))' }}
-              activeDot={{ r: 7 }}
+              stroke="rgba(244, 114, 182, 0.6)" 
+              strokeWidth={2.5}
+              dot={{ fill: 'rgba(244, 114, 182, 0.7)', r: 4, filter: 'drop-shadow(0 0 4px rgba(244, 114, 182, 0.4))' }}
+              activeDot={{ r: 6 }}
             />
             <Line 
               type="monotone" 
               dataKey="Santé" 
-              stroke="hsl(var(--aura-purple))" 
-              strokeWidth={3}
-              dot={{ fill: 'hsl(var(--aura-purple))', r: 5, filter: 'drop-shadow(0 0 8px hsl(var(--aura-purple)))' }}
-              activeDot={{ r: 7 }}
+              stroke="rgba(168, 85, 247, 0.6)" 
+              strokeWidth={2.5}
+              dot={{ fill: 'rgba(168, 85, 247, 0.7)', r: 4, filter: 'drop-shadow(0 0 4px rgba(168, 85, 247, 0.4))' }}
+              activeDot={{ r: 6 }}
             />
           </LineChart>
         </ResponsiveContainer>
