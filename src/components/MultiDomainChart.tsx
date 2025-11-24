@@ -14,14 +14,14 @@ const mockData = [
 export const MultiDomainChart = () => {
   return (
     <Card className="backdrop-blur-2xl bg-white/[0.02] border border-white/[0.12] rounded-2xl p-8 relative overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
-      {/* Aura effect */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 bg-aura-purple/20 rounded-full blur-3xl" />
-      <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-aura-blue/20 rounded-full blur-3xl" />
+      {/* Aura effect - Neon glow */}
+      <div className="absolute -top-20 -right-20 w-80 h-80 bg-aura-purple/30 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-aura-cyan/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       
       <div className="relative z-10">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold text-white">Performance Multi-Domaines</h2>
-          <span className="text-sm text-success font-medium">+18% cette semaine</span>
+          <h2 className="text-lg font-semibold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">Performance Multi-Domaines</h2>
+          <span className="text-sm text-success font-medium drop-shadow-[0_0_10px_rgba(16,185,129,0.6)]">+18% cette semaine</span>
         </div>
         
         <ResponsiveContainer width="100%" height={300}>
@@ -48,34 +48,34 @@ export const MultiDomainChart = () => {
             <Line 
               type="monotone" 
               dataKey="Business" 
-              stroke="hsl(var(--aura-blue))" 
-              strokeWidth={2}
-              dot={{ fill: 'hsl(var(--aura-blue))', r: 4 }}
-              activeDot={{ r: 6 }}
+              stroke="hsl(var(--aura-cyan))" 
+              strokeWidth={3}
+              dot={{ fill: 'hsl(var(--aura-cyan))', r: 5, filter: 'drop-shadow(0 0 8px hsl(var(--aura-cyan)))' }}
+              activeDot={{ r: 7 }}
             />
             <Line 
               type="monotone" 
               dataKey="Sport" 
-              stroke="hsl(var(--success))" 
-              strokeWidth={2}
-              dot={{ fill: 'hsl(var(--success))', r: 4 }}
-              activeDot={{ r: 6 }}
+              stroke="hsl(var(--aura-green))" 
+              strokeWidth={3}
+              dot={{ fill: 'hsl(var(--aura-green))', r: 5, filter: 'drop-shadow(0 0 8px hsl(var(--aura-green)))' }}
+              activeDot={{ r: 7 }}
             />
             <Line 
               type="monotone" 
               dataKey="Social" 
               stroke="hsl(var(--aura-pink))" 
-              strokeWidth={2}
-              dot={{ fill: 'hsl(var(--aura-pink))', r: 4 }}
-              activeDot={{ r: 6 }}
+              strokeWidth={3}
+              dot={{ fill: 'hsl(var(--aura-pink))', r: 5, filter: 'drop-shadow(0 0 8px hsl(var(--aura-pink)))' }}
+              activeDot={{ r: 7 }}
             />
             <Line 
               type="monotone" 
               dataKey="Santé" 
               stroke="hsl(var(--aura-purple))" 
-              strokeWidth={2}
-              dot={{ fill: 'hsl(var(--aura-purple))', r: 4 }}
-              activeDot={{ r: 6 }}
+              strokeWidth={3}
+              dot={{ fill: 'hsl(var(--aura-purple))', r: 5, filter: 'drop-shadow(0 0 8px hsl(var(--aura-purple)))' }}
+              activeDot={{ r: 7 }}
             />
           </LineChart>
         </ResponsiveContainer>

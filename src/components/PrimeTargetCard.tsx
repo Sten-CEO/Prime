@@ -12,9 +12,9 @@ interface PrimeTargetCardProps {
 
 export const PrimeTargetCard = ({ title, progress, deadline, status, completed }: PrimeTargetCardProps) => {
   const statusColors = {
-    "in-progress": "bg-success",
-    "completed": "bg-success",
-    "delayed": "bg-warning",
+    "in-progress": "bg-success shadow-[0_0_20px_rgba(16,185,129,0.6)]",
+    "completed": "bg-success shadow-[0_0_20px_rgba(16,185,129,0.6)]",
+    "delayed": "bg-warning shadow-[0_0_20px_rgba(251,146,60,0.6)]",
   };
 
   const statusLabels = {
@@ -51,7 +51,7 @@ export const PrimeTargetCard = ({ title, progress, deadline, status, completed }
             </div>
             <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden backdrop-blur-lg border border-white/[0.12] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
               <div 
-                className={`h-full ${statusColors[status]} rounded-full transition-all drop-shadow-lg`}
+                className={`h-full ${statusColors[status]} rounded-full transition-all`}
                 style={{ width: `${progress}%` }}
               />
             </div>
