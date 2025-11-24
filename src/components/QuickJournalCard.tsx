@@ -10,7 +10,7 @@ const recentEntries = [
 
 export const QuickJournalCard = () => {
   return (
-    <Card className="backdrop-blur-xl bg-glass-bg/20 border-glass-border/10 rounded-3xl p-6">
+    <Card className="backdrop-blur-xl bg-glass-bg/5 border-glass-border/10 rounded-2xl p-6">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Journal</h2>
@@ -24,7 +24,7 @@ export const QuickJournalCard = () => {
           </Button>
         </div>
         
-        <Button className="w-full backdrop-blur-xl bg-glass-bg/30 hover:bg-glass-bg/40 border border-glass-border/20 text-foreground rounded-2xl h-12">
+        <Button className="w-full backdrop-blur-xl bg-glass-bg/10 hover:bg-glass-bg/20 border border-glass-border/20 text-foreground rounded-2xl h-12">
           <PenLine className="w-4 h-4 mr-2" />
           Écrire une entrée rapide
         </Button>
@@ -34,7 +34,7 @@ export const QuickJournalCard = () => {
           {recentEntries.map((entry) => (
             <div 
               key={entry.id}
-              className="p-3 rounded-xl bg-glass-bg/10 hover:bg-glass-bg/20 transition-all cursor-pointer"
+              className="p-3 rounded-xl bg-glass-bg/5 hover:bg-glass-bg/10 transition-all cursor-pointer"
             >
               <div className="flex items-start gap-3">
                 <span className="text-xs text-foreground/50 min-w-[50px]">{entry.date}</span>

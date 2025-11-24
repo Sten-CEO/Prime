@@ -18,9 +18,9 @@ export const DomainCard = ({ name, icon: Icon, score, trend, fillRate, status }:
   };
 
   return (
-    <Card className="min-w-[200px] backdrop-blur-xl bg-glass-bg/20 border-glass-border/10 rounded-3xl p-6 hover:bg-glass-bg/25 transition-all">
+    <Card className="min-w-[200px] backdrop-blur-xl bg-glass-bg/5 border-glass-border/10 rounded-2xl p-6 hover:bg-glass-bg/10 transition-all">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-glass-bg/10 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-glass-bg/10 flex items-center justify-center">
           <Icon className="w-6 h-6 text-foreground" />
         </div>
         

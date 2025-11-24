@@ -14,7 +14,7 @@ export const InsightCard = ({ text, date, highlightColor }: InsightCardProps) =>
   };
 
   return (
-    <Card className="backdrop-blur-xl bg-glass-bg/20 border-glass-border/10 rounded-2xl p-4 hover:bg-glass-bg/25 transition-all">
+    <Card className="backdrop-blur-xl bg-glass-bg/5 border-glass-border/10 rounded-2xl p-4 hover:bg-glass-bg/10 transition-all">
       <div className="space-y-2">
         <p className={`text-sm text-foreground px-2 py-1 rounded-lg border ${highlightColors[highlightColor]}`}>
           {text}
