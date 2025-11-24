@@ -41,8 +41,8 @@ export const CategoryStatsBlock = ({ categoryName, domainName, stats }: Category
   };
 
   const statBlocks = [
-    { label: "Moy. 7j", value: stats.avgScore7d, suffix: "/100", icon: BarChart2, color: "text-white" },
-    { label: "Moy. 30j", value: stats.avgScore30d, suffix: "/100", icon: BarChart2, color: "text-white" },
+    { label: "Indice moy. 7j", value: stats.avgScore7d, suffix: "", icon: BarChart2, color: "text-white" },
+    { label: "Indice moy. 30j", value: stats.avgScore30d, suffix: "", icon: BarChart2, color: "text-white" },
     { label: "Jours remplis", value: stats.filledDaysPercent, suffix: "%", icon: Check, color: "text-success" },
     { label: "Jours vides", value: stats.emptyDaysPercent, suffix: "%", icon: X, color: "text-red-500" },
     { label: "Métriques actives", value: stats.activeMetricsCount, suffix: "", icon: Target, color: "text-white" },

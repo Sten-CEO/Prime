@@ -58,10 +58,10 @@ export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProp
     toast({ title: "Métrique ajoutée", description: `${metric.name} a été ajoutée avec succès.` });
   };
 
-  const handleRecord = (data: { date: string; score: number; note?: string }) => {
+  const handleRecord = (data: { date: string; level: string; impact: number; note?: string }) => {
     toast({ 
-      title: "Score enregistré", 
-      description: `Score de ${data.score}/100 enregistré pour le ${data.date}.` 
+      title: "Impact enregistré", 
+      description: `Impact de ${data.impact} enregistré pour le ${data.date}.` 
     });
   };
 

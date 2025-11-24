@@ -56,11 +56,11 @@ const CustomTooltip = ({ active, payload }: any) => {
         {data.hasData ? (
           <>
             <p className="text-white/80 text-xs">
-              Score: <span className="font-semibold text-white">{data.score?.toFixed(0)}/100</span>
+              Indice: <span className="font-semibold text-white">{data.score?.toFixed(1)}</span>
             </p>
             {data.prevScore && (
               <p className="text-white/60 text-xs">
-                Score précédent: <span className="font-medium">{data.prevScore.toFixed(0)}</span>
+                Indice précédent: <span className="font-medium">{data.prevScore.toFixed(1)}</span>
               </p>
             )}
             <p className={`text-xs font-medium ${data.variation?.startsWith('+') ? 'text-success' : data.variation?.startsWith('-') ? 'text-red-500' : 'text-white/60'}`}>
@@ -106,7 +106,7 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
           </h2>
           <div className="flex items-baseline gap-3">
             <span className="text-4xl font-bold text-white">{score}</span>
-            <span className="text-sm text-white/60">/100</span>
+            <span className="text-sm text-white/60">indice</span>
             <span className={`text-sm font-medium ${
               variation.startsWith('-') ? 'text-red-500' : 'text-success'
             }`}>
@@ -149,7 +149,6 @@ export const CategoryScoreChart = ({ categoryName, score, variation }: CategoryS
               tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }}
             />
             <YAxis
-              domain={[0, 100]}
               stroke="rgba(255,255,255,0.3)"
               tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }}
             />
