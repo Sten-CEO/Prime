@@ -83,7 +83,7 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
           <Line
             type="monotone"
             dataKey="score"
-            stroke="hsl(var(--success))"
+            stroke="rgba(255,255,255,0.8)"
             strokeWidth={2}
             strokeDasharray="5 5"
             dot={(props) => {
@@ -94,7 +94,7 @@ export const DomainScoreChart = ({ domainName, score, variation }: DomainScoreCh
                   cx={cx}
                   cy={cy}
                   r={4}
-                  fill="hsl(var(--success))"
+                  fill="rgba(255,255,255,0.9)"
                   stroke="rgba(255,255,255,0.3)"
                   strokeWidth={2}
                 />
