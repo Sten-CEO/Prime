@@ -15,8 +15,8 @@ export const MultiDomainChart = () => {
   return (
     <Card className="backdrop-blur-xl bg-glass-bg/5 border-glass-border/10 rounded-2xl p-8 relative overflow-hidden">
       {/* Aura effect */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 bg-aura-purple/10 rounded-full blur-3xl" />
-      <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-aura-blue/10 rounded-full blur-3xl" />
+      <div className="absolute -top-20 -right-20 w-64 h-64 bg-aura-purple/20 rounded-full blur-3xl" />
+      <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-aura-blue/20 rounded-full blur-3xl" />
       
       <div className="relative z-10">
         <div className="flex justify-between items-center mb-6">
