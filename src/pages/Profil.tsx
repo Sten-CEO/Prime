@@ -17,6 +17,7 @@ const Profil = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -26,6 +27,7 @@ const Profil = () => {
         setUser(user);
         setEmail(user.email || "");
         setFullName(user.user_metadata?.full_name || "");
+        setAvatarUrl(user.user_metadata?.avatar_url || "");
       }
     };
     getUser();
@@ -125,11 +127,65 @@ const Profil = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    try {
-      // TODO: Implémenter l'upload vers Supabase Storage
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
       toast({
-        title: "En cours de développement",
-        description: "La fonctionnalité d'upload de photo sera bientôt disponible",
+        title: t.error,
+        description: "Veuillez sélectionner une image valide",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: t.error,
+        description: "L'image ne doit pas dépasser 2 MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (!user) throw new Error("User not found");
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      // Delete old avatar if exists
+      if (avatarUrl) {
+        const oldPath = avatarUrl.split('/').slice(-2).join('/');
+        await supabase.storage.from('avatars').remove([oldPath]);
+      }
+
+      // Upload new avatar
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const publicUrl = data.publicUrl;
+
+      // Update user metadata
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl }
+      });
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+
+      toast({
+        title: "Photo mise à jour",
+        description: "Votre photo de profil a été mise à jour avec succès",
       });
     } catch (error) {
       console.error("Error uploading photo:", error);
@@ -138,6 +194,8 @@ const Profil = () => {
         description: "Impossible de téléverser la photo",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -222,9 +280,17 @@ const Profil = () => {
               <div className="flex flex-col items-center gap-4">
                 <div 
                   onClick={handlePhotoClick}
-                  className="w-32 h-32 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center cursor-pointer hover:border-primary/50 transition-all group"
+                  className="w-32 h-32 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center cursor-pointer hover:border-primary/50 transition-all group overflow-hidden"
                 >
-                  <span className="text-4xl font-bold text-white group-hover:scale-110 transition-transform">{getInitials()}</span>
+                  {avatarUrl ? (
+                    <img 
+                      src={avatarUrl} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-4xl font-bold text-white group-hover:scale-110 transition-transform">{getInitials()}</span>
+                  )}
                 </div>
                 <input
                   ref={fileInputRef}
