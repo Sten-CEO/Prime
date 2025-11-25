@@ -14,6 +14,7 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useDomains } from "@/hooks/useDomains";
 import { useCategories } from "@/hooks/useCategories";
+import { useDomainStats } from "@/hooks/useDomainStats";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Domaines = () => {
@@ -25,6 +26,9 @@ const Domaines = () => {
 
   const domain = domains.find(d => d.slug === slug);
   const { categories } = useCategories(domain?.id);
+
+  // Fetch domain stats for scoring
+  const { stats: domainStats, isLoading: statsLoading } = useDomainStats(domain?.id, 30);
 
   // Map categories to the format expected by DomainScoreChart
   const mappedCategories = categories.map(cat => ({
@@ -112,8 +116,8 @@ const Domaines = () => {
             <DomainScoreChart
               domainName={domainName}
               domainSlug={slug || ""}
-              score={0}
-              variation="+0%"
+              score={Math.round(domainStats?.displayedScore || 0)}
+              variation={domainStats && domainStats.normalizedIndex > 0 ? `+${domainStats.normalizedIndex.toFixed(1)}%` : "+0%"}
               categories={mappedCategories}
             />
             <div className="w-[400px]">

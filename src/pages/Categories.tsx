@@ -12,6 +12,7 @@ import { CategoryStatsBlock } from "@/components/CategoryStatsBlock";
 import { useToast } from "@/hooks/use-toast";
 import { useDomainSlugToId } from "@/hooks/useDomainSlugToId";
 import { useCategories } from "@/hooks/useCategories";
+import { useCategoryStatsScoring } from "@/hooks/useCategoryStatsScoring";
 
 const domainNames: { [key: string]: string } = {
   business: "Business",
@@ -32,6 +33,13 @@ const Categories = () => {
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<{ id: string; name: string; color?: string } | null>(null);
+
+  // Fetch stats for active category
+  const { stats: categoryStats, isLoading: statsLoading } = useCategoryStatsScoring(
+    activeCategory || undefined,
+    domainIdData || undefined,
+    30 // 30 jours pour les stats
+  );
 
   useEffect(() => {
     if (categories.length > 0 && !activeCategory) {
@@ -125,17 +133,37 @@ const Categories = () => {
   };
 
   const computeStats = () => {
-    // TODO: Calculer les vraies statistiques depuis Supabase
+    if (!categoryStats || statsLoading) {
+      return {
+        avgScore7d: "-",
+        avgScore30d: "-",
+        filledDaysPercent: "-",
+        emptyDaysPercent: "-",
+        activeMetricsCount: "-",
+        metricsCompletionRate: "-",
+        performancesRatedCount: "-",
+        trend: "stable" as const,
+        trendMessage: "Chargement des statistiques...",
+      };
+    }
+
+    const filledPercent = Math.round(categoryStats.filledRate * 100);
+    const emptyPercent = 100 - filledPercent;
+
     return {
-      avgScore7d: "-",
-      avgScore30d: "-",
-      filledDaysPercent: "-",
-      emptyDaysPercent: "-",
-      activeMetricsCount: "-",
+      avgScore7d: categoryStats.normalizedIndex.toFixed(1),
+      avgScore30d: categoryStats.normalizedIndex.toFixed(1),
+      filledDaysPercent: filledPercent,
+      emptyDaysPercent: emptyPercent,
+      activeMetricsCount: "-", // TODO: compter les métriques actives
       metricsCompletionRate: "-",
-      performancesRatedCount: "-",
-      trend: "stable" as const,
-      trendMessage: "Aucune donnée enregistrée",
+      performancesRatedCount: categoryStats.filledDays,
+      trend: categoryStats.normalizedIndex > 70 ? "up" as const : categoryStats.normalizedIndex < 40 ? "down" as const : "stable" as const,
+      trendMessage: categoryStats.normalizedIndex > 70 
+        ? "Excellente performance !" 
+        : categoryStats.normalizedIndex < 40 
+        ? "Besoin d'amélioration" 
+        : "Performance stable",
     };
   };
 

@@ -107,6 +107,10 @@ export const useMetricRecords = (domainId?: string, startDate?: string, endDate?
       queryClient.invalidateQueries({ queryKey: ["domain_stats"] });
       queryClient.invalidateQueries({ queryKey: ["category_stats"] });
       queryClient.invalidateQueries({ queryKey: ["metrics"] });
+      queryClient.invalidateQueries({ queryKey: ["domain-performance"] });
+      queryClient.invalidateQueries({ queryKey: ["category-performance"] });
+      queryClient.invalidateQueries({ queryKey: ["metrics_for_scoring"] });
+      queryClient.invalidateQueries({ queryKey: ["metrics_for_category_scoring"] });
     },
     onError: (error: Error) => {
       toast({
@@ -131,6 +135,10 @@ export const useMetricRecords = (domainId?: string, startDate?: string, endDate?
       queryClient.invalidateQueries({ queryKey: ["domain_stats"] });
       queryClient.invalidateQueries({ queryKey: ["category_stats"] });
       queryClient.invalidateQueries({ queryKey: ["metrics"] });
+      queryClient.invalidateQueries({ queryKey: ["domain-performance"] });
+      queryClient.invalidateQueries({ queryKey: ["category-performance"] });
+      queryClient.invalidateQueries({ queryKey: ["metrics_for_scoring"] });
+      queryClient.invalidateQueries({ queryKey: ["metrics_for_category_scoring"] });
     },
     onError: (error: Error) => {
       toast({
