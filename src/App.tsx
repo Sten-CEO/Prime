@@ -11,6 +11,7 @@ import Categories from "./pages/Categories";
 import Journal from "./pages/Journal";
 import JournalDomain from "./pages/JournalDomain";
 import JournalMonth from "./pages/JournalMonth";
+import JournalEntry from "./pages/JournalEntry";
 import QuickNotes from "./pages/QuickNotes";
 import Profil from "./pages/Profil";
 import Parametres from "./pages/Parametres";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/domaines/:slug" element={<Domaines />} />
           <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
           <Route path="/journal" element={<Journal />} />
+          <Route path="/journal/entry/:id" element={<JournalEntry />} />
           <Route path="/journal/:domain" element={<JournalDomain />} />
           <Route path="/journal/:domain/:year/:month" element={<JournalMonth />} />
           <Route path="/quick-notes" element={<QuickNotes />} />

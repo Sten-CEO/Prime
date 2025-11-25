@@ -38,6 +38,7 @@ interface Insight {
   highlightColor: "pink" | "purple" | "blue";
   category: string;
   domain_id: string;
+  entry_id?: string;
 }
 
 const Accueil = () => {
@@ -96,6 +97,7 @@ const Accueil = () => {
         highlightColor: "blue" as const, // Non utilisé maintenant, couleur dynamique dans InsightCard
         category: getDomainLabel(insight.domain_id),
         domain_id: insight.domain_id,
+        entry_id: insight.entry_id,
       }));
 
       setInsights(formattedInsights);
