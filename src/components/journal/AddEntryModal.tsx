@@ -58,6 +58,12 @@ export const AddEntryModal = ({
   const [showInsightPopup, setShowInsightPopup] = useState(false);
   const [insights, setInsights] = useState<string[]>([]);
   const [tempInsights, setTempInsights] = useState<string[]>([]);
+  const [formatStates, setFormatStates] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+    strikeThrough: false
+  });
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Reset form when modal opens with initial data
@@ -88,6 +94,16 @@ export const AddEntryModal = ({
   const applyFormat = (command: string) => {
     document.execCommand(command, false);
     contentRef.current?.focus();
+    updateFormatStates();
+  };
+
+  const updateFormatStates = () => {
+    setFormatStates({
+      bold: document.queryCommandState('bold'),
+      italic: document.queryCommandState('italic'),
+      underline: document.queryCommandState('underline'),
+      strikeThrough: document.queryCommandState('strikeThrough')
+    });
   };
 
   const handleTextSelection = () => {
@@ -288,34 +304,58 @@ export const AddEntryModal = ({
                   <button
                     type="button"
                     onClick={() => applyFormat('bold')}
-                    className="p-1.5 rounded hover:bg-white/[0.08] transition-colors"
+                    className={`p-1.5 rounded transition-all ${
+                      formatStates.bold
+                        ? 'bg-white/[0.12] border border-white/[0.1] shadow-[0_0_10px_rgba(255,255,255,0.15)]'
+                        : 'hover:bg-white/[0.08]'
+                    }`}
                     title="Gras"
                   >
-                    <Bold className="w-3.5 h-3.5 text-white/60 hover:text-white/90" />
+                    <Bold className={`w-3.5 h-3.5 transition-colors ${
+                      formatStates.bold ? 'text-white' : 'text-white/60 hover:text-white/90'
+                    }`} />
                   </button>
                   <button
                     type="button"
                     onClick={() => applyFormat('italic')}
-                    className="p-1.5 rounded hover:bg-white/[0.08] transition-colors"
+                    className={`p-1.5 rounded transition-all ${
+                      formatStates.italic
+                        ? 'bg-white/[0.12] border border-white/[0.1] shadow-[0_0_10px_rgba(255,255,255,0.15)]'
+                        : 'hover:bg-white/[0.08]'
+                    }`}
                     title="Italique"
                   >
-                    <Italic className="w-3.5 h-3.5 text-white/60 hover:text-white/90" />
+                    <Italic className={`w-3.5 h-3.5 transition-colors ${
+                      formatStates.italic ? 'text-white' : 'text-white/60 hover:text-white/90'
+                    }`} />
                   </button>
                   <button
                     type="button"
                     onClick={() => applyFormat('underline')}
-                    className="p-1.5 rounded hover:bg-white/[0.08] transition-colors"
+                    className={`p-1.5 rounded transition-all ${
+                      formatStates.underline
+                        ? 'bg-white/[0.12] border border-white/[0.1] shadow-[0_0_10px_rgba(255,255,255,0.15)]'
+                        : 'hover:bg-white/[0.08]'
+                    }`}
                     title="Souligner"
                   >
-                    <Underline className="w-3.5 h-3.5 text-white/60 hover:text-white/90" />
+                    <Underline className={`w-3.5 h-3.5 transition-colors ${
+                      formatStates.underline ? 'text-white' : 'text-white/60 hover:text-white/90'
+                    }`} />
                   </button>
                   <button
                     type="button"
                     onClick={() => applyFormat('strikeThrough')}
-                    className="p-1.5 rounded hover:bg-white/[0.08] transition-colors"
+                    className={`p-1.5 rounded transition-all ${
+                      formatStates.strikeThrough
+                        ? 'bg-white/[0.12] border border-white/[0.1] shadow-[0_0_10px_rgba(255,255,255,0.15)]'
+                        : 'hover:bg-white/[0.08]'
+                    }`}
                     title="Barrer"
                   >
-                    <Strikethrough className="w-3.5 h-3.5 text-white/60 hover:text-white/90" />
+                    <Strikethrough className={`w-3.5 h-3.5 transition-colors ${
+                      formatStates.strikeThrough ? 'text-white' : 'text-white/60 hover:text-white/90'
+                    }`} />
                   </button>
                 </div>
                 
@@ -339,7 +379,11 @@ export const AddEntryModal = ({
             <div
               ref={contentRef}
               contentEditable
-              onMouseUp={handleTextSelection}
+              onMouseUp={() => {
+                handleTextSelection();
+                updateFormatStates();
+              }}
+              onKeyUp={updateFormatStates}
               onTouchEnd={handleTextSelection}
               onInput={(e) => setContent(e.currentTarget.innerText)}
               className={`bg-white/[0.05] border border-white/[0.1] text-white min-h-[200px] rounded-md px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white/20 ${
