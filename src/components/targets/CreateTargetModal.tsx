@@ -50,7 +50,7 @@ export const CreateTargetModal = ({
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [domain, setDomain] = useState(defaultDomain || "");
+  const [domain, setDomain] = useState(defaultDomain || dbDomains[0]?.slug || "business");
   const [category, setCategory] = useState(defaultCategory || "");
   const [startDate, setStartDate] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -75,7 +75,7 @@ export const CreateTargetModal = ({
       // Reset form
       setTitle("");
       setDescription("");
-      setDomain(defaultDomain || "");
+      setDomain(defaultDomain || dbDomains[0]?.slug || "business");
       setCategory(defaultCategory || "");
       setStartDate("");
       setDeadline("");

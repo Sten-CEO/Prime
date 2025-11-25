@@ -40,7 +40,7 @@ export const AddEntryModal = ({
   const { domains: dbDomains, isLoading: isLoadingDomains } = useDomains();
   const [title, setTitle] = useState(initialData?.title || "");
   const [content, setContent] = useState(initialData?.content || "");
-  const [domain, setDomain] = useState(initialData?.domain_id || defaultDomain || "");
+  const [domain, setDomain] = useState(initialData?.domain_id || defaultDomain || "general");
   const [date, setDate] = useState<Date>(
     initialData?.entry_date ? new Date(initialData.entry_date) : new Date()
   );
