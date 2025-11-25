@@ -6,6 +6,7 @@ import { Home, Award, BookOpen, Target, User, Settings, Plus, TrendingUp, CheckC
 import { PrimeTargetCard } from "@/components/targets/PrimeTargetCard";
 import { CreateTargetModal } from "@/components/targets/CreateTargetModal";
 import { TargetDetailPanel } from "@/components/targets/TargetDetailPanel";
+import bgImage from "@/assets/black-shapes-bg.jpg";
 
 interface PrimeTarget {
   id: string;
@@ -203,10 +204,11 @@ const PrimeTargets = () => {
   const archived = filteredTargets.filter(t => t.status === "archived");
 
   return (
-    <div className="min-h-screen bg-black relative">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
+    <div className="relative min-h-screen w-full bg-black">
+      {/* Background image - fixed */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+        style={{ backgroundImage: `url(${bgImage})` }}
       />
 
       {/* Glass Sidebar */}
@@ -264,9 +266,9 @@ const PrimeTargets = () => {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 ml-32 min-h-screen pr-8">
-        <div className="max-w-7xl mx-auto p-8 space-y-6">
+      {/* Content - scrollable */}
+      <div className="relative z-10 ml-32 min-h-screen">
+        <div className="max-w-7xl mx-auto px-8 py-8 space-y-6">
           {/* Header avec stats */}
           <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
             <div className="flex items-start justify-between mb-6">
