@@ -79,7 +79,13 @@ export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProp
       </div>
       
       <div className="space-y-4">
-        {metrics.map((metric) => (
+        {metrics.length === 0 ? (
+          <div className="py-8 text-center">
+            <p className="text-white/40 text-sm">Aucune métrique pour cette catégorie</p>
+            <p className="text-white/30 text-xs mt-1">Cliquez sur + pour en ajouter</p>
+          </div>
+        ) : (
+          metrics.map((metric) => (
           <div key={metric.id} className="space-y-2">
             <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.04] transition-all group">
               <div className="flex-1">
@@ -136,7 +142,8 @@ export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProp
               </div>
             )}
           </div>
-        ))}
+          ))
+        )}
       </div>
 
       <AddMetricModal

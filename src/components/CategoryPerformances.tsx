@@ -97,7 +97,13 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
       </div>
       
       <div className="space-y-3">
-        {performances.map((perf, index) => (
+        {performances.length === 0 ? (
+          <div className="py-8 text-center">
+            <p className="text-white/40 text-sm">Aucune performance pour cette catégorie</p>
+            <p className="text-white/30 text-xs mt-1">Cliquez sur Ajouter pour en créer</p>
+          </div>
+        ) : (
+          performances.map((perf, index) => (
           <div
             key={perf.id}
             draggable
@@ -152,7 +158,8 @@ export const CategoryPerformances = ({ categoryName, performances: initialPerfor
               </div>
             )}
           </div>
-        ))}
+          ))
+        )}
       </div>
 
       <AddPerformanceModal
