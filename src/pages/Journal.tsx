@@ -4,9 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Home, Award, BookOpen, Target, User, Settings } from "lucide-react";
-import { JournalEntryCard } from "@/components/journal/JournalEntryCard";
 import { AddEntryModal } from "@/components/journal/AddEntryModal";
-import { EntryDetailView } from "@/components/journal/EntryDetailView";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -24,7 +22,6 @@ const Journal = () => {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
 
   const fetchEntries = async () => {
     try {
@@ -63,84 +60,6 @@ const Journal = () => {
   useEffect(() => {
     fetchEntries();
   }, []);
-
-  if (selectedEntry) {
-    return (
-      <div className="min-h-screen bg-black relative">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
-        />
-
-        {/* Glass Sidebar */}
-        <div className="fixed left-6 top-6 bottom-6 w-20 z-20">
-          <div className="h-full backdrop-blur-2xl bg-white/[0.02] rounded-2xl border border-white/[0.08] flex flex-col items-center py-6 px-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)]">
-            <div className="mb-4">
-              <span className="text-white font-bold text-lg tracking-tight">Prime.</span>
-            </div>
-            
-            <Separator className="w-10 bg-white/20 mb-8" />
-            
-            <div className="flex-none">
-              <button 
-                onClick={() => navigate("/accueil")}
-                className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
-              >
-                <Home className="w-5 h-5 text-gray-400 opacity-70" />
-              </button>
-              <Separator className="w-10 bg-white/20 mx-auto my-4" />
-            </div>
-            
-            <div className="flex-1 flex flex-col gap-4">
-              <button 
-                onClick={() => navigate("/domaines/business")}
-                className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
-              >
-                <Award className="w-5 h-5 text-gray-400 opacity-70" />
-              </button>
-              <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/[0.08] transition-colors">
-                <BookOpen className="w-5 h-5 text-gray-400 opacity-70" />
-              </button>
-              <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
-                <Target className="w-5 h-5 text-gray-400 opacity-70" />
-              </button>
-              <Separator className="w-10 bg-white/20 mx-auto my-2" />
-            </div>
-            
-          <div className="flex-none flex flex-col gap-4 mt-8">
-            <button 
-              onClick={() => navigate("/profil")}
-              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
-            >
-              <User className="w-5 h-5 text-gray-400 opacity-70" />
-            </button>
-            <button 
-              onClick={() => navigate("/parametres")}
-              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
-            >
-              <Settings className="w-5 h-5 text-gray-400 opacity-70" />
-            </button>
-          </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 ml-32 p-8">
-          <EntryDetailView
-            id={selectedEntry.id}
-            title={selectedEntry.title}
-            content={selectedEntry.content}
-            domain={selectedEntry.domain_id}
-            date={new Date(selectedEntry.entry_date)}
-            onBack={() => setSelectedEntry(null)}
-            onDeleted={() => {
-              setSelectedEntry(null);
-              fetchEntries();
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black relative">
@@ -237,17 +156,52 @@ const Journal = () => {
                 Aucune entrée de journal. Commencez par en créer une !
               </div>
             ) : (
-              entries.map((entry) => (
-                <JournalEntryCard
-                  key={entry.id}
-                  id={entry.id}
-                  title={entry.title}
-                  content={entry.content}
-                  domain={entry.domain_id}
-                  date={new Date(entry.entry_date)}
-                  onClick={() => setSelectedEntry(entry)}
-                />
-              ))
+              (() => {
+                // Group entries by domain
+                const entriesByDomain = entries.reduce((acc, entry) => {
+                  if (!acc[entry.domain_id]) {
+                    acc[entry.domain_id] = [];
+                  }
+                  acc[entry.domain_id].push(entry);
+                  return acc;
+                }, {} as Record<string, JournalEntry[]>);
+
+                const getDomainLabel = (domainId: string) => {
+                  const domains: Record<string, string> = {
+                    business: "Business",
+                    sport: "Sport",
+                    social: "Social",
+                    sante: "Santé",
+                    developpement: "Développement",
+                    finance: "Finance",
+                  };
+                  return domains[domainId] || domainId;
+                };
+
+                return Object.entries(entriesByDomain).map(([domainId, domainEntries]) => (
+                  <div
+                    key={domainId}
+                    onClick={() => navigate(`/journal/${domainId}`)}
+                    className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h2 className="text-xl font-semibold text-white">
+                        Journal {getDomainLabel(domainId)}
+                      </h2>
+                      <span className="text-sm text-white/40">
+                        {domainEntries.length} {domainEntries.length === 1 ? "entrée" : "entrées"}
+                      </span>
+                    </div>
+                    <p className="text-sm text-white/60">
+                      Dernière entrée le {new Date(domainEntries[0].entry_date).toLocaleDateString("fr-FR", { 
+                        day: "numeric", 
+                        month: "long", 
+                        year: "numeric" 
+                      })}
+                    </p>
+                  </div>
+                ));
+              })()
             )}
           </div>
         </div>
