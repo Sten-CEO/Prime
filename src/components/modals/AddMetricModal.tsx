@@ -37,7 +37,7 @@ const weekDaysMap: Record<string, string> = {
 export const AddMetricModal = ({ open, onOpenChange, onAdd, domainId, categories, editMetric }: AddMetricModalProps) => {
   const [name, setName] = useState(editMetric?.name || "");
   const [selectedIcon, setSelectedIcon] = useState(editMetric?.icon || "💧");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(editMetric?.category_id || "");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(editMetric?.category_id || undefined);
   const [impactWeight, setImpactWeight] = useState<string>(editMetric?.impact_weight?.toString() || "1");
   const [selectedDays, setSelectedDays] = useState<string[]>(editMetric?.scheduled_days || []);
   
@@ -102,7 +102,7 @@ export const AddMetricModal = ({ open, onOpenChange, onAdd, domainId, categories
   const resetForm = () => {
     setName("");
     setSelectedIcon("💧");
-    setSelectedCategoryId("");
+    setSelectedCategoryId(undefined);
     setImpactWeight("1");
     setSelectedDays([]);
   };
