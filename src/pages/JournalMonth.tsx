@@ -8,7 +8,7 @@ import { AddEntryModal } from "@/components/journal/AddEntryModal";
 import { EntryDetailView } from "@/components/journal/EntryDetailView";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { format, startOfWeek, isSameWeek, parseISO } from "date-fns";
+import { format, parseISO, isSameWeek } from "date-fns";
 import { fr } from "date-fns/locale";
 
 interface JournalEntry {
@@ -20,8 +20,8 @@ interface JournalEntry {
   created_at: string;
 }
 
-const JournalDomain = () => {
-  const { domain } = useParams<{ domain: string }>();
+const JournalMonth = () => {
+  const { domain, year, month } = useParams<{ domain: string; year: string; month: string }>();
   const navigate = useNavigate();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,6 +40,12 @@ const JournalDomain = () => {
     return domains[domainId] || domainId;
   };
 
+  const getMonthLabel = () => {
+    if (!year || !month) return "";
+    const date = new Date(parseInt(year), parseInt(month) - 1);
+    return format(date, "MMMM yyyy", { locale: fr });
+  };
+
   const fetchEntries = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -53,11 +59,19 @@ const JournalDomain = () => {
         return;
       }
 
+      // Calculate start and end dates for the month
+      const startDate = `${year}-${month?.padStart(2, '0')}-01`;
+      const endYear = month === '12' ? (parseInt(year!) + 1).toString() : year;
+      const endMonth = month === '12' ? '01' : (parseInt(month!) + 1).toString().padStart(2, '0');
+      const endDate = `${endYear}-${endMonth}-01`;
+
       const { data, error } = await supabase
         .from("journal_entries")
         .select("*")
         .eq("user_id", user.id)
         .eq("domain_id", domain)
+        .gte("entry_date", startDate)
+        .lt("entry_date", endDate)
         .order("entry_date", { ascending: false });
 
       if (error) throw error;
@@ -75,41 +89,18 @@ const JournalDomain = () => {
     }
   };
 
-  // Group entries by month
-  const groupEntriesByMonth = () => {
-    const grouped: Record<string, { entries: JournalEntry[], year: string, month: string }> = {};
-    
-    entries.forEach((entry) => {
-      const date = parseISO(entry.entry_date);
-      const monthKey = format(date, "MMMM yyyy", { locale: fr });
-      const year = format(date, "yyyy");
-      const month = format(date, "MM");
-      
-      if (!grouped[monthKey]) {
-        grouped[monthKey] = { entries: [], year, month };
-      }
-      grouped[monthKey].entries.push(entry);
-    });
-    
-    return grouped;
-  };
-
-  // Check if we need a week separator
   const needsWeekSeparator = (currentEntry: JournalEntry, previousEntry: JournalEntry | null) => {
     if (!previousEntry) return false;
     
     const currentDate = parseISO(currentEntry.entry_date);
     const previousDate = parseISO(previousEntry.entry_date);
     
-    // Get timezone from localStorage or default to Europe/Paris
-    const timezone = localStorage.getItem('prime_timezone') || 'Europe/Paris';
-    
     return !isSameWeek(currentDate, previousDate, { weekStartsOn: 1, locale: fr });
   };
 
   useEffect(() => {
     fetchEntries();
-  }, [domain]);
+  }, [domain, year, month]);
 
   if (selectedEntry) {
     return (
@@ -157,20 +148,20 @@ const JournalDomain = () => {
               <Separator className="w-10 bg-white/20 mx-auto my-2" />
             </div>
             
-          <div className="flex-none flex flex-col gap-4 mt-8">
-            <button 
-              onClick={() => navigate("/profil")}
-              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
-            >
-              <User className="w-5 h-5 text-gray-400 opacity-70" />
-            </button>
-            <button 
-              onClick={() => navigate("/parametres")}
-              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
-            >
-              <Settings className="w-5 h-5 text-gray-400 opacity-70" />
-            </button>
-          </div>
+            <div className="flex-none flex flex-col gap-4 mt-8">
+              <button 
+                onClick={() => navigate("/profil")}
+                className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+              >
+                <User className="w-5 h-5 text-gray-400 opacity-70" />
+              </button>
+              <button 
+                onClick={() => navigate("/parametres")}
+                className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+              >
+                <Settings className="w-5 h-5 text-gray-400 opacity-70" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -260,13 +251,13 @@ const JournalDomain = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate("/journal")}
+                onClick={() => navigate(`/journal/${domain}`)}
                 className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-full p-2 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4 text-white/70" />
               </button>
-              <h1 className="text-3xl font-bold text-white">
-                Journal – {getDomainLabel(domain || "")}
+              <h1 className="text-3xl font-bold text-white capitalize">
+                {getDomainLabel(domain || "")} – {getMonthLabel()}
               </h1>
             </div>
             
@@ -290,46 +281,31 @@ const JournalDomain = () => {
             />
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-4">
             {loading ? (
               <div className="text-center text-white/60 py-12">
                 Chargement des entrées...
               </div>
             ) : entries.length === 0 ? (
               <div className="text-center text-white/60 py-12">
-                Aucune entrée pour ce domaine. Commencez par en créer une !
+                Aucune entrée pour ce mois. Commencez par en créer une !
               </div>
             ) : (
-              Object.entries(groupEntriesByMonth()).map(([monthKey, monthData]) => (
-                <div key={monthKey} className="space-y-4">
-                  <button
-                    onClick={() => navigate(`/journal/${domain}/${monthData.year}/${monthData.month}`)}
-                    className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-4 py-2 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer"
-                  >
-                    <h2 className="text-sm font-medium text-white/80 capitalize">
-                      Entrées de {monthKey}
-                    </h2>
-                  </button>
-                  
-                  <div className="space-y-4">
-                    {monthData.entries.map((entry, index) => (
-                      <div key={entry.id}>
-                        {needsWeekSeparator(entry, index > 0 ? monthData.entries[index - 1] : null) && (
-                          <div className="my-6 flex items-center gap-4">
-                            <div className="flex-1 h-px bg-white/[0.08]" />
-                          </div>
-                        )}
-                        <JournalEntryCard
-                          id={entry.id}
-                          title={entry.title}
-                          content={entry.content}
-                          domain={entry.domain_id}
-                          date={new Date(entry.entry_date)}
-                          onClick={() => setSelectedEntry(entry)}
-                        />
-                      </div>
-                    ))}
-                  </div>
+              entries.map((entry, index) => (
+                <div key={entry.id}>
+                  {needsWeekSeparator(entry, index > 0 ? entries[index - 1] : null) && (
+                    <div className="my-6 flex items-center gap-4">
+                      <div className="flex-1 h-px bg-white/[0.08]" />
+                    </div>
+                  )}
+                  <JournalEntryCard
+                    id={entry.id}
+                    title={entry.title}
+                    content={entry.content}
+                    domain={entry.domain_id}
+                    date={new Date(entry.entry_date)}
+                    onClick={() => setSelectedEntry(entry)}
+                  />
                 </div>
               ))
             )}
@@ -347,4 +323,4 @@ const JournalDomain = () => {
   );
 };
 
-export default JournalDomain;
+export default JournalMonth;

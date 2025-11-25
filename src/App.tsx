@@ -10,6 +10,7 @@ import Domaines from "./pages/Domaines";
 import Categories from "./pages/Categories";
 import Journal from "./pages/Journal";
 import JournalDomain from "./pages/JournalDomain";
+import JournalMonth from "./pages/JournalMonth";
 import Profil from "./pages/Profil";
 import Parametres from "./pages/Parametres";
 import PrimeHistory from "./pages/PrimeHistory";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
           <Route path="/journal" element={<Journal />} />
           <Route path="/journal/:domain" element={<JournalDomain />} />
+          <Route path="/journal/:domain/:year/:month" element={<JournalMonth />} />
           <Route path="/profil" element={<Profil />} />
           <Route path="/parametres" element={<Parametres />} />
           <Route path="/prime-history" element={<PrimeHistory />} />
