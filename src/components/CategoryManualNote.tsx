@@ -1,17 +1,30 @@
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Slider } from "@/components/ui/slider";
 import { TrendingUp } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface CategoryManualNoteProps {
   categoryName: string;
 }
 
+type ImpactLevel = 1 | 2 | 3 | null;
+
+const IMPACT_VALUES = {
+  1: 20,
+  2: 50,
+  3: 80,
+};
+
 export const CategoryManualNote = ({ categoryName }: CategoryManualNoteProps) => {
   const [note, setNote] = useState("");
-  const [score, setScore] = useState([75]);
-  const [impactsCurve, setImpactsCurve] = useState(true);
+  const [impactLevel, setImpactLevel] = useState<ImpactLevel>(null);
+
+  const handleRecord = () => {
+    if (!impactLevel) return;
+    // TODO: Enregistrer dans Supabase
+    console.log("Recording manual note:", { note, impact: IMPACT_VALUES[impactLevel], categoryName });
+  };
 
   return (
     <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] hover:bg-white/[0.03] hover:border-white/[0.25] transition-all">
@@ -31,43 +44,59 @@ export const CategoryManualNote = ({ categoryName }: CategoryManualNoteProps) =>
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-xs text-white/60">
-              Note de performance
-            </label>
-            <span className="text-sm font-medium text-white">
-              {score[0].toFixed(0)}<span className="text-white/60">/100</span>
-            </span>
+          <label className="text-xs text-white/60 mb-2 block">
+            Impact de la performance
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              onClick={() => setImpactLevel(1)}
+              className={cn(
+                "px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                impactLevel === 1
+                  ? "bg-white/[0.15] border-2 border-white/[0.3] text-white"
+                  : "bg-white/[0.05] border border-white/[0.1] text-white/60 hover:bg-white/[0.08]"
+              )}
+            >
+              <div className="text-xs mb-1">Impact 1</div>
+              <div className="text-[10px] text-white/50">Simple</div>
+            </button>
+            <button
+              onClick={() => setImpactLevel(2)}
+              className={cn(
+                "px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                impactLevel === 2
+                  ? "bg-white/[0.15] border-2 border-white/[0.3] text-white"
+                  : "bg-white/[0.05] border border-white/[0.1] text-white/60 hover:bg-white/[0.08]"
+              )}
+            >
+              <div className="text-xs mb-1">Impact 2</div>
+              <div className="text-[10px] text-white/50">Avancée</div>
+            </button>
+            <button
+              onClick={() => setImpactLevel(3)}
+              className={cn(
+                "px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                impactLevel === 3
+                  ? "bg-white/[0.15] border-2 border-white/[0.3] text-white"
+                  : "bg-white/[0.05] border border-white/[0.1] text-white/60 hover:bg-white/[0.08]"
+              )}
+            >
+              <div className="text-xs mb-1">Impact 3</div>
+              <div className="text-[10px] text-white/50">Exceptionnelle</div>
+            </button>
           </div>
-          <Slider
-            value={score}
-            onValueChange={setScore}
-            max={100}
-            step={1}
-            className="mb-1"
-          />
+          {impactLevel && (
+            <p className="text-xs text-white/70 mt-2">
+              Valeur ajoutée: <span className="font-bold text-success">+{IMPACT_VALUES[impactLevel]}</span>
+            </p>
+          )}
         </div>
 
-        <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.08]">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-success" />
-            <span className="text-sm text-white/80">Impact sur la courbe du jour</span>
-          </div>
-          <button
-            onClick={() => setImpactsCurve(!impactsCurve)}
-            className={`w-10 h-5 rounded-full transition-all ${
-              impactsCurve 
-                ? "bg-success/30 border border-success/50" 
-                : "bg-white/[0.05] border border-white/[0.12]"
-            }`}
-          >
-            <div className={`w-4 h-4 rounded-full bg-white shadow-lg transition-transform ${
-              impactsCurve ? "translate-x-5" : "translate-x-0"
-            }`} />
-          </button>
-        </div>
-
-        <button className="w-full py-2.5 rounded-lg backdrop-blur-xl bg-white/[0.08] border border-white/[0.15] hover:bg-white/[0.12] hover:border-white/[0.25] transition-all text-white text-sm font-medium">
+        <button 
+          onClick={handleRecord}
+          disabled={!impactLevel}
+          className="w-full py-2.5 rounded-lg backdrop-blur-xl bg-white/[0.08] border border-white/[0.15] hover:bg-white/[0.12] hover:border-white/[0.25] transition-all text-white text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+        >
           Enregistrer
         </button>
       </div>
