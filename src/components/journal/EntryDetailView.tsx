@@ -196,7 +196,7 @@ export const EntryDetailView = ({
       <Card className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8">
         <div className="space-y-6">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+            <span className="text-sm font-semibold text-white px-4 py-1.5 rounded-full bg-gradient-to-br from-white/[0.15] to-white/[0.08] border border-white/[0.25] shadow-[0_0_15px_rgba(255,255,255,0.1)] backdrop-blur-sm">
               {getDomainLabel(domain)}
             </span>
             {insights.length > 0 && (
