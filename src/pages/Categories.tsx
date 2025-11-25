@@ -11,38 +11,8 @@ import { CategorySelector } from "@/components/CategorySelector";
 import { AddCategoryModal } from "@/components/modals/AddCategoryModal";
 import { CategoryStatsBlock } from "@/components/CategoryStatsBlock";
 import { useToast } from "@/hooks/use-toast";
-
-interface Metric {
-  id: string;
-  name: string;
-  enabled: boolean;
-  days: string[];
-}
-
-type PerformanceLevel = "simple" | "advanced" | "exceptional";
-
-interface Performance {
-  id: string;
-  name: string;
-  level: PerformanceLevel;
-  impact: number;
-}
-
-interface CategoryData {
-  id: string;
-  name: string;
-  color?: string;
-  score: number;
-  variation: string;
-  metrics: Metric[];
-  performances: Performance[];
-}
-
-interface DomainCategories {
-  [domainKey: string]: CategoryData[];
-}
-
-const initialCategoriesData: DomainCategories = {};
+import { useDomainSlugToId } from "@/hooks/useDomainSlugToId";
+import { useCategories } from "@/hooks/useCategories";
 
 const domainNames: { [key: string]: string } = {
   business: "Business",
@@ -57,22 +27,22 @@ const Categories = () => {
   const location = useLocation();
   const { toast } = useToast();
   
-  const [categoriesData, setCategoriesData] = useState<DomainCategories>(initialCategoriesData);
+  const { data: domainIdData } = useDomainSlugToId(slug || "");
+  const { categories, isLoading: categoriesLoading, createCategory, updateCategory, deleteCategory } = useCategories(domainIdData || undefined);
+  
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<{ id: string; name: string; color?: string } | null>(null);
 
-  const currentDomainCategories = slug ? categoriesData[slug] || [] : [];
-
   useEffect(() => {
-    if (currentDomainCategories.length > 0 && !activeCategory) {
-      setActiveCategory(currentDomainCategories[0].id);
+    if (categories.length > 0 && !activeCategory) {
+      setActiveCategory(categories[0].id);
     }
-  }, [slug, currentDomainCategories.length]);
+  }, [categories.length]);
 
-  const activeCategoryData = currentDomainCategories.find(c => c.id === activeCategory);
+  const activeCategoryData = categories.find(c => c.id === activeCategory);
 
-  if (!slug) {
+  if (!slug || !domainIdData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <p>Domaine non trouvé</p>
@@ -80,8 +50,8 @@ const Categories = () => {
     );
   }
 
-  // Permettre l'affichage même sans catégories
-  const hasCategories = currentDomainCategories.length > 0;
+  const hasCategories = categories.length > 0;
+  const isLoading = categoriesLoading;
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -93,45 +63,35 @@ const Categories = () => {
   };
 
   const handleEditCategory = (categoryId: string) => {
-    const category = currentDomainCategories.find(c => c.id === categoryId);
+    const category = categories.find(c => c.id === categoryId);
     if (category) {
-      setEditingCategory({ id: category.id, name: category.name, color: category.color });
+      setEditingCategory({ id: category.id, name: category.name, color: category.color || undefined });
       setShowAddModal(true);
     }
   };
 
   const handleSaveCategory = (name: string, color: string) => {
+    if (!domainIdData) return;
+    
     if (editingCategory) {
       // Renommer
-      setCategoriesData(prev => ({
-        ...prev,
-        [slug]: (prev[slug] || []).map(c =>
-          c.id === editingCategory.id ? { ...c, name, color } : c
-        ),
-      }));
-      toast({ title: "Catégorie renommée", description: `La catégorie a été renommée en "${name}".` });
-    } else {
-      // Créer
-      const newCategory: CategoryData = {
-        id: `category_${Date.now()}`,
+      updateCategory({
+        id: editingCategory.id,
         name,
         color,
-        score: 0,
-        variation: "N/A",
-        metrics: [],
-        performances: [],
-      };
-      setCategoriesData(prev => ({
-        ...prev,
-        [slug]: [...(prev[slug] || []), newCategory],
-      }));
-      setActiveCategory(newCategory.id);
-      toast({ title: "Catégorie créée", description: `"${name}" a été ajoutée avec succès.` });
+      });
+    } else {
+      // Créer
+      createCategory({
+        name,
+        color,
+        domain_id: domainIdData,
+      });
     }
   };
 
   const handleDeleteCategory = (categoryId: string) => {
-    if (currentDomainCategories.length <= 1) {
+    if (categories.length <= 1) {
       toast({ 
         title: "Impossible de supprimer", 
         description: "Il doit rester au moins une catégorie.",
@@ -140,89 +100,41 @@ const Categories = () => {
       return;
     }
 
-    setCategoriesData(prev => ({
-      ...prev,
-      [slug]: (prev[slug] || []).filter(c => c.id !== categoryId),
-    }));
+    deleteCategory(categoryId);
 
-    if (activeCategory === categoryId) {
-      setActiveCategory(currentDomainCategories[0].id !== categoryId 
-        ? currentDomainCategories[0].id 
-        : currentDomainCategories[1].id);
+    if (activeCategory === categoryId && categories.length > 1) {
+      const otherCategory = categories.find(c => c.id !== categoryId);
+      if (otherCategory) {
+        setActiveCategory(otherCategory.id);
+      }
     }
-
-    toast({ title: "Catégorie supprimée", description: "La catégorie a été supprimée avec succès." });
   };
 
   const handleDuplicateCategory = (categoryId: string) => {
-    const category = currentDomainCategories.find(c => c.id === categoryId);
+    if (!domainIdData) return;
+    
+    const category = categories.find(c => c.id === categoryId);
     if (category) {
-      const duplicated: CategoryData = {
-        ...category,
-        id: `category_${Date.now()}`,
+      createCategory({
         name: `${category.name} (copie)`,
-        score: 0,
-        variation: "N/A",
-      };
-      setCategoriesData(prev => ({
-        ...prev,
-        [slug]: [...(prev[slug] || []), duplicated],
-      }));
-      setActiveCategory(duplicated.id);
-      toast({ title: "Catégorie dupliquée", description: `"${duplicated.name}" a été créée.` });
+        color: category.color || undefined,
+        domain_id: domainIdData,
+      });
     }
   };
 
   const computeStats = () => {
-    if (!activeCategoryData) {
-      return {
-        avgScore7d: "-",
-        avgScore30d: "-",
-        filledDaysPercent: "-",
-        emptyDaysPercent: "-",
-        activeMetricsCount: "-",
-        metricsCompletionRate: "-",
-        performancesRatedCount: "-",
-        trend: "stable" as const,
-        trendMessage: "Aucune donnée disponible",
-      };
-    }
-    
-    const activeMetricsCount = activeCategoryData.metrics.filter(m => m.enabled).length;
-    const performancesRatedCount = activeCategoryData.performances.length;
-    
-    // Si aucune donnée n'a été enregistrée, retourner "-"
-    const hasData = activeMetricsCount > 0 || performancesRatedCount > 0;
-    
-    if (!hasData) {
-      return {
-        avgScore7d: "-",
-        avgScore30d: "-",
-        filledDaysPercent: "-",
-        emptyDaysPercent: "-",
-        activeMetricsCount: activeMetricsCount,
-        metricsCompletionRate: "-",
-        performancesRatedCount: performancesRatedCount,
-        trend: "stable" as const,
-        trendMessage: "Aucune donnée enregistrée",
-      };
-    }
-    
     // TODO: Calculer les vraies statistiques depuis Supabase
     return {
       avgScore7d: "-",
       avgScore30d: "-",
       filledDaysPercent: "-",
       emptyDaysPercent: "-",
-      activeMetricsCount,
+      activeMetricsCount: "-",
       metricsCompletionRate: "-",
-      performancesRatedCount,
-      trend: activeCategoryData.variation.startsWith("+") ? "up" as const : activeCategoryData.variation.startsWith("-") ? "down" as const : "stable" as const,
-      trendMessage: activeCategoryData.variation.startsWith("+") 
-        ? "Catégorie en forte progression" 
-        : activeCategoryData.variation.startsWith("-")
-        ? "Catégorie en baisse, attention"
-        : "Catégorie stable",
+      performancesRatedCount: "-",
+      trend: "stable" as const,
+      trendMessage: "Aucune donnée enregistrée",
     };
   };
 
@@ -287,15 +199,21 @@ const Categories = () => {
         <div className="max-w-[1600px] mx-auto px-8 py-8">
           <CategoryHighBar currentDomain={slug || "business"} currentCategory={activeCategory} />
           
-          <CategorySelector
-            categories={currentDomainCategories}
-            activeCategory={activeCategory}
-            onCategoryChange={handleCategoryChange}
-            onAddCategory={handleAddCategory}
-            onEditCategory={handleEditCategory}
-            onDeleteCategory={handleDeleteCategory}
-            onDuplicateCategory={handleDuplicateCategory}
-          />
+          {isLoading ? (
+            <div className="py-8">
+              <div className="h-12 bg-white/[0.02] border border-white/[0.08] rounded-2xl animate-pulse" />
+            </div>
+          ) : (
+            <CategorySelector
+              categories={categories}
+              activeCategory={activeCategory}
+              onCategoryChange={handleCategoryChange}
+              onAddCategory={handleAddCategory}
+              onEditCategory={handleEditCategory}
+              onDeleteCategory={handleDeleteCategory}
+              onDuplicateCategory={handleDuplicateCategory}
+            />
+          )}
           
           {!hasCategories ? (
             <div className="mt-12 text-center">
@@ -319,9 +237,9 @@ const Categories = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <CategoryPerformances 
                   categoryName={activeCategoryData.name}
-                  performances={activeCategoryData.performances}
+                  performances={[]}
                 />
-                <CategoryMetrics metrics={activeCategoryData.metrics} />
+                <CategoryMetrics metrics={[]} />
               </div>
 
               <CategoryManualNote categoryName={activeCategoryData.name} />
