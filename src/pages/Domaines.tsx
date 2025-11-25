@@ -2,6 +2,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import bgImage from "@/assets/black-shapes-bg.jpg";
 import { Home, Award, BookOpen, Target, User, Settings } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { DomainHighBar } from "@/components/DomainHighBar";
 import { DomainScoreChart } from "@/components/DomainScoreChart";
 import { DomainPerformances } from "@/components/DomainPerformances";
@@ -210,7 +211,10 @@ const Domaines = () => {
             <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/[0.08] transition-colors">
               <Award className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
-            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
+            <button 
+              onClick={() => navigate("/journal")}
+              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+            >
               <BookOpen className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
             <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
@@ -237,10 +241,18 @@ const Domaines = () => {
           <DomainHighBar currentDomain={slug || ""} />
 
           {/* Domain Title */}
-          <div className="mb-8 mt-6">
+          <div className="mb-8 mt-6 flex items-center justify-between">
             <h1 className="text-4xl font-bold text-white tracking-tight">
               {domain.name}
             </h1>
+            <Button
+              onClick={() => navigate(`/journal/${slug}`)}
+              variant="outline"
+              className="border-white/[0.1] text-white hover:bg-white/[0.05]"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Aller vers le journal
+            </Button>
           </div>
 
           {/* Performances + Metrics */}
