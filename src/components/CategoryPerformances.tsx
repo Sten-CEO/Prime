@@ -1,9 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { AddFreePerformanceModal } from "@/components/modals/AddFreePerformanceModal";
-import { useFreePerformances } from "@/hooks/useFreePerformances";
+import { useFreePerformanceRecords } from "@/hooks/useFreePerformanceRecords";
+import { FreePerformanceCard } from "@/components/FreePerformanceCard";
 
 interface CategoryPerformancesProps {
   categoryId: string;
@@ -11,27 +12,9 @@ interface CategoryPerformancesProps {
 }
 
 export const CategoryPerformances = ({ categoryId, domainId }: CategoryPerformancesProps) => {
-  const { freePerformances, isLoading, createFreePerformance, deleteFreePerformance } = useFreePerformances(categoryId);
+  const { freePerformanceRecords, isLoading, deleteFreePerformanceRecord } = useFreePerformanceRecords(domainId, categoryId);
   const [showAddModal, setShowAddModal] = useState(false);
-
-  const handleAdd = (performance: { 
-    title: string; 
-    date: string; 
-    description?: string; 
-    level: any; 
-    impact: number; 
-    impactType: any;
-  }) => {
-    createFreePerformance({
-      name: performance.title,
-      category_id: categoryId,
-      domain_id: domainId,
-    });
-  };
-
-  const handleDelete = (id: string) => {
-    deleteFreePerformance(id);
-  };
+  const [editingPerformance, setEditingPerformance] = useState<any>(null);
 
   return (
     <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] hover:bg-white/[0.03] hover:border-white/[0.25] transition-all">
@@ -51,34 +34,33 @@ export const CategoryPerformances = ({ categoryId, domainId }: CategoryPerforman
           <div className="py-8 text-center">
             <p className="text-white/40 text-sm">Chargement...</p>
           </div>
-        ) : freePerformances.length === 0 ? (
+        ) : freePerformanceRecords.length === 0 ? (
           <div className="py-8 text-center">
             <p className="text-white/40 text-sm">Aucune performance libre</p>
             <p className="text-white/30 text-xs mt-1">Cliquez sur + pour en ajouter</p>
           </div>
         ) : (
-          freePerformances.map((perf) => (
-            <div
+          freePerformanceRecords.map((perf) => (
+            <FreePerformanceCard
               key={perf.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.04] transition-all group"
-            >
-              <p className="text-sm text-white/80 flex-1">{perf.name}</p>
-              <button
-                onClick={() => handleDelete(perf.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded hover:bg-red-500/20"
-                title="Supprimer"
-              >
-                <Trash2 className="w-3.5 h-3.5 text-red-400" />
-              </button>
-            </div>
+              performance={perf}
+              onEdit={() => setEditingPerformance(perf)}
+              onDelete={() => deleteFreePerformanceRecord(perf.id)}
+            />
           ))
         )}
       </div>
 
       <AddFreePerformanceModal
-        open={showAddModal}
-        onOpenChange={setShowAddModal}
-        onAdd={handleAdd}
+        open={showAddModal || !!editingPerformance}
+        onOpenChange={(open) => {
+          setShowAddModal(open);
+          if (!open) setEditingPerformance(null);
+        }}
+        onAdd={() => {}}
+        domainId={domainId}
+        categories={[{ id: categoryId, name: "" }]}
+        editPerformance={editingPerformance}
       />
     </Card>
   );

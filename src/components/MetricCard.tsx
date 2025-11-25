@@ -63,7 +63,7 @@ export const MetricCard = ({ metric, onEdit, onDelete, onToggleActive }: MetricC
     setIsCompletedToday(!!todayRecord);
   }, [metricRecords, metric.id, today]);
 
-  const handleToggleComplete = () => {
+  const handleToggleComplete = async () => {
     if (!isScheduledToday) return;
     
     const todayRecord = metricRecords.find(
@@ -72,16 +72,14 @@ export const MetricCard = ({ metric, onEdit, onDelete, onToggleActive }: MetricC
     
     if (todayRecord) {
       // Delete the existing record (uncheck)
-      deleteMetricRecord(todayRecord.id);
-      setIsCompletedToday(false);
+      await deleteMetricRecord(todayRecord.id);
     } else {
       // Create new record (check)
-      recordMetricCompletion({
+      await recordMetricCompletion({
         metric_id: metric.id,
         recorded_date: today,
         custom_impact: metric.impact_weight || undefined,
       });
-      setIsCompletedToday(true);
     }
   };
 
