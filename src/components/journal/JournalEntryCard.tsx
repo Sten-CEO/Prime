@@ -54,8 +54,8 @@ export const JournalEntryCard = ({
               <Sparkles 
                 className="w-4 h-4 flex-shrink-0"
                 style={{ 
-                  color: `hsl(${domainHslColor})`,
-                  filter: `drop-shadow(0 0 8px hsl(${domainHslColor} / 0.6))`
+                  color: domain === 'general' ? 'rgb(255, 255, 255)' : `hsl(${domainHslColor})`,
+                  filter: domain === 'general' ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6))' : `drop-shadow(0 0 8px hsl(${domainHslColor} / 0.6))`
                 }}
               />
             )}

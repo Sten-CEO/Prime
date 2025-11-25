@@ -11,30 +11,71 @@ const generateMockData = (days: number) => {
   const data = [];
   const today = new Date();
   
-  for (let i = days - 1; i >= 0; i--) {
-    const date = subDays(today, i);
-    const dayLabel = days <= 7 
-      ? format(date, "EEE", { locale: fr }).slice(0, 3)
-      : days <= 30
-      ? format(date, "d MMM", { locale: fr })
-      : days <= 90
-      ? format(date, "d MMM", { locale: fr })
-      : format(date, "MMM", { locale: fr });
-    
-    const business = Math.floor(Math.random() * 30) + 70;
-    const sport = Math.floor(Math.random() * 30) + 65;
-    const social = Math.floor(Math.random() * 30) + 60;
-    const sante = Math.floor(Math.random() * 30) + 75;
-    const general = Math.round((business + sport + social + sante) / 4);
-    
-    data.push({
-      day: dayLabel,
-      Business: business,
-      Sport: sport,
-      Social: social,
-      Santé: sante,
-      Général: general,
-    });
+  if (days === 365) {
+    // 12 mois: 1 point par mois
+    for (let i = 11; i >= 0; i--) {
+      const date = subMonths(today, i);
+      const monthLabel = format(date, "MMM", { locale: fr });
+      
+      const business = Math.floor(Math.random() * 30) + 70;
+      const sport = Math.floor(Math.random() * 30) + 65;
+      const social = Math.floor(Math.random() * 30) + 60;
+      const sante = Math.floor(Math.random() * 30) + 75;
+      const general = Math.round((business + sport + social + sante) / 4);
+      
+      data.push({
+        day: monthLabel,
+        Business: business,
+        Sport: sport,
+        Social: social,
+        Santé: sante,
+        Général: general,
+      });
+    }
+  } else if (days === 90) {
+    // 90 jours: 1 point par semaine (13 semaines)
+    for (let i = 12; i >= 0; i--) {
+      const date = subDays(today, i * 7);
+      const weekLabel = `S${13 - i}`;
+      
+      const business = Math.floor(Math.random() * 30) + 70;
+      const sport = Math.floor(Math.random() * 30) + 65;
+      const social = Math.floor(Math.random() * 30) + 60;
+      const sante = Math.floor(Math.random() * 30) + 75;
+      const general = Math.round((business + sport + social + sante) / 4);
+      
+      data.push({
+        day: weekLabel,
+        Business: business,
+        Sport: sport,
+        Social: social,
+        Santé: sante,
+        Général: general,
+      });
+    }
+  } else {
+    // 7 ou 30 jours: 1 point par jour
+    for (let i = days - 1; i >= 0; i--) {
+      const date = subDays(today, i);
+      const dayLabel = days <= 7 
+        ? format(date, "EEE", { locale: fr }).slice(0, 3)
+        : format(date, "d MMM", { locale: fr });
+      
+      const business = Math.floor(Math.random() * 30) + 70;
+      const sport = Math.floor(Math.random() * 30) + 65;
+      const social = Math.floor(Math.random() * 30) + 60;
+      const sante = Math.floor(Math.random() * 30) + 75;
+      const general = Math.round((business + sport + social + sante) / 4);
+      
+      data.push({
+        day: dayLabel,
+        Business: business,
+        Sport: sport,
+        Social: social,
+        Santé: sante,
+        Général: general,
+      });
+    }
   }
   
   return data;
@@ -100,12 +141,12 @@ export const MultiDomainChart = () => {
     return Object.keys(domainMapping).map(key => {
       const slug = domainMapping[key];
       const hslColor = getDomainColor(slug);
-      // Général reste complètement blanc sans opacité
+      // Général reste complètement blanc pur (RGB)
       const isGeneral = slug === 'general';
       return {
         key,
-        color: isGeneral ? `hsl(${hslColor})` : `hsl(${hslColor} / 0.6)`,
-        activeColor: isGeneral ? `hsl(${hslColor})` : `hsl(${hslColor} / 0.9)`,
+        color: isGeneral ? 'rgb(255, 255, 255)' : `hsl(${hslColor} / 0.6)`,
+        activeColor: isGeneral ? 'rgb(255, 255, 255)' : `hsl(${hslColor} / 0.9)`,
       };
     });
   }, [getDomainColor]);
