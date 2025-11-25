@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useDomainColors } from "@/hooks/useDomainColors";
 
 interface JournalEntryCardProps {
   id: string;
@@ -21,6 +22,8 @@ export const JournalEntryCard = ({
   onClick,
   hasInsight = false,
 }: JournalEntryCardProps) => {
+  const { getDomainColor } = useDomainColors();
+  const domainHslColor = getDomainColor(domain);
   const truncatedContent = content.length > 120 ? content.substring(0, 120) + "..." : content;
   
   const getDomainLabel = (domainId: string) => {
@@ -31,6 +34,7 @@ export const JournalEntryCard = ({
       sante: "Santé",
       developpement: "Développement",
       finance: "Finance",
+      general: "Général",
     };
     return domains[domainId] || domainId;
   };
@@ -47,7 +51,13 @@ export const JournalEntryCard = ({
               {getDomainLabel(domain)}
             </span>
             {hasInsight && (
-              <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
+              <Sparkles 
+                className="w-4 h-4 flex-shrink-0"
+                style={{ 
+                  color: `hsl(${domainHslColor})`,
+                  filter: `drop-shadow(0 0 8px hsl(${domainHslColor} / 0.6))`
+                }}
+              />
             )}
             <span className="text-xs text-white/40">
               {format(date, "d MMMM yyyy", { locale: fr })}

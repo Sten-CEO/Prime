@@ -7,6 +7,7 @@ import { fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { AddEntryModal } from "@/components/journal/AddEntryModal";
+import { useDomainColors } from "@/hooks/useDomainColors";
 
 interface EntryDetailViewProps {
   id: string;
@@ -29,6 +30,8 @@ export const EntryDetailView = ({
   onDeleted,
   onEdited,
 }: EntryDetailViewProps) => {
+  const { getDomainColor } = useDomainColors();
+  const domainHslColor = getDomainColor(domain);
   const [selectedText, setSelectedText] = useState("");
   const [showHighlightButton, setShowHighlightButton] = useState(false);
   const [highlightPosition, setHighlightPosition] = useState({ x: 0, y: 0 });
@@ -62,6 +65,7 @@ export const EntryDetailView = ({
       sante: "Santé",
       developpement: "Développement",
       finance: "Finance",
+      general: "Général",
     };
     return domains[domainId] || domainId;
   };
@@ -75,7 +79,7 @@ export const EntryDetailView = ({
       const regex = new RegExp(`(${escapedInsight})`, 'gi');
       highlightedText = highlightedText.replace(
         regex,
-        `<mark class="bg-primary/20 text-white rounded px-1 shadow-[0_0_8px_rgba(139,92,246,0.3)]">$1</mark>`
+        `<mark style="background-color: hsl(${domainHslColor} / 0.2); color: white; border-radius: 4px; padding: 0 4px; box-shadow: 0 0 8px hsl(${domainHslColor} / 0.3);">$1</mark>`
       );
     });
 
@@ -206,8 +210,17 @@ export const EntryDetailView = ({
               {getDomainLabel(domain)}
             </span>
             {insights.length > 0 && (
-              <span className="text-xs font-medium text-primary/80 px-3 py-1 rounded-full bg-primary/5 border border-primary/15 flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3" />
+              <span 
+                className="text-xs font-medium text-white px-3 py-1 rounded-full border flex items-center gap-1.5"
+                style={{
+                  backgroundColor: `hsl(${domainHslColor} / 0.15)`,
+                  borderColor: `hsl(${domainHslColor} / 0.3)`,
+                }}
+              >
+                <Sparkles 
+                  className="w-3 h-3"
+                  style={{ color: `hsl(${domainHslColor})` }}
+                />
                 Insight
               </span>
             )}
@@ -237,9 +250,25 @@ export const EntryDetailView = ({
               >
                 <button
                   onClick={handleHighlight}
-                  className="backdrop-blur-xl bg-primary/20 border border-primary/30 rounded-2xl px-4 py-2 hover:bg-primary/30 hover:border-primary/40 transition-all cursor-pointer shadow-[0_0_20px_rgba(139,92,246,0.3)] flex items-center gap-2"
+                  className="backdrop-blur-xl border rounded-2xl px-4 py-2 hover:shadow-[0_0_20px] transition-all cursor-pointer flex items-center gap-2"
+                  style={{
+                    backgroundColor: `hsl(${domainHslColor} / 0.2)`,
+                    borderColor: `hsl(${domainHslColor} / 0.3)`,
+                    boxShadow: `0 0 20px hsl(${domainHslColor} / 0.3)`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `hsl(${domainHslColor} / 0.3)`;
+                    e.currentTarget.style.borderColor = `hsl(${domainHslColor} / 0.4)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = `hsl(${domainHslColor} / 0.2)`;
+                    e.currentTarget.style.borderColor = `hsl(${domainHslColor} / 0.3)`;
+                  }}
                 >
-                  <Highlighter className="w-4 h-4 text-primary" />
+                  <Highlighter 
+                    className="w-4 h-4"
+                    style={{ color: `hsl(${domainHslColor})` }}
+                  />
                   <span className="text-white text-sm font-medium">Surligner comme Insight</span>
                 </button>
               </div>
