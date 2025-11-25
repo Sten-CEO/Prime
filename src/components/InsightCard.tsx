@@ -10,6 +10,7 @@ interface InsightCardProps {
   id: string;
   text: string;
   date: string;
+  insight_date: string; // Date ISO brute pour le routing
   highlightColor: "pink" | "purple" | "blue";
   category?: string;
   domain_id: string;
@@ -17,15 +18,15 @@ interface InsightCardProps {
   onDelete?: () => void;
 }
 
-export const InsightCard = ({ id, text, date, highlightColor, category = "Business", domain_id, entry_id, onDelete }: InsightCardProps) => {
+export const InsightCard = ({ id, text, date, insight_date, highlightColor, category = "Business", domain_id, entry_id, onDelete }: InsightCardProps) => {
   const navigate = useNavigate();
   const { getDomainColor } = useDomainColors();
   const domainHslColor = getDomainColor(domain_id);
   const [open, setOpen] = useState(false);
 
   const getJournalUrl = () => {
-    // Parse the date string to extract year and month
-    const parsedDate = new Date(date);
+    // Parse the ISO date string to extract year and month
+    const parsedDate = new Date(insight_date);
     const year = parsedDate.getFullYear();
     const month = parsedDate.getMonth() + 1; // +1 because getMonth() returns 0-11
     
