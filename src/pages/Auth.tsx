@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { z } from "zod";
+import bgImage from "@/assets/black-shapes-bg.jpg";
 
 const authSchema = z.object({
   email: z.string().trim().email("Email invalide").max(255, "Email trop long"),
@@ -130,36 +131,43 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black relative flex items-center justify-center">
+    <div className="min-h-screen bg-black relative flex items-center justify-center overflow-hidden">
+      {/* Background image with opacity */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
+        className="fixed inset-0 opacity-40"
+        style={{ 
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       />
 
-      {/* Logo */}
-      <div className="absolute top-8 left-8 z-10">
-        <span className="text-white font-bold text-2xl tracking-tight">Prime.</span>
+      {/* Prime. Logo behind the form */}
+      <div className="absolute z-0 select-none pointer-events-none">
+        <h1 className="font-inter font-black text-[clamp(8rem,20vw,18rem)] tracking-tighter text-white leading-none">
+          Prime.
+        </h1>
       </div>
 
-      {/* Auth Form */}
+      {/* Auth Form (overlaying the logo) */}
       <div className="relative z-10 w-full max-w-md px-6">
-        <div className="backdrop-blur-2xl bg-white/[0.03] border border-white/[0.08] rounded-3xl p-10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-          <h1 className="text-3xl font-bold text-white mb-2 text-center">
-            {isSignUp ? "Créer un compte" : "Connexion"}
+        <div className="backdrop-blur-3xl bg-white/[0.03] border border-white/[0.08] rounded-3xl p-10 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
+          <h1 className="text-2xl font-semibold text-white mb-2 text-center">
+            {isSignUp ? "Créer un compte" : "Connectez-vous à Prime."}
           </h1>
-          <p className="text-white/60 text-center mb-8">
-            {isSignUp ? "Rejoignez Prime" : "Bienvenue sur Prime"}
+          <p className="text-white/50 text-center mb-8 text-sm">
+            {isSignUp ? "Rejoignez Prime" : ""}
           </p>
 
-          <form onSubmit={handleAuth} className="space-y-5">
+          <form onSubmit={handleAuth} className="space-y-6">
             {isSignUp && (
               <div>
-                <label className="text-sm text-white/70 mb-2 block">Nom complet</label>
+                <label className="text-xs text-white/60 mb-2 block">Nom complet</label>
                 <Input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="bg-white/[0.05] border-white/[0.1] text-white placeholder:text-white/40"
+                  className="backdrop-blur-xl bg-white/[0.05] border-white/[0.12] text-white placeholder:text-white/40 focus:border-white/[0.25] focus:outline-none focus:ring-0 rounded-xl h-12"
                   placeholder="Votre nom"
                   required={isSignUp}
                 />
@@ -167,24 +175,24 @@ const Auth = () => {
             )}
 
             <div>
-              <label className="text-sm text-white/70 mb-2 block">Email</label>
+              <label className="text-xs text-white/60 mb-2 block">Email</label>
               <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-white/[0.05] border-white/[0.1] text-white placeholder:text-white/40"
+                className="backdrop-blur-xl bg-white/[0.05] border-white/[0.12] text-white placeholder:text-white/40 focus:border-white/[0.25] focus:outline-none focus:ring-0 rounded-xl h-12"
                 placeholder="votre@email.com"
                 required
               />
             </div>
 
             <div>
-              <label className="text-sm text-white/70 mb-2 block">Mot de passe</label>
+              <label className="text-xs text-white/60 mb-2 block">Mot de passe</label>
               <Input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-white/[0.05] border-white/[0.1] text-white placeholder:text-white/40"
+                className="backdrop-blur-xl bg-white/[0.05] border-white/[0.12] text-white placeholder:text-white/40 focus:border-white/[0.25] focus:outline-none focus:ring-0 rounded-xl h-12"
                 placeholder="••••••••"
                 required
               />
@@ -196,9 +204,9 @@ const Auth = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full backdrop-blur-xl bg-white/[0.08] border border-white/[0.15] rounded-2xl px-6 py-3 hover:bg-white/[0.12] hover:border-white/[0.2] hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] text-white font-semibold"
+              className="w-full mt-8 backdrop-blur-xl bg-white/[0.08] border border-white/[0.15] rounded-xl px-6 py-3.5 hover:bg-white/[0.12] hover:border-white/[0.2] active:scale-[0.98] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] text-white font-medium text-sm"
             >
-              {loading ? "Chargement..." : (isSignUp ? "S'inscrire" : "Se connecter")}
+              {loading ? "Chargement..." : (isSignUp ? "S'inscrire" : "Connexion")}
             </button>
           </form>
 
