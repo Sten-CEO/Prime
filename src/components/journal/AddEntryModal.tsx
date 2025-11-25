@@ -83,40 +83,7 @@ export const AddEntryModal = ({
 
     if (text && text.length > 0) {
       setSelectedText(text);
-      
-      const range = selection?.getRangeAt(0);
-      const rect = range?.getBoundingClientRect();
-      
-      if (rect) {
-        // Popup dimensions (approximate)
-        const popupWidth = 240;
-        const popupHeight = 120;
-        
-        // Calculate initial position (centered above selection)
-        let x = rect.left + rect.width / 2;
-        let y = rect.top - 60;
-        
-        // Adjust horizontal position if popup goes off screen
-        const screenWidth = window.innerWidth;
-        const halfPopupWidth = popupWidth / 2;
-        
-        if (x - halfPopupWidth < 20) {
-          // Too far left
-          x = halfPopupWidth + 20;
-        } else if (x + halfPopupWidth > screenWidth - 20) {
-          // Too far right
-          x = screenWidth - halfPopupWidth - 20;
-        }
-        
-        // Adjust vertical position if popup goes off top of screen
-        if (y < 20) {
-          // Position below selection instead
-          y = rect.bottom + 10;
-        }
-        
-        setPopupPosition({ x, y });
-        setShowInsightPopup(true);
-      }
+      setShowInsightPopup(true);
     }
   };
 
@@ -278,11 +245,12 @@ export const AddEntryModal = ({
               <label className="text-sm text-white/70">Contenu</label>
               <button
                 type="button"
+                id="insight-button"
                 onClick={() => setInsightMode(!insightMode)}
-                className={`text-xs px-3 py-1 rounded-full transition-all ${
+                className={`text-xs px-4 py-2 rounded-xl transition-all font-medium ${
                   insightMode 
-                    ? 'bg-primary/20 text-primary border border-primary/30' 
-                    : 'bg-white/[0.05] text-white/60 border border-white/[0.1] hover:bg-white/[0.08]'
+                    ? 'bg-white text-black border border-white shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:shadow-[0_0_24px_rgba(255,255,255,0.5)]' 
+                    : 'bg-white/[0.05] text-white/60 border border-white/[0.1] hover:bg-white/[0.08] hover:text-white/80'
                 }`}
               >
                 ✨ Insight
@@ -300,14 +268,7 @@ export const AddEntryModal = ({
             />
             
             {showInsightPopup && insightMode && (
-              <div
-                className="fixed z-[100] animate-scale-in"
-                style={{
-                  left: `${popupPosition.x}px`,
-                  top: `${popupPosition.y}px`,
-                  transform: "translateX(-50%)",
-                }}
-              >
+              <div className="absolute right-0 top-12 z-[100] animate-scale-in">
                 <div className="backdrop-blur-2xl bg-gradient-to-br from-primary/25 to-primary/15 border border-primary/40 rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(139,92,246,0.4)] min-w-[240px]">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
