@@ -105,14 +105,24 @@ export const AddEntryModal = ({
   };
 
   const handleTextSelection = () => {
-    if (!insightMode) return;
+    console.log('handleTextSelection called, insightMode:', insightMode);
+    
+    if (!insightMode) {
+      console.log('insightMode is false, returning');
+      return;
+    }
     
     const selection = window.getSelection();
     const text = selection?.toString().trim();
+    
+    console.log('Selected text:', text, 'length:', text?.length);
 
     if (text && text.length > 0) {
+      console.log('Setting showInsightPopup to true');
       setSelectedText(text);
       setShowInsightPopup(true);
+    } else {
+      console.log('No text selected or empty');
     }
   };
 
@@ -363,7 +373,11 @@ export const AddEntryModal = ({
                 <button
                   type="button"
                   id="insight-button"
-                  onClick={() => setInsightMode(!insightMode)}
+                  onClick={() => {
+                    const newMode = !insightMode;
+                    console.log('Insight button clicked, new mode:', newMode);
+                    setInsightMode(newMode);
+                  }}
                   className={`group flex items-center justify-center w-9 h-9 rounded-lg transition-all ${
                     insightMode 
                       ? 'backdrop-blur-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_24px_rgba(255,255,255,0.25)]' 
@@ -379,12 +393,16 @@ export const AddEntryModal = ({
             <div
               ref={contentRef}
               contentEditable
-              onMouseUp={() => {
+              onMouseUp={(e) => {
+                console.log('onMouseUp event triggered');
                 handleTextSelection();
                 updateFormatStates();
               }}
               onKeyUp={updateFormatStates}
-              onTouchEnd={handleTextSelection}
+              onTouchEnd={() => {
+                console.log('onTouchEnd event triggered');
+                handleTextSelection();
+              }}
               onInput={(e) => setContent(e.currentTarget.innerText)}
               className={`bg-white/[0.05] border border-white/[0.1] text-white min-h-[200px] rounded-md px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white/20 ${
                 insightMode ? 'cursor-text' : ''
