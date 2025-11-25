@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import bgImage from "@/assets/black-shapes-bg.jpg";
+import { Award, BookOpen } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { DomainHighBar } from "@/components/DomainHighBar";
