@@ -35,6 +35,7 @@ interface Insight {
   id: string;
   text: string;
   date: string;
+  insight_date: string; // Date ISO brute pour le routing
   highlightColor: "pink" | "purple" | "blue";
   category: string;
   domain_id: string;
@@ -94,6 +95,7 @@ const Accueil = () => {
         id: insight.id,
         text: insight.phrase,
         date: format(new Date(insight.insight_date), "d MMM", { locale: fr }),
+        insight_date: insight.insight_date, // Date ISO brute
         highlightColor: "blue" as const, // Non utilisé maintenant, couleur dynamique dans InsightCard
         category: getDomainLabel(insight.domain_id),
         domain_id: insight.domain_id,
