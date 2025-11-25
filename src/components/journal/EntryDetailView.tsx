@@ -74,12 +74,16 @@ export const EntryDetailView = ({
     if (insights.length === 0) return text;
 
     let highlightedText = text;
+    const isGeneral = domain === 'general';
+    const highlightColor = isGeneral ? 'rgba(255, 255, 255, 0.2)' : `hsl(${domainHslColor} / 0.2)`;
+    const shadowColor = isGeneral ? 'rgba(255, 255, 255, 0.3)' : `hsl(${domainHslColor} / 0.3)`;
+    
     insights.forEach((insight, index) => {
       const escapedInsight = insight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regex = new RegExp(`(${escapedInsight})`, 'gi');
       highlightedText = highlightedText.replace(
         regex,
-        `<mark style="background-color: hsl(${domainHslColor} / 0.2); color: white; border-radius: 4px; padding: 0 4px; box-shadow: 0 0 8px hsl(${domainHslColor} / 0.3);">$1</mark>`
+        `<mark style="background-color: ${highlightColor}; color: white; border-radius: 4px; padding: 0 4px; box-shadow: 0 0 8px ${shadowColor};">$1</mark>`
       );
     });
 
@@ -213,13 +217,13 @@ export const EntryDetailView = ({
               <span 
                 className="text-xs font-medium text-white px-3 py-1 rounded-full border flex items-center gap-1.5"
                 style={{
-                  backgroundColor: `hsl(${domainHslColor} / 0.15)`,
-                  borderColor: `hsl(${domainHslColor} / 0.3)`,
+                  backgroundColor: domain === 'general' ? 'rgba(255, 255, 255, 0.15)' : `hsl(${domainHslColor} / 0.15)`,
+                  borderColor: domain === 'general' ? 'rgba(255, 255, 255, 0.3)' : `hsl(${domainHslColor} / 0.3)`,
                 }}
               >
                 <Sparkles 
                   className="w-3 h-3"
-                  style={{ color: `hsl(${domainHslColor})` }}
+                  style={{ color: domain === 'general' ? 'rgb(255, 255, 255)' : `hsl(${domainHslColor})` }}
                 />
                 Insight
               </span>
@@ -252,22 +256,32 @@ export const EntryDetailView = ({
                   onClick={handleHighlight}
                   className="backdrop-blur-xl border rounded-2xl px-4 py-2 hover:shadow-[0_0_20px] transition-all cursor-pointer flex items-center gap-2"
                   style={{
-                    backgroundColor: `hsl(${domainHslColor} / 0.2)`,
-                    borderColor: `hsl(${domainHslColor} / 0.3)`,
-                    boxShadow: `0 0 20px hsl(${domainHslColor} / 0.3)`,
+                    backgroundColor: domain === 'general' ? 'rgba(255, 255, 255, 0.2)' : `hsl(${domainHslColor} / 0.2)`,
+                    borderColor: domain === 'general' ? 'rgba(255, 255, 255, 0.3)' : `hsl(${domainHslColor} / 0.3)`,
+                    boxShadow: domain === 'general' ? '0 0 20px rgba(255, 255, 255, 0.3)' : `0 0 20px hsl(${domainHslColor} / 0.3)`,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = `hsl(${domainHslColor} / 0.3)`;
-                    e.currentTarget.style.borderColor = `hsl(${domainHslColor} / 0.4)`;
+                    if (domain === 'general') {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                    } else {
+                      e.currentTarget.style.backgroundColor = `hsl(${domainHslColor} / 0.3)`;
+                      e.currentTarget.style.borderColor = `hsl(${domainHslColor} / 0.4)`;
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = `hsl(${domainHslColor} / 0.2)`;
-                    e.currentTarget.style.borderColor = `hsl(${domainHslColor} / 0.3)`;
+                    if (domain === 'general') {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                    } else {
+                      e.currentTarget.style.backgroundColor = `hsl(${domainHslColor} / 0.2)`;
+                      e.currentTarget.style.borderColor = `hsl(${domainHslColor} / 0.3)`;
+                    }
                   }}
                 >
                   <Highlighter 
                     className="w-4 h-4"
-                    style={{ color: `hsl(${domainHslColor})` }}
+                    style={{ color: domain === 'general' ? 'rgb(255, 255, 255)' : `hsl(${domainHslColor})` }}
                   />
                   <span className="text-white text-sm font-medium">Surligner comme Insight</span>
                 </button>
