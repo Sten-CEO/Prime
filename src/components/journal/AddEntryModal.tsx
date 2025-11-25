@@ -268,7 +268,7 @@ export const AddEntryModal = ({
             />
             
             {showInsightPopup && insightMode && (
-              <div className="absolute right-0 -top-2 translate-y-[-100%] z-[100] animate-scale-in">
+              <div className="fixed right-8 top-8 z-[100] animate-scale-in">
                 <div className="backdrop-blur-2xl bg-gradient-to-br from-primary/25 to-primary/15 border border-primary/40 rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(139,92,246,0.4)] min-w-[240px]">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
