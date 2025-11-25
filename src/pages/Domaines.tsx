@@ -245,14 +245,13 @@ const Domaines = () => {
             <h1 className="text-4xl font-bold text-white tracking-tight">
               {domain.name}
             </h1>
-            <Button
+            <button
               onClick={() => navigate(`/journal/${slug}`)}
-              variant="outline"
-              className="border-white/[0.1] text-white hover:bg-white/[0.05]"
+              className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-6 py-3 hover:bg-white/[0.04] hover:border-white/[0.12] hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] flex items-center gap-2"
             >
-              <BookOpen className="w-4 h-4 mr-2" />
-              Aller vers le journal
-            </Button>
+              <BookOpen className="w-4 h-4 text-white/70" />
+              <span className="text-white text-sm font-medium">Aller vers le journal</span>
+            </button>
           </div>
 
           {/* Performances + Metrics */}
