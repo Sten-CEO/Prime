@@ -290,11 +290,14 @@ export type Database = {
           default_impact_advanced: number
           default_impact_exceptional: number
           default_impact_simple: number
+          difficulty_level: string | null
           domain_id: string
           icon: string | null
           id: string
+          impact_weight: number | null
           is_active: boolean
           name: string
+          scheduled_days: string[] | null
           updated_at: string
           user_id: string
         }
@@ -304,11 +307,14 @@ export type Database = {
           default_impact_advanced?: number
           default_impact_exceptional?: number
           default_impact_simple?: number
+          difficulty_level?: string | null
           domain_id: string
           icon?: string | null
           id?: string
+          impact_weight?: number | null
           is_active?: boolean
           name: string
+          scheduled_days?: string[] | null
           updated_at?: string
           user_id: string
         }
@@ -318,11 +324,14 @@ export type Database = {
           default_impact_advanced?: number
           default_impact_exceptional?: number
           default_impact_simple?: number
+          difficulty_level?: string | null
           domain_id?: string
           icon?: string | null
           id?: string
+          impact_weight?: number | null
           is_active?: boolean
           name?: string
+          scheduled_days?: string[] | null
           updated_at?: string
           user_id?: string
         }
