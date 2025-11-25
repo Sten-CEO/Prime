@@ -33,7 +33,7 @@ const iconOptions = ["🎯", "⚡", "💪", "🧠", "❤️", "🔥", "✨", "�
 export const AddFreePerformanceModal = ({ open, onOpenChange, onAdd, domainId, categories, editPerformance }: AddFreePerformanceModalProps) => {
   const [name, setName] = useState(editPerformance?.label || "");
   const [selectedIcon, setSelectedIcon] = useState("🎯");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(editPerformance?.category_id || "");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(editPerformance?.category_id || undefined);
   const [selectedDate, setSelectedDate] = useState<Date>(editPerformance ? new Date(editPerformance.recorded_date) : new Date());
   const [impactValue, setImpactValue] = useState<string>(editPerformance?.impact_value?.toString() || "1");
   
@@ -83,7 +83,7 @@ export const AddFreePerformanceModal = ({ open, onOpenChange, onAdd, domainId, c
   const resetForm = () => {
     setName("");
     setSelectedIcon("🎯");
-    setSelectedCategoryId("");
+    setSelectedCategoryId(undefined);
     setSelectedDate(new Date());
     setImpactValue("1");
   };
