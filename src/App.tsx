@@ -44,6 +44,7 @@ function App() {
           <Route path="/domaines" element={<Domaines />} />
           <Route path="/domaines/:slug" element={<Domaines />} />
           <Route path="/domaines/:slug/performances" element={<DomainPerformances />} />
+          <Route path="/domaines/:slug/categories" element={<Categories />} />
           <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
           <Route path="/journal" element={<Journal />} />
           <Route path="/journal/entry/:id" element={<JournalEntry />} />
