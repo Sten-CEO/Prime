@@ -45,16 +45,28 @@ const Profil = () => {
   const handleSaveProfile = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: { full_name: fullName }
-      });
+      const updateData: any = { data: { full_name: fullName } };
+      
+      // Check if email has changed
+      if (email !== user?.email) {
+        updateData.email = email;
+      }
+
+      const { error } = await supabase.auth.updateUser(updateData);
 
       if (error) throw error;
 
-      toast({
-        title: t.profileUpdated,
-        description: t.profileUpdateSuccess,
-      });
+      if (email !== user?.email) {
+        toast({
+          title: t.profileUpdated,
+          description: "Profil mis à jour. Vérifiez votre nouvelle adresse email pour confirmer le changement.",
+        });
+      } else {
+        toast({
+          title: t.profileUpdated,
+          description: t.profileUpdateSuccess,
+        });
+      }
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
@@ -327,9 +339,13 @@ const Profil = () => {
                   <label className="text-sm text-white/70 mb-2 block">{t.email}</label>
                   <Input
                     value={email}
-                    disabled
-                    className="bg-white/[0.02] border-white/[0.08] text-white/60 cursor-not-allowed"
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-white/[0.05] border-white/[0.1] text-white"
+                    placeholder={t.email}
                   />
+                  <p className="text-xs text-white/40 mt-1">
+                    Vous recevrez un email de confirmation sur votre nouvelle adresse
+                  </p>
                 </div>
                 <button
                   onClick={handleSaveProfile}
