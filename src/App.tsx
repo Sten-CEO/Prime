@@ -14,6 +14,7 @@ import JournalMonth from "./pages/JournalMonth";
 import Profil from "./pages/Profil";
 import Parametres from "./pages/Parametres";
 import PrimeHistory from "./pages/PrimeHistory";
+import PrimeTargets from "./pages/PrimeTargets";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/journal/:domain/:year/:month" element={<JournalMonth />} />
           <Route path="/profil" element={<Profil />} />
           <Route path="/parametres" element={<Parametres />} />
+          <Route path="/prime-targets" element={<PrimeTargets />} />
           <Route path="/prime-history" element={<PrimeHistory />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
