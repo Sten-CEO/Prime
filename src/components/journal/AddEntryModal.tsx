@@ -268,20 +268,21 @@ export const AddEntryModal = ({
             />
             
             {showInsightPopup && insightMode && (
-              <div className="absolute right-0 top-12 z-[100] animate-scale-in">
-                <div className="backdrop-blur-2xl bg-gradient-to-br from-primary/25 to-primary/15 border border-primary/40 rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(139,92,246,0.4)] min-w-[240px]">
+              <div className="fixed right-8 top-1/2 -translate-y-1/2 z-[100] animate-scale-in">
+                <div className="backdrop-blur-2xl bg-gradient-to-br from-primary/25 to-primary/15 border border-primary/40 rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(139,92,246,0.4)] w-[280px]">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
                       <Sparkles className="w-4 h-4 text-primary" />
                     </div>
                     <p className="text-white text-sm font-medium">Ajouter en Insight ?</p>
                   </div>
-                  <div className="flex gap-2">
+                  <p className="text-white/60 text-xs mb-4">Le texte sélectionné sera enregistré comme un insight lié à cette entrée.</p>
+                  <div className="flex flex-col gap-2">
                     <button
                       onClick={handleConfirmInsight}
-                      className="flex-1 backdrop-blur-xl bg-primary/40 hover:bg-primary/50 border border-primary/50 hover:border-primary/60 text-white text-sm font-medium px-4 py-2 rounded-xl transition-all hover:shadow-[0_0_16px_rgba(139,92,246,0.5)] hover:-translate-y-0.5"
+                      className="w-full backdrop-blur-xl bg-primary/40 hover:bg-primary/50 border border-primary/50 hover:border-primary/60 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all hover:shadow-[0_0_16px_rgba(139,92,246,0.5)] hover:-translate-y-0.5"
                     >
-                      Confirmer
+                      ✓ Confirmer
                     </button>
                     <button
                       onClick={() => {
@@ -289,9 +290,9 @@ export const AddEntryModal = ({
                         setSelectedText("");
                         window.getSelection()?.removeAllRanges();
                       }}
-                      className="flex-1 backdrop-blur-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.1] hover:border-white/[0.15] text-white/70 hover:text-white text-sm px-4 py-2 rounded-xl transition-all"
+                      className="w-full backdrop-blur-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.1] hover:border-white/[0.15] text-white/70 hover:text-white text-sm px-4 py-2.5 rounded-xl transition-all"
                     >
-                      Annuler
+                      × Annuler
                     </button>
                   </div>
                 </div>
