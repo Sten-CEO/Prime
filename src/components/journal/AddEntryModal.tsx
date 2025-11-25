@@ -55,6 +55,7 @@ export const AddEntryModal = ({
   const [loading, setLoading] = useState(false);
   const [insightMode, setInsightMode] = useState(false);
   const [selectedText, setSelectedText] = useState("");
+  const [showInsightPopup, setShowInsightPopup] = useState(false);
   const [insights, setInsights] = useState<string[]>([]);
   const [tempInsights, setTempInsights] = useState<string[]>([]);
 
@@ -73,6 +74,7 @@ export const AddEntryModal = ({
       setTempInsights([]);
       setInsightMode(false);
       setSelectedText("");
+      setShowInsightPopup(false);
     }
   }, [open, initialData, defaultDomain]);
 
@@ -84,6 +86,7 @@ export const AddEntryModal = ({
 
     if (text && text.length > 0) {
       setSelectedText(text);
+      setShowInsightPopup(true);
     }
   };
 
@@ -95,15 +98,15 @@ export const AddEntryModal = ({
         description: "Le texte a été ajouté aux insights",
       });
     }
+    setShowInsightPopup(false);
     setSelectedText("");
     window.getSelection()?.removeAllRanges();
-    setInsightMode(false);
   };
 
   const handleCancelInsight = () => {
+    setShowInsightPopup(false);
     setSelectedText("");
     window.getSelection()?.removeAllRanges();
-    setInsightMode(false);
   };
 
   const handleSubmit = async () => {
@@ -214,6 +217,7 @@ export const AddEntryModal = ({
       setDate(new Date());
       setInsightMode(false);
       setSelectedText("");
+      setShowInsightPopup(false);
       setTempInsights([]);
       onOpenChange(false);
       onSuccess?.();
@@ -278,7 +282,7 @@ export const AddEntryModal = ({
               }`}
             />
             
-            {insightMode && createPortal(
+            {showInsightPopup && insightMode && createPortal(
               <div className="fixed right-8 top-8 z-[100] animate-scale-in">
                 <div className="backdrop-blur-2xl bg-gradient-to-br from-white/20 to-white/10 border border-white/[0.15] rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(255,255,255,0.15)] min-w-[240px]">
                   <div className="flex items-center gap-2 mb-3">
@@ -289,13 +293,14 @@ export const AddEntryModal = ({
                   </div>
                   <div className="flex gap-2">
                     <button
+                      type="button"
                       onClick={handleConfirmInsight}
-                      disabled={!selectedText}
-                      className="flex-1 backdrop-blur-xl bg-white/[0.12] hover:bg-white/[0.18] border border-white/[0.2] hover:border-white/[0.25] text-white text-sm font-medium px-4 py-2 rounded-xl transition-all hover:shadow-[0_0_16px_rgba(255,255,255,0.3)] hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                      className="flex-1 backdrop-blur-xl bg-white/[0.12] hover:bg-white/[0.18] border border-white/[0.2] hover:border-white/[0.25] text-white text-sm font-medium px-4 py-2 rounded-xl transition-all hover:shadow-[0_0_16px_rgba(255,255,255,0.3)] hover:-translate-y-0.5"
                     >
                       Confirmer
                     </button>
                     <button
+                      type="button"
                       onClick={handleCancelInsight}
                       className="flex-1 backdrop-blur-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.1] hover:border-white/[0.15] text-white/70 hover:text-white text-sm px-4 py-2 rounded-xl transition-all"
                     >
