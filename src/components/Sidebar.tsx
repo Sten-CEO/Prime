@@ -27,7 +27,7 @@ export const Sidebar = () => {
     { 
       icon: List, 
       label: "Catégories", 
-      onClick: () => navigate(`/categories/${currentDomain}`) 
+      onClick: () => navigate(`/domaines/${currentDomain}/categories`) 
     },
     { 
       icon: Gauge, 
