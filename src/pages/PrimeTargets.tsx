@@ -282,7 +282,7 @@ const PrimeTargets = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-black/90 border-white/[0.1]">
                   <SelectItem value="all" className="text-white">Tous les domaines</SelectItem>
-                  {domains.map(domain => (
+                  {domains.filter(d => d.slug && d.slug.trim()).map(domain => (
                     <SelectItem key={domain.id} value={domain.slug} className="text-white">
                       {domain.name}
                     </SelectItem>
