@@ -9,6 +9,8 @@
     <title>Prime.</title>
     <meta name="description" content="Prime - Modern SaaS Platform" />
     <meta name="author" content="Prime" />
+    <link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#000000" />
 
     <meta property="og:title" content="c30b533a-5074-478c-a883-b098c44cf3b8" />
     <meta property="og:description" content="Lovable Generated Project" />
@@ -23,5 +25,10 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js");
+  }
+</script>
   </body>
 </html>
