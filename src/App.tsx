@@ -1,6 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
@@ -23,31 +22,29 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/accueil" element={<Accueil />} />
-          <Route path="/domaines" element={<Domaines />} />
-          <Route path="/domaines/:slug" element={<Domaines />} />
-          <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
-          <Route path="/journal" element={<Journal />} />
-          <Route path="/journal/entry/:id" element={<JournalEntry />} />
-          <Route path="/journal/:domain" element={<JournalDomain />} />
-          <Route path="/journal/:domain/:year/:month" element={<JournalMonth />} />
-          <Route path="/quick-notes" element={<QuickNotes />} />
-          <Route path="/profil" element={<Profil />} />
-          <Route path="/parametres" element={<Parametres />} />
-          <Route path="/prime-targets" element={<PrimeTargets />} />
-          <Route path="/prime-history" element={<PrimeHistory />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <Toaster />
+    <Sonner />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/accueil" element={<Accueil />} />
+        <Route path="/domaines" element={<Domaines />} />
+        <Route path="/domaines/:slug" element={<Domaines />} />
+        <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
+        <Route path="/journal" element={<Journal />} />
+        <Route path="/journal/entry/:id" element={<JournalEntry />} />
+        <Route path="/journal/:domain" element={<JournalDomain />} />
+        <Route path="/journal/:domain/:year/:month" element={<JournalMonth />} />
+        <Route path="/quick-notes" element={<QuickNotes />} />
+        <Route path="/profil" element={<Profil />} />
+        <Route path="/parametres" element={<Parametres />} />
+        <Route path="/prime-targets" element={<PrimeTargets />} />
+        <Route path="/prime-history" element={<PrimeHistory />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
