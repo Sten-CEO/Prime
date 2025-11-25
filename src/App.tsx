@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Accueil from "./pages/Accueil";
 import Domaines from "./pages/Domaines";
+import DomainPerformances from "./pages/DomainPerformances";
 import Categories from "./pages/Categories";
 import Journal from "./pages/Journal";
 import JournalDomain from "./pages/JournalDomain";
@@ -42,6 +43,7 @@ function App() {
           <Route path="/accueil" element={<Accueil />} />
           <Route path="/domaines" element={<Domaines />} />
           <Route path="/domaines/:slug" element={<Domaines />} />
+          <Route path="/domaines/:slug/performances" element={<DomainPerformances />} />
           <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
           <Route path="/journal" element={<Journal />} />
           <Route path="/journal/entry/:id" element={<JournalEntry />} />
