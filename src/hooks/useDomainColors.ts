@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+
+// Domaines disponibles dans l'application (basés sur les pages /domaines/[slug])
+const AVAILABLE_DOMAINS = ['business', 'sport', 'social', 'sante'] as const;
 
 export interface DomainColor {
   domain: string;
@@ -10,21 +12,15 @@ export interface DomainColor {
 const DEFAULT_COLORS: Record<string, string> = {
   business: '210 100% 60%',
   sport: '142 90% 55%',
-  developpement: '271 100% 72%',
+  social: '330 100% 70%',
   sante: '0 100% 65%',
-  relations: '330 100% 70%',
-  finance: '25 100% 60%',
-  general: '195 100% 60%',
 };
 
 const DOMAIN_LABELS: Record<string, string> = {
   business: 'Business',
   sport: 'Sport',
-  developpement: 'Développement',
+  social: 'Social',
   sante: 'Santé',
-  relations: 'Relations',
-  finance: 'Finance',
-  general: 'Général',
 };
 
 export const COLOR_PALETTE = [
@@ -48,33 +44,6 @@ export const useDomainColors = () => {
     return stored ? JSON.parse(stored) : {};
   });
 
-  const [activeDomains, setActiveDomains] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchActiveDomains = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: journalDomains } = await supabase
-        .from('journal_entries')
-        .select('domain_id')
-        .eq('user_id', user.id);
-
-      const { data: insightDomains } = await supabase
-        .from('insights')
-        .select('domain_id')
-        .eq('user_id', user.id);
-
-      const domains = new Set<string>();
-      journalDomains?.forEach(entry => domains.add(entry.domain_id));
-      insightDomains?.forEach(insight => domains.add(insight.domain_id));
-
-      setActiveDomains(Array.from(domains));
-    };
-
-    fetchActiveDomains();
-  }, []);
-
   useEffect(() => {
     localStorage.setItem('prime_domain_colors', JSON.stringify(domainColors));
   }, [domainColors]);
@@ -95,7 +64,7 @@ export const useDomainColors = () => {
   };
 
   const getAllDomains = (): DomainColor[] => {
-    return activeDomains.map(domain => ({
+    return AVAILABLE_DOMAINS.map(domain => ({
       domain,
       color: getDomainColor(domain),
       label: getDomainLabel(domain),
@@ -104,7 +73,7 @@ export const useDomainColors = () => {
 
   const resetToDefaults = () => {
     const resetColors: Record<string, string> = {};
-    activeDomains.forEach(domain => {
+    AVAILABLE_DOMAINS.forEach(domain => {
       resetColors[domain] = DEFAULT_COLORS[domain] || '210 100% 60%';
     });
     setDomainColors(resetColors);
