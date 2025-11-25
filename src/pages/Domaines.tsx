@@ -12,172 +12,19 @@ import { DomainObjectives } from "@/components/DomainObjectives";
 import { CreateTargetModal } from "@/components/targets/CreateTargetModal";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-
-const domainData = {
-  business: {
-    name: "Business",
-    score: 85,
-    variation: "+12% cette semaine",
-    categories: [
-      { id: "strategie", name: "Stratégie", color: "rgba(34, 211, 238, 0.8)", score: 88 },
-      { id: "execution", name: "Exécution", color: "rgba(16, 185, 129, 0.8)", score: 82 },
-    ],
-    performances: [
-      { id: "fp1", title: "🚀 Deep Work 3h imprévues", date: "2025-11-23", level: "exceptional" as const, impact: 3, impactType: "positive" as const },
-      { id: "fp2", title: "💡 Idée révolutionnaire", date: "2025-11-22", description: "Nouvelle stratégie marketing", level: "exceptional" as const, impact: 3, impactType: "positive" as const },
-    ],
-    trends: [
-      { period: "Semaine", value: "+12%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
-      { period: "Mois", value: "+8%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 30 jours" },
-      { period: "Année", value: "+15%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 365 jours" },
-    ],
-    objectives: [
-      { 
-        id: 1, 
-        title: "Lancer le nouveau produit", 
-        progress: 75, 
-        deadline: "30 Nov 2025", 
-        status: "in-progress" as const, 
-        completed: false,
-        notes: "Sprint final en cours. Besoin de finaliser les tests avant le lancement.",
-        subObjectives: [
-          "Finaliser les tests utilisateurs",
-          "Préparer le plan marketing",
-          "Former l'équipe support"
-        ],
-        history: [
-          { date: "20 Nov", progress: 65 },
-          { date: "18 Nov", progress: 55 },
-          { date: "15 Nov", progress: 50 }
-        ]
-      },
-      { 
-        id: 2, 
-        title: "Atteindre 10k utilisateurs", 
-        progress: 45, 
-        deadline: "15 Déc 2025", 
-        status: "in-progress" as const, 
-        completed: false,
-        notes: "Croissance régulière. Focus sur l'acquisition organique.",
-        subObjectives: [
-          "Optimiser le SEO",
-          "Lancer campagne réseaux sociaux",
-          "Programme de parrainage"
-        ],
-        history: [
-          { date: "20 Nov", progress: 40 },
-          { date: "15 Nov", progress: 35 },
-          { date: "10 Nov", progress: 30 }
-        ]
-      },
-    ],
-  },
-  sport: {
-    name: "Sport",
-    score: 78,
-    variation: "+8% cette semaine",
-    categories: [
-      { id: "entrainement", name: "Entraînement", color: "rgba(16, 185, 129, 0.8)", score: 78 },
-      { id: "nutrition", name: "Nutrition", color: "rgba(34, 211, 238, 0.8)", score: 85 },
-    ],
-    performances: [
-      { id: "fp1", title: "🏃 10km course spontanée", date: "2025-11-24", level: "advanced" as const, impact: 2.5, impactType: "positive" as const },
-    ],
-    trends: [
-      { period: "Semaine", value: "+8%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
-      { period: "Mois", value: "+5%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 30 jours" },
-      { period: "Année", value: "+10%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 365 jours" },
-    ],
-    objectives: [
-      { 
-        id: 1, 
-        title: "Courir un marathon", 
-        progress: 45, 
-        deadline: "15 Déc 2025", 
-        status: "in-progress" as const, 
-        completed: false,
-        notes: "Entraînement régulier 4x/semaine. Attention aux blessures.",
-        subObjectives: [
-          "Augmenter distance hebdomadaire",
-          "Travail spécifique vitesse",
-          "Nutrition adaptée"
-        ],
-        history: [
-          { date: "20 Nov", progress: 42 },
-          { date: "15 Nov", progress: 38 },
-          { date: "10 Nov", progress: 35 }
-        ]
-      },
-    ],
-  },
-  social: {
-    name: "Social",
-    score: 69,
-    variation: "-3% cette semaine",
-    categories: [
-      { id: "relations", name: "Relations", color: "rgba(244, 114, 182, 0.8)", score: 69 },
-      { id: "famille", name: "Famille", color: "rgba(168, 85, 247, 0.8)", score: 75 },
-    ],
-    performances: [
-      { id: "fp1", title: "💬 Longue conversation de qualité", date: "2025-11-23", level: "advanced" as const, impact: 2, impactType: "positive" as const },
-    ],
-    trends: [
-      { period: "Semaine", value: "-3%", type: "down" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
-      { period: "Mois", value: "+2%", type: "stable" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 30 jours" },
-      { period: "Année", value: "+5%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 365 jours" },
-    ],
-    objectives: [],
-  },
-  sante: {
-    name: "Santé",
-    score: 92,
-    variation: "+15% cette semaine",
-    categories: [
-      { id: "bienetre", name: "Bien-être", color: "rgba(168, 85, 247, 0.8)", score: 92 },
-      { id: "sommeil", name: "Sommeil", color: "rgba(34, 211, 238, 0.8)", score: 88 },
-    ],
-    performances: [
-      { id: "fp1", title: "🧘 Méditation 45min spontanée", date: "2025-11-24", level: "exceptional" as const, impact: 3, impactType: "positive" as const },
-      { id: "fp2", title: "🥗 Repas équilibré maison", date: "2025-11-23", description: "Préparation complète fait-maison, très satisfaisant", level: "exceptional" as const, impact: 3, impactType: "positive" as const },
-    ],
-    trends: [
-      { period: "Semaine", value: "+15%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 7 jours" },
-      { period: "Mois", value: "+12%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 30 jours" },
-      { period: "Année", value: "+18%", type: "up" as const, tooltip: "Basé sur la moyenne mobile du domaine sur 365 jours" },
-    ],
-    objectives: [
-      { 
-        id: 1, 
-        title: "Méditer 30 jours consécutifs", 
-        progress: 90, 
-        deadline: "28 Nov 2025", 
-        status: "in-progress" as const, 
-        completed: false,
-        notes: "Excellent progrès. Méditation quotidienne ancrée dans la routine.",
-        subObjectives: [
-          "Maintenir la régularité",
-          "Approfondir la pratique",
-          "Varier les techniques"
-        ],
-        history: [
-          { date: "20 Nov", progress: 87 },
-          { date: "15 Nov", progress: 80 },
-          { date: "10 Nov", progress: 73 }
-        ]
-      },
-    ],
-  },
-};
+import { useDomains } from "@/hooks/useDomains";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Domaines = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const domain = slug ? domainData[slug as keyof typeof domainData] : null;
+  const { domains, isLoading } = useDomains();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  const domain = domains.find(d => d.slug === slug);
+
   const handleCreateTarget = (target: any) => {
-    // TODO: Intégrer avec Supabase pour créer l'objectif
     toast({
       title: "Objectif créé",
       description: "Le nouvel objectif a été ajouté avec succès",
@@ -185,10 +32,30 @@ const Domaines = () => {
     setShowCreateModal(false);
   };
 
+  if (isLoading) {
+    return (
+      <div className="relative min-h-screen w-full bg-black">
+        <div 
+          className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+          style={{ backgroundImage: `url(${bgImage})` }}
+        />
+        <div className="relative z-10 ml-32 min-h-screen flex items-center justify-center">
+          <Skeleton className="w-64 h-8 bg-white/10" />
+        </div>
+      </div>
+    );
+  }
+
   if (!domain) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-2xl">Domaine non trouvé</div>
+      <div className="relative min-h-screen w-full bg-black">
+        <div 
+          className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+          style={{ backgroundImage: `url(${bgImage})` }}
+        />
+        <div className="relative z-10 ml-32 min-h-screen flex items-center justify-center">
+          <div className="text-white text-2xl">Domaine non trouvé</div>
+        </div>
       </div>
     );
   }
@@ -281,14 +148,14 @@ const Domaines = () => {
             <DomainMetrics domainName={domain.name} />
             <DomainPerformances
               domainName={domain.name}
-              performances={domain.performances}
+              performances={[]}
             />
           </div>
 
           {/* Objectives */}
           <div className="mb-8">
             <DomainObjectives 
-              domainSlug={slug || "business"}
+              domainSlug={slug || ""}
               onAddObjective={() => setShowCreateModal(true)}
             />
           </div>
@@ -297,10 +164,10 @@ const Domaines = () => {
           <div className="grid grid-cols-[1fr_auto] gap-8">
             <DomainScoreChart
               domainName={domain.name}
-              domainSlug={slug || "business"}
-              score={domain.score}
-              variation={domain.variation}
-              categories={domain.categories}
+              domainSlug={slug || ""}
+              score={0}
+              variation="+0%"
+              categories={[]}
             />
             <div className="w-[400px]">
               <DomainCategoryStats />
