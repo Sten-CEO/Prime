@@ -12,6 +12,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useDomainMetrics } from "@/hooks/useDomainMetrics";
+import { useDomainSlugToId } from "@/hooks/useDomainSlugToId";
 
 type PerformanceLevel = "simple" | "advanced" | "exceptional" | null;
 
@@ -24,14 +26,20 @@ interface Metric {
 
 interface DomainMetricsProps {
   domainName: string;
+  domainSlug: string;
 }
 
-export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
-  const [metrics, setMetrics] = useState<Metric[]>([
-    { id: "m1", name: "💧 Hydratation", enabled: true, days: ["L", "M", "M", "J", "V", "S", "D"] },
-    { id: "m2", name: "👟 10k pas", enabled: true, days: ["L", "M", "M", "J", "V"] },
-    { id: "m3", name: "📖 Lecture 20min", enabled: false, days: ["L", "M", "J", "V"] },
-  ]);
+export const DomainMetrics = ({ domainName, domainSlug }: DomainMetricsProps) => {
+  const { data: domainIdData } = useDomainSlugToId(domainSlug);
+  const { data: dbMetrics = [], isLoading } = useDomainMetrics(domainIdData);
+  
+  // Convertir les métriques Supabase en format local
+  const metrics: Metric[] = dbMetrics.map(m => ({
+    id: m.id,
+    name: m.icon ? `${m.icon} ${m.name}` : m.name,
+    enabled: m.is_active,
+    days: ["L", "M", "M", "J", "V", "S", "D"], // TODO: récupérer les jours actifs depuis la DB
+  }));
   const [showAddModal, setShowAddModal] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [recordingMetricId, setRecordingMetricId] = useState<string | null>(null);
@@ -43,10 +51,12 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
 
   const recordingMetric = metrics.find((m) => m.id === recordingMetricId);
 
-  const toggleMetric = (id: string) => {
-    setMetrics(prev =>
-      prev.map(m => (m.id === id ? { ...m, enabled: !m.enabled } : m))
-    );
+  const toggleMetric = async (id: string) => {
+    // TODO: Mettre à jour dans Supabase
+    toast({
+      title: "Fonction à venir",
+      description: "La modification des métriques sera bientôt disponible.",
+    });
   };
 
   const getLevelImpact = (level: PerformanceLevel): number => {
@@ -94,26 +104,23 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
     return metricDays.includes(dayMap[today]);
   };
 
-  const handleAdd = (metric: { name: string; icon: string; days: string[] }) => {
-    const newMetric = {
-      id: `m${metrics.length + 1}`,
-      name: `${metric.icon} ${metric.name}`,
-      enabled: true,
-      days: metric.days,
-    };
-    setMetrics([...metrics, newMetric]);
-    toast({ title: "Métrique ajoutée", description: `${metric.name} a été ajoutée avec succès.` });
+  const handleAdd = async (metric: { name: string; icon: string; days: string[] }) => {
+    // TODO: Ajouter dans Supabase
+    toast({ 
+      title: "Fonction à venir", 
+      description: "L'ajout de métriques sera bientôt disponible." 
+    });
   };
 
-  const handleDelete = (id: string, name: string) => {
-    setMetrics(prev => prev.filter(m => m.id !== id));
+  const handleDelete = async (id: string, name: string) => {
+    // TODO: Supprimer dans Supabase
     if (expandedId === id) {
       setExpandedId(null);
       setRecordingMetricId(null);
     }
     toast({
-      title: "Métrique supprimée",
-      description: `${name} a été supprimée avec succès.`,
+      title: "Fonction à venir",
+      description: "La suppression de métriques sera bientôt disponible.",
     });
   };
 
@@ -155,8 +162,19 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
         </Button>
       </div>
 
-      <div className="space-y-2.5">
-        {metrics.map((metric) => (
+      {isLoading ? (
+        <div className="space-y-2.5">
+          <div className="h-16 rounded-lg bg-white/[0.02] border border-white/[0.08] animate-pulse" />
+          <div className="h-16 rounded-lg bg-white/[0.02] border border-white/[0.08] animate-pulse" />
+        </div>
+      ) : metrics.length === 0 ? (
+        <div className="py-8 text-center">
+          <p className="text-white/40 text-sm">Aucune métrique pour ce domaine</p>
+          <p className="text-white/30 text-xs mt-1">Cliquez sur + pour en ajouter</p>
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {metrics.map((metric) => (
           <div key={metric.id} className="space-y-0">
             <div
               onClick={() => {
@@ -368,8 +386,9 @@ export const DomainMetrics = ({ domainName }: DomainMetricsProps) => {
               </div>
             )}
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <AddMetricModal
         open={showAddModal}

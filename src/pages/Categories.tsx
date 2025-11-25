@@ -159,13 +159,16 @@ const Categories = () => {
 
   const activeCategoryData = currentDomainCategories.find(c => c.id === activeCategory);
 
-  if (!slug || !activeCategoryData) {
+  if (!slug) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <p>Domaine non trouvé ou aucune catégorie disponible</p>
+        <p>Domaine non trouvé</p>
       </div>
     );
   }
+
+  // Permettre l'affichage même sans catégories
+  const hasCategories = currentDomainCategories.length > 0;
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -349,25 +352,36 @@ const Categories = () => {
             onDuplicateCategory={handleDuplicateCategory}
           />
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div className="lg:col-span-2">
-              <CategoryStatsBlock
-                categoryName={activeCategoryData.name}
-                domainName={domainNames[slug]}
-                stats={computeStats()}
-              />
+          {!hasCategories ? (
+            <div className="mt-12 text-center">
+              <div className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-12 max-w-md mx-auto">
+                <p className="text-white/60 text-lg mb-2">Aucune catégorie pour ce domaine</p>
+                <p className="text-white/40 text-sm">Créez votre première catégorie pour commencer</p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div className="lg:col-span-2">
+                  <CategoryStatsBlock
+                    categoryName={activeCategoryData!.name}
+                    domainName={domainNames[slug]}
+                    stats={computeStats()}
+                  />
+                </div>
+              </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <CategoryPerformances 
-              categoryName={activeCategoryData.name}
-              performances={activeCategoryData.performances}
-            />
-            <CategoryMetrics metrics={activeCategoryData.metrics} />
-          </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <CategoryPerformances 
+                  categoryName={activeCategoryData!.name}
+                  performances={activeCategoryData!.performances}
+                />
+                <CategoryMetrics metrics={activeCategoryData!.metrics} />
+              </div>
 
-          <CategoryManualNote categoryName={activeCategoryData.name} />
+              <CategoryManualNote categoryName={activeCategoryData!.name} />
+            </>
+          )}
         </div>
       </div>
 

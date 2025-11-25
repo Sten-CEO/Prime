@@ -145,7 +145,7 @@ const Domaines = () => {
 
           {/* Performances + Metrics */}
           <div className="grid grid-cols-2 gap-8 mb-8">
-            <DomainMetrics domainName={domain.name} />
+            <DomainMetrics domainName={domain.name} domainSlug={slug || ""} />
             <DomainPerformances
               domainName={domain.name}
               performances={[]}
