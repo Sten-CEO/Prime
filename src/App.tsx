@@ -8,6 +8,7 @@ import Accueil from "./pages/Accueil";
 import Domaines from "./pages/Domaines";
 import Categories from "./pages/Categories";
 import Journal from "./pages/Journal";
+import JournalDomain from "./pages/JournalDomain";
 import PrimeHistory from "./pages/PrimeHistory";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/domaines/:slug" element={<Domaines />} />
           <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
           <Route path="/journal" element={<Journal />} />
+          <Route path="/journal/:domain" element={<JournalDomain />} />
           <Route path="/prime-history" element={<PrimeHistory />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
