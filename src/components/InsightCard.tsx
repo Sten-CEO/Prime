@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Trash2 } from "lucide-react";
 import { useDomainColors } from "@/hooks/useDomainColors";
+import { useNavigate } from "react-router-dom";
 
 interface InsightCardProps {
   id: string;
@@ -11,10 +12,12 @@ interface InsightCardProps {
   highlightColor: "pink" | "purple" | "blue";
   category?: string;
   domain_id: string;
+  entry_id?: string;
   onDelete?: () => void;
 }
 
-export const InsightCard = ({ id, text, date, highlightColor, category = "Business", domain_id, onDelete }: InsightCardProps) => {
+export const InsightCard = ({ id, text, date, highlightColor, category = "Business", domain_id, entry_id, onDelete }: InsightCardProps) => {
+  const navigate = useNavigate();
   const { getDomainColor } = useDomainColors();
   const domainHslColor = getDomainColor(domain_id);
   
@@ -73,7 +76,8 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
           <div className="flex gap-2">
             <Button 
               className="flex-1 backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
-              onClick={() => window.location.href = `/journal/${domain_id}`}
+              onClick={() => entry_id && navigate(`/journal/entry/${entry_id}`)}
+              disabled={!entry_id}
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               Voir dans Journal
