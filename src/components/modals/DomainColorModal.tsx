@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useDomainColors, COLOR_PALETTE, DomainKey } from "@/hooks/useDomainColors";
+import { useDomainColors, COLOR_PALETTE } from "@/hooks/useDomainColors";
 import { toast } from "@/hooks/use-toast";
 
 interface DomainColorModalProps {
@@ -12,10 +12,10 @@ interface DomainColorModalProps {
 export const DomainColorModal = ({ open, onOpenChange }: DomainColorModalProps) => {
   const { getAllDomains, setDomainColor } = useDomainColors();
   const [step, setStep] = useState<'select-domain' | 'select-color'>('select-domain');
-  const [selectedDomain, setSelectedDomain] = useState<DomainKey | null>(null);
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>('');
 
-  const handleDomainSelect = (domain: DomainKey, currentColor: string) => {
+  const handleDomainSelect = (domain: string, currentColor: string) => {
     setSelectedDomain(domain);
     setSelectedColor(currentColor);
     setStep('select-color');
