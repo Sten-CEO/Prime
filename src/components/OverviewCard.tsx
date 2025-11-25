@@ -42,11 +42,13 @@ export const OverviewCard = ({ items, favorites, onToggleFavorite, onReorderItem
   const [isReorderOpen, setIsReorderOpen] = useState(false);
   const [localItems, setLocalItems] = useState(items);
 
-  const bestDomain = items.reduce((best, item) => {
-    const trendValue = parseFloat(item.trend.replace(/[^0-9.-]/g, ''));
-    const bestTrendValue = parseFloat(best.trend.replace(/[^0-9.-]/g, ''));
-    return trendValue > bestTrendValue ? item : best;
-  });
+  const bestDomain = items.length > 0 
+    ? items.reduce((best, item) => {
+        const trendValue = parseFloat(item.trend.replace(/[^0-9.-]/g, ''));
+        const bestTrendValue = parseFloat(best.trend.replace(/[^0-9.-]/g, ''));
+        return trendValue > bestTrendValue ? item : best;
+      })
+    : null;
 
   const handleItemClick = (name: string) => {
     const slug = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -86,36 +88,41 @@ export const OverviewCard = ({ items, favorites, onToggleFavorite, onReorderItem
           <span className="text-white/50 text-xs font-medium uppercase tracking-wider">Score</span>
         </div>
         <div className="space-y-6">
-          {items.map((item) => {
-            const Icon = item.icon;
-            const isPositive = item.trend.startsWith('+');
-            const isBest = item.name === bestDomain.name;
-            const isFavorite = favorites.includes(item.name);
-            
-            return (
-              <Tooltip key={item.name}>
-                <TooltipTrigger asChild>
-                  <div 
-                    className={`flex items-center gap-4 cursor-pointer rounded-xl p-3 -mx-3 transition-all hover:bg-white/[0.05] relative group ${
-                      isBest ? 'animate-pulse-slow' : ''
-                    }`}
-                    onClick={() => handleItemClick(item.name)}
-                  >
-                    {isBest && (
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-success/10 to-transparent blur-xl -z-10" />
-                    )}
-                    <Icon className="w-6 h-6 text-white/70" style={{ filter: 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.4))' }} />
-                    <div className="flex items-center gap-2">
-                      <span className="text-white font-medium min-w-[80px]">{item.name}</span>
-                      {isFavorite && (
-                        <Star className="w-3.5 h-3.5 text-warning fill-warning" style={{ filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.6))' }} />
+          {items.length === 0 ? (
+            <div className="text-center py-8 text-white/50">
+              Chargement des données...
+            </div>
+          ) : (
+            items.map((item) => {
+              const Icon = item.icon;
+              const isPositive = item.trend.startsWith('+');
+              const isBest = bestDomain ? item.name === bestDomain.name : false;
+              const isFavorite = favorites.includes(item.name);
+              
+              return (
+                <Tooltip key={item.name}>
+                  <TooltipTrigger asChild>
+                    <div 
+                      className={`flex items-center gap-4 cursor-pointer rounded-xl p-3 -mx-3 transition-all hover:bg-white/[0.05] relative group ${
+                        isBest ? 'animate-pulse-slow' : ''
+                      }`}
+                      onClick={() => handleItemClick(item.name)}
+                    >
+                      {isBest && (
+                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-success/10 to-transparent blur-xl -z-10" />
                       )}
-                    </div>
-                    <span className="text-white text-xl font-bold ml-auto">{item.score}</span>
-                    <span className={`text-sm font-medium min-w-[60px] text-right ${isPositive ? 'text-success' : 'text-warning'}`} 
-                          style={{ filter: isPositive ? 'drop-shadow(0 0 6px rgba(16, 185, 129, 0.6))' : 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.6))' }}>
-                      {item.trend}
-                    </span>
+                      <Icon className="w-6 h-6 text-white/70" style={{ filter: 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.4))' }} />
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-medium min-w-[80px]">{item.name}</span>
+                        {isFavorite && (
+                          <Star className="w-3.5 h-3.5 text-warning fill-warning" style={{ filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.6))' }} />
+                        )}
+                      </div>
+                      <span className="text-white text-xl font-bold ml-auto">{item.score}</span>
+                      <span className={`text-sm font-medium min-w-[60px] text-right ${isPositive ? 'text-success' : 'text-warning'}`} 
+                            style={{ filter: isPositive ? 'drop-shadow(0 0 6px rgba(16, 185, 129, 0.6))' : 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.6))' }}>
+                        {item.trend}
+                      </span>
                     
                     <DropdownMenu>
                       <DropdownMenuTrigger className="ml-2 opacity-0 group-hover:opacity-100 hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
@@ -156,7 +163,8 @@ export const OverviewCard = ({ items, favorites, onToggleFavorite, onReorderItem
                 </TooltipContent>
               </Tooltip>
             );
-          })}
+          })
+        )}
         </div>
       </Card>
 
