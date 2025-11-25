@@ -6,63 +6,39 @@ import { useState } from "react";
 import { AddMetricModal } from "@/components/modals/AddMetricModal";
 import { MetricStatsPanel } from "@/components/modals/MetricStatsPanel";
 import { RecordMetricModal } from "@/components/modals/RecordMetricModal";
-import { useToast } from "@/hooks/use-toast";
-
-interface Metric {
-  id: string;
-  name: string;
-  enabled: boolean;
-  days: string[];
-}
+import { useMetrics } from "@/hooks/useMetrics";
 
 interface CategoryMetricsProps {
-  metrics: Metric[];
+  categoryId: string;
+  domainId: string;
 }
 
 const allDays = ["L", "M", "M", "J", "V", "S", "D"];
 
-export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProps) => {
-  const [metrics, setMetrics] = useState(initialMetrics);
-  const [editingId, setEditingId] = useState<string | null>(null);
+export const CategoryMetrics = ({ categoryId, domainId }: CategoryMetricsProps) => {
+  const { metrics, isLoading, createMetric, updateMetric } = useMetrics(categoryId);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [statsMetric, setStatsMetric] = useState<Metric | null>(null);
-  const [recordingMetric, setRecordingMetric] = useState<Metric | null>(null);
-  const { toast } = useToast();
+  const [statsMetric, setStatsMetric] = useState<any>(null);
+  const [recordingMetric, setRecordingMetric] = useState<any>(null);
 
   const toggleMetric = (id: string) => {
-    setMetrics(metrics.map(m => 
-      m.id === id ? { ...m, enabled: !m.enabled } : m
-    ));
-  };
-
-  const toggleDay = (id: string, day: string) => {
-    setMetrics(metrics.map(m => {
-      if (m.id === id) {
-        const newDays = m.days.includes(day)
-          ? m.days.filter(d => d !== day)
-          : [...m.days, day];
-        return { ...m, days: newDays };
-      }
-      return m;
-    }));
+    const metric = metrics.find(m => m.id === id);
+    if (metric) {
+      updateMetric({ id, is_active: !metric.is_active });
+    }
   };
 
   const handleAdd = (metric: { name: string; icon: string; days: string[] }) => {
-    const newMetric = {
-      id: `${metrics.length + 1}`,
+    createMetric({
       name: `${metric.icon} ${metric.name}`,
-      enabled: true,
-      days: metric.days
-    };
-    setMetrics([...metrics, newMetric]);
-    toast({ title: "Métrique ajoutée", description: `${metric.name} a été ajoutée avec succès.` });
+      icon: metric.icon,
+      category_id: categoryId,
+      domain_id: domainId,
+    });
   };
 
   const handleRecord = (data: { date: string; level: string; impact: number; note?: string }) => {
-    toast({ 
-      title: "Impact enregistré", 
-      description: `Impact de ${data.impact} enregistré pour le ${data.date}.` 
-    });
+    // Record logic will be implemented later
   };
 
   return (
@@ -79,7 +55,11 @@ export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProp
       </div>
       
       <div className="space-y-4">
-        {metrics.length === 0 ? (
+        {isLoading ? (
+          <div className="py-8 text-center">
+            <p className="text-white/40 text-sm">Chargement...</p>
+          </div>
+        ) : metrics.length === 0 ? (
           <div className="py-8 text-center">
             <p className="text-white/40 text-sm">Aucune métrique pour cette catégorie</p>
             <p className="text-white/30 text-xs mt-1">Cliquez sur + pour en ajouter</p>
@@ -106,41 +86,12 @@ export const CategoryMetrics = ({ metrics: initialMetrics }: CategoryMetricsProp
                     <BarChart3 className="w-3.5 h-3.5 text-white/60" />
                   </button>
                 </div>
-                <button
-                  onClick={() => setEditingId(editingId === metric.id ? null : metric.id)}
-                  className="text-xs text-white/50 hover:text-white/70 transition-colors"
-                >
-                  {editingId === metric.id ? "Masquer jours ▲" : "Jours spécifiques ▼"}
-                </button>
               </div>
               <Switch
-                checked={metric.enabled}
+                checked={metric.is_active}
                 onCheckedChange={() => toggleMetric(metric.id)}
               />
             </div>
-
-            {editingId === metric.id && (
-              <div className="ml-4 p-3 rounded-lg bg-white/[0.02] border border-white/[0.08] animate-fade-in">
-                <div className="flex gap-2 flex-wrap">
-                  {allDays.map((day, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => toggleDay(metric.id, day)}
-                      className={`w-8 h-8 rounded-lg text-xs font-medium transition-all ${
-                        metric.days.includes(day)
-                          ? "bg-white/[0.15] border border-white/[0.3] text-white shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                          : "bg-white/[0.05] border border-white/[0.12] text-white/50 hover:bg-white/[0.08]"
-                      }`}
-                    >
-                      {day}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-white/50 mt-2">
-                  {metric.days.length} jour(s) sélectionné(s)
-                </p>
-              </div>
-            )}
           </div>
           ))
         )}
