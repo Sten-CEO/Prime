@@ -275,11 +275,11 @@ export const MultiDomainChart = () => {
                 const isActive = activeDomains[key];
                 const isCompared = compareMode && comparedDomains.includes(key);
                 const opacity = compareMode 
-                  ? (isCompared ? 1 : 0.2)
-                  : (isActive ? 1 : 0.2);
+                  ? (isCompared ? 1 : 0.15)
+                  : (isActive ? 1 : 0.15);
                 const strokeColor = compareMode && isCompared ? activeColor : color;
                 
-                return isActive && (
+                return (
                   <Line 
                     key={key}
                     type="monotone" 
