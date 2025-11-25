@@ -3,22 +3,49 @@ import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useState, useMemo } from "react";
 import { useDomainColors } from "@/hooks/useDomainColors";
+import { subDays, subMonths, format } from "date-fns";
+import { fr } from "date-fns/locale";
 
-const mockData = [
-  { day: "Lun", Business: 80, Sport: 70, Social: 60, Santé: 90 },
-  { day: "Mar", Business: 70, Sport: 80, Social: 70, Santé: 80 },
-  { day: "Mer", Business: 90, Sport: 60, Social: 80, Santé: 70 },
-  { day: "Jeu", Business: 80, Sport: 90, Social: 70, Santé: 90 },
-  { day: "Ven", Business: 90, Sport: 80, Social: 90, Santé: 80 },
-  { day: "Sam", Business: 70, Sport: 90, Social: 80, Santé: 90 },
-  { day: "Dim", Business: 80, Sport: 70, Social: 90, Santé: 80 },
-];
+// Generate mock data for different periods
+const generateMockData = (days: number) => {
+  const data = [];
+  const today = new Date();
+  
+  for (let i = days - 1; i >= 0; i--) {
+    const date = subDays(today, i);
+    const dayLabel = days <= 7 
+      ? format(date, "EEE", { locale: fr }).slice(0, 3)
+      : days <= 30
+      ? format(date, "d MMM", { locale: fr })
+      : days <= 90
+      ? format(date, "d MMM", { locale: fr })
+      : format(date, "MMM", { locale: fr });
+    
+    const business = Math.floor(Math.random() * 30) + 70;
+    const sport = Math.floor(Math.random() * 30) + 65;
+    const social = Math.floor(Math.random() * 30) + 60;
+    const sante = Math.floor(Math.random() * 30) + 75;
+    const general = Math.round((business + sport + social + sante) / 4);
+    
+    data.push({
+      day: dayLabel,
+      Business: business,
+      Sport: sport,
+      Social: social,
+      Santé: sante,
+      Général: general,
+    });
+  }
+  
+  return data;
+};
 
 const domainMapping: Record<string, string> = {
   "Business": "business",
   "Sport": "sport",
   "Social": "social",
   "Santé": "sante",
+  "Général": "general",
 };
 
 const periods = [
@@ -36,12 +63,38 @@ export const MultiDomainChart = () => {
     Sport: true,
     Social: true,
     Santé: true,
+    Général: true,
   });
   const [compareMode, setCompareMode] = useState(false);
   const [comparedDomains, setComparedDomains] = useState<string[]>([]);
   const [mouseX, setMouseX] = useState<number | null>(null);
   
-  const weekVariation = "+18% cette semaine";
+  // Generate data based on selected period
+  const chartData = useMemo(() => {
+    const daysMap: Record<string, number> = {
+      "7d": 7,
+      "30d": 30,
+      "90d": 90,
+      "12m": 365,
+    };
+    return generateMockData(daysMap[selectedPeriod] || 7);
+  }, [selectedPeriod]);
+  
+  // Calculate week variation for "Général"
+  const weekVariation = useMemo(() => {
+    if (chartData.length < 7) return "+0%";
+    
+    const lastWeek = chartData.slice(-7);
+    const previousWeek = chartData.slice(-14, -7);
+    
+    if (previousWeek.length === 0) return "+0%";
+    
+    const lastWeekAvg = lastWeek.reduce((sum, d) => sum + (d.Général || 0), 0) / lastWeek.length;
+    const previousWeekAvg = previousWeek.reduce((sum, d) => sum + (d.Général || 0), 0) / previousWeek.length;
+    
+    const change = ((lastWeekAvg - previousWeekAvg) / previousWeekAvg) * 100;
+    return `${change > 0 ? '+' : ''}${Math.round(change)}%`;
+  }, [chartData]);
 
   const domains = useMemo(() => {
     return Object.keys(domainMapping).map(key => {
@@ -152,7 +205,7 @@ export const MultiDomainChart = () => {
           setMouseX(e.clientX - rect.left);
         }} onMouseLeave={() => setMouseX(null)}>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={mockData}>
+            <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--glass-border) / 0.1)" />
               <XAxis 
                 dataKey="day" 
