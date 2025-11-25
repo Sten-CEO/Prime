@@ -7,12 +7,11 @@ import { Home, Award, BookOpen, Target, User, Settings, Bell, Calendar, Crosshai
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/locales/translations";
-import { useDomainColors, COLOR_PALETTE, DomainKey } from "@/hooks/useDomainColors";
+import { DomainColorModal } from "@/components/modals/DomainColorModal";
 
 const Parametres = () => {
   const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
-  const { getAllDomains, setDomainColor } = useDomainColors();
   const [timezone, setTimezone] = useState(() => localStorage.getItem('prime_timezone') || "Europe/Paris");
   const [dateFormat, setDateFormat] = useState(() => localStorage.getItem('prime_dateformat') || "DD/MM/YYYY");
   
@@ -25,14 +24,8 @@ const Parametres = () => {
   const [animations, setAnimations] = useState(true);
   const [showEmptyDays, setShowEmptyDays] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
-
-  const handleColorChange = (domain: DomainKey, color: string) => {
-    setDomainColor(domain, color);
-    toast({
-      title: "Couleur mise à jour",
-      description: `La couleur du domaine a été modifiée`,
-    });
-  };
+  
+  const [domainColorModalOpen, setDomainColorModalOpen] = useState(false);
 
   const handleSavePreferences = () => {
     localStorage.setItem('prime_timezone', timezone);
@@ -248,40 +241,6 @@ const Parametres = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Couleurs des domaines */}
-              <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-5">
-                <h2 className="text-xl font-semibold text-white flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] flex items-center justify-center border border-white/[0.1] shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-                    <Palette className="w-5 h-5 text-white" />
-                  </div>
-                  Couleurs des domaines
-                </h2>
-                <p className="text-white/40 text-xs">Personnalisez la couleur de chaque domaine pour les graphiques et insights</p>
-                
-                <div className="space-y-4">
-                  {getAllDomains().map((domain) => (
-                    <div key={domain.domain} className="space-y-2">
-                      <label className="text-xs text-white/70 block font-medium">{domain.label}</label>
-                      <div className="grid grid-cols-6 gap-2">
-                        {COLOR_PALETTE.map((colorOption) => (
-                          <button
-                            key={colorOption.name}
-                            onClick={() => handleColorChange(domain.domain, colorOption.value)}
-                            className={`w-full aspect-square rounded-lg border-2 transition-all hover:scale-110 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] ${
-                              domain.color === colorOption.value
-                                ? 'border-white shadow-[0_0_15px_rgba(255,255,255,0.5)]'
-                                : 'border-white/20'
-                            }`}
-                            style={{ backgroundColor: `hsl(${colorOption.value})` }}
-                            title={colorOption.name}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
             {/* Colonne droite - Rappels & notifications */}
@@ -368,6 +327,21 @@ const Parametres = () => {
                       <Switch checked={targetAlerts} onCheckedChange={setTargetAlerts} />
                     </div>
                   </div>
+
+                  <div className="backdrop-blur-xl bg-white/[0.01] border border-white/[0.05] rounded-xl p-4">
+                    <button
+                      onClick={() => setDomainColorModalOpen(true)}
+                      className="w-full flex items-center gap-3 hover:bg-white/[0.03] transition-all rounded-lg p-1"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                        <Palette className="w-4 h-4 text-white/80" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-white text-sm font-medium">Changer les couleurs des domaines</p>
+                        <p className="text-white/40 text-xs">Personnaliser la couleur de chaque domaine</p>
+                      </div>
+                    </button>
+                  </div>
                 </div>
 
                 <p className="text-xs text-white/30 text-center pt-2">
@@ -378,6 +352,11 @@ const Parametres = () => {
           </div>
         </div>
       </div>
+
+      <DomainColorModal 
+        open={domainColorModalOpen} 
+        onOpenChange={setDomainColorModalOpen}
+      />
     </div>
   );
 };
