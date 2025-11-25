@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -144,13 +143,12 @@ export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: 
               <label className="text-sm text-white/70 mb-2 block">Date</label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal bg-white/[0.05] border-white/[0.1] text-white hover:bg-white/[0.08]"
+                  <button
+                    className="w-full justify-start text-left font-normal bg-white/[0.05] border border-white/[0.1] text-white hover:bg-white/[0.08] rounded-md px-3 py-2 flex items-center transition-colors"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {format(date, "d MMMM yyyy", { locale: fr })}
-                  </Button>
+                  </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-black/90 border-white/[0.1]">
                   <Calendar
@@ -166,20 +164,19 @@ export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: 
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button
-              variant="outline"
+            <button
               onClick={() => onOpenChange(false)}
-              className="border-white/[0.1] text-white hover:bg-white/[0.05]"
+              className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl px-6 py-2.5 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer text-white text-sm font-medium"
             >
               Annuler
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={handleSubmit}
               disabled={loading}
-              className="bg-primary hover:bg-primary/90"
+              className="backdrop-blur-xl bg-white/[0.08] border border-white/[0.12] rounded-xl px-6 py-2.5 hover:bg-white/[0.12] hover:border-white/[0.15] hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] transition-all cursor-pointer text-white text-sm font-semibold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {loading ? "Enregistrement..." : "Enregistrer"}
-            </Button>
+            </button>
           </div>
         </div>
       </DialogContent>
