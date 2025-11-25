@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Trash2 } from "lucide-react";
 
 interface InsightCardProps {
+  id: string;
   text: string;
   date: string;
   highlightColor: "pink" | "purple" | "blue";
   category?: string;
+  domain_id: string;
   onDelete?: () => void;
 }
 
-export const InsightCard = ({ text, date, highlightColor, category = "Business", onDelete }: InsightCardProps) => {
+export const InsightCard = ({ id, text, date, highlightColor, category = "Business", domain_id, onDelete }: InsightCardProps) => {
   const highlightColors = {
     pink: "bg-aura-pink/20 border-aura-pink/40 shadow-[0_0_20px_rgba(244,114,182,0.4)]",
     purple: "bg-aura-purple/20 border-aura-purple/40 shadow-[0_0_20px_rgba(168,85,247,0.4)]",
@@ -53,7 +55,7 @@ export const InsightCard = ({ text, date, highlightColor, category = "Business",
           <div className="flex gap-2">
             <Button 
               className="flex-1 backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
-              onClick={() => window.location.href = '/journal'}
+              onClick={() => window.location.href = `/journal/${domain_id}`}
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               Voir dans Journal

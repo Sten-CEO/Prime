@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           domain_id: string
           entry_id: string | null
+          hidden_from_home: boolean | null
           id: string
           insight_date: string
           phrase: string
@@ -30,6 +31,7 @@ export type Database = {
           created_at?: string
           domain_id: string
           entry_id?: string | null
+          hidden_from_home?: boolean | null
           id?: string
           insight_date: string
           phrase: string
@@ -40,6 +42,7 @@ export type Database = {
           created_at?: string
           domain_id?: string
           entry_id?: string | null
+          hidden_from_home?: boolean | null
           id?: string
           insight_date?: string
           phrase?: string
