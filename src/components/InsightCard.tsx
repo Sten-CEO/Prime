@@ -76,7 +76,14 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
           <div className="flex gap-2">
             <Button 
               className="flex-1 backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
-              onClick={() => entry_id && navigate(`/journal/entry/${entry_id}`)}
+              onClick={() => {
+                console.log("Button clicked, entry_id:", entry_id);
+                if (entry_id) {
+                  navigate(`/journal/entry/${entry_id}`);
+                } else {
+                  console.error("No entry_id available");
+                }
+              }}
               disabled={!entry_id}
             >
               <ExternalLink className="w-4 h-4 mr-2" />
