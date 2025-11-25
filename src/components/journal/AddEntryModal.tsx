@@ -140,12 +140,14 @@ export const AddEntryModal = ({
     }
     setShowInsightPopup(false);
     setSelectedText("");
+    setInsightMode(false);
     window.getSelection()?.removeAllRanges();
   };
 
   const handleCancelInsight = () => {
     setShowInsightPopup(false);
     setSelectedText("");
+    setInsightMode(false);
     window.getSelection()?.removeAllRanges();
   };
 
