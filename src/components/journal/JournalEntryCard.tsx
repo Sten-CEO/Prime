@@ -41,7 +41,7 @@ export const JournalEntryCard = ({
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-xs font-medium text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+            <span className="text-sm font-semibold text-white px-4 py-1.5 rounded-full bg-gradient-to-br from-white/[0.15] to-white/[0.08] border border-white/[0.25] shadow-[0_0_15px_rgba(255,255,255,0.1)] backdrop-blur-sm">
               {getDomainLabel(domain)}
             </span>
             <span className="text-xs text-white/40">

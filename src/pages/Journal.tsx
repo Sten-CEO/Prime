@@ -216,7 +216,7 @@ const Journal = () => {
                         className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer group"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <h2 className="text-xl font-semibold text-white">
+                          <h2 className="text-2xl font-bold text-white bg-gradient-to-r from-white via-white/95 to-white/80 bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
                             Journal {getDomainLabel(domainId)}
                           </h2>
                           <span className="text-sm text-white/40">
