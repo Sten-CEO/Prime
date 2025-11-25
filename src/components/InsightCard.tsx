@@ -18,11 +18,13 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
   const { getDomainColor } = useDomainColors();
   const domainHslColor = getDomainColor(domain_id);
   
-  // Utilise la couleur personnalisée du domaine avec des opacités appropriées
+  // Pour le domaine Général, utiliser blanc complet sans opacité
+  const isGeneral = domain_id === 'general';
+  
   const highlightStyle = {
-    backgroundColor: `hsl(${domainHslColor} / 0.2)`,
-    borderColor: `hsl(${domainHslColor} / 0.4)`,
-    boxShadow: `0 0 20px hsl(${domainHslColor} / 0.4)`,
+    backgroundColor: isGeneral ? `hsl(${domainHslColor} / 0.15)` : `hsl(${domainHslColor} / 0.2)`,
+    borderColor: isGeneral ? `hsl(${domainHslColor} / 0.6)` : `hsl(${domainHslColor} / 0.4)`,
+    boxShadow: isGeneral ? `0 0 20px hsl(${domainHslColor} / 0.6)` : `0 0 20px hsl(${domainHslColor} / 0.4)`,
   };
 
   return (
