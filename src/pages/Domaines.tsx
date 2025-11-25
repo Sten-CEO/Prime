@@ -56,19 +56,8 @@ const Domaines = () => {
     );
   }
 
-  if (!domain) {
-    return (
-      <div className="relative min-h-screen w-full bg-black">
-        <div 
-          className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        />
-        <div className="relative z-10 ml-32 min-h-screen flex items-center justify-center">
-          <div className="text-white text-2xl">Domaine non trouvé</div>
-        </div>
-      </div>
-    );
-  }
+  // Allow page to render even if domain data hasn't loaded yet
+  const domainName = domain?.name || (slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : "Domaine");
 
   return (
     <div className="relative min-h-screen w-full bg-black">
@@ -90,7 +79,7 @@ const Domaines = () => {
           {/* Domain Title */}
           <div className="mb-8 mt-6 flex items-center justify-between">
             <h1 className="text-4xl font-bold text-white tracking-tight">
-              {domain.name}
+              {domainName}
             </h1>
             <div className="flex items-center gap-3">
               <button
@@ -121,7 +110,7 @@ const Domaines = () => {
           {/* Score + Chart + Category Stats */}
           <div className="grid grid-cols-[1fr_auto] gap-8">
             <DomainScoreChart
-              domainName={domain.name}
+              domainName={domainName}
               domainSlug={slug || ""}
               score={0}
               variation="+0%"

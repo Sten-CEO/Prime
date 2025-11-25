@@ -45,19 +45,8 @@ const DomainPerformances = () => {
     );
   }
 
-  if (!domain) {
-    return (
-      <div className="relative min-h-screen w-full bg-black">
-        <div 
-          className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        />
-        <div className="relative z-10 ml-32 min-h-screen flex items-center justify-center">
-          <div className="text-white text-2xl">Domaine non trouvé</div>
-        </div>
-      </div>
-    );
-  }
+  // Allow page to render even if domain data hasn't loaded yet
+  const domainName = domain?.name || (slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : "Domaine");
 
   return (
     <div className="relative min-h-screen w-full bg-black">
@@ -79,7 +68,7 @@ const DomainPerformances = () => {
           {/* Page Title */}
           <div className="mb-8 mt-6">
             <h1 className="text-4xl font-bold text-white tracking-tight">
-              Performances - {domain.name}
+              Performances - {domainName}
             </h1>
             <p className="text-white/50 text-sm mt-2">
               Gérez toutes vos métriques et performances libres pour ce domaine
@@ -105,7 +94,13 @@ const DomainPerformances = () => {
                 {categories.length === 0 ? (
                   <div className="py-8 text-center">
                     <p className="text-white/40 text-sm">Aucune catégorie créée</p>
-                    <p className="text-white/30 text-xs mt-1">Créez d'abord des catégories pour ce domaine</p>
+                    <p className="text-white/30 text-xs mt-1">Créez des catégories pour ce domaine</p>
+                    <button
+                      onClick={() => navigate(`/domaines/${slug}/categories`)}
+                      className="mt-4 backdrop-blur-xl bg-white/[0.05] border border-white/[0.12] rounded-xl px-4 py-2 hover:bg-white/[0.08] transition-all text-white text-xs"
+                    >
+                      Gérer les catégories
+                    </button>
                   </div>
                 ) : (
                   categories.map(category => (
@@ -113,7 +108,7 @@ const DomainPerformances = () => {
                       key={category.id}
                       categoryId={category.id}
                       categoryName={category.name}
-                      domainId={domain.id}
+                      domainId={domain?.id || ""}
                       onEditMetric={setEditingMetric}
                     />
                   ))
@@ -138,7 +133,13 @@ const DomainPerformances = () => {
                 {categories.length === 0 ? (
                   <div className="py-8 text-center">
                     <p className="text-white/40 text-sm">Aucune catégorie créée</p>
-                    <p className="text-white/30 text-xs mt-1">Créez d'abord des catégories pour ce domaine</p>
+                    <p className="text-white/30 text-xs mt-1">Créez des catégories pour ce domaine</p>
+                    <button
+                      onClick={() => navigate(`/domaines/${slug}/categories`)}
+                      className="mt-4 backdrop-blur-xl bg-white/[0.05] border border-white/[0.12] rounded-xl px-4 py-2 hover:bg-white/[0.08] transition-all text-white text-xs"
+                    >
+                      Gérer les catégories
+                    </button>
                   </div>
                 ) : (
                   categories.map(category => (
@@ -146,7 +147,7 @@ const DomainPerformances = () => {
                       key={category.id}
                       categoryId={category.id}
                       categoryName={category.name}
-                      domainId={domain.id}
+                      domainId={domain?.id || ""}
                       onEditPerformance={setEditingPerformance}
                     />
                   ))
@@ -157,29 +158,33 @@ const DomainPerformances = () => {
         </div>
       </div>
 
-      <AddMetricModal
-        open={showAddMetricModal || !!editingMetric}
-        onOpenChange={(open) => {
-          setShowAddMetricModal(open);
-          if (!open) setEditingMetric(null);
-        }}
-        onAdd={() => {}}
-        domainId={domain.id}
-        categories={categories}
-        editMetric={editingMetric}
-      />
+      {domain && (
+        <>
+          <AddMetricModal
+            open={showAddMetricModal || !!editingMetric}
+            onOpenChange={(open) => {
+              setShowAddMetricModal(open);
+              if (!open) setEditingMetric(null);
+            }}
+            onAdd={() => {}}
+            domainId={domain.id}
+            categories={categories}
+            editMetric={editingMetric}
+          />
 
-      <AddFreePerformanceModal
-        open={showAddPerformanceModal || !!editingPerformance}
-        onOpenChange={(open) => {
-          setShowAddPerformanceModal(open);
-          if (!open) setEditingPerformance(null);
-        }}
-        onAdd={() => {}}
-        domainId={domain.id}
-        categories={categories}
-        editPerformance={editingPerformance}
-      />
+          <AddFreePerformanceModal
+            open={showAddPerformanceModal || !!editingPerformance}
+            onOpenChange={(open) => {
+              setShowAddPerformanceModal(open);
+              if (!open) setEditingPerformance(null);
+            }}
+            onAdd={() => {}}
+            domainId={domain.id}
+            categories={categories}
+            editPerformance={editingPerformance}
+          />
+        </>
+      )}
     </div>
   );
 };
