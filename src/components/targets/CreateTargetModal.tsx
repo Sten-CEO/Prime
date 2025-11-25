@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useObjectives } from "@/hooks/useObjectives";
 import { useDomainSlugToId } from "@/hooks/useDomainSlugToId";
+import { useDomains } from "@/hooks/useDomains";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -45,10 +46,7 @@ export const CreateTargetModal = ({
   defaultCategory,
 }: CreateTargetModalProps) => {
   const { createObjective, updateObjective, calculateStatus } = useObjectives();
-  const { data: businessDomainId } = useDomainSlugToId("business");
-  const { data: sportDomainId } = useDomainSlugToId("sport");
-  const { data: socialDomainId } = useDomainSlugToId("social");
-  const { data: santeDomainId } = useDomainSlugToId("sante");
+  const { domains: dbDomains, isLoading: isLoadingDomains } = useDomains();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -59,17 +57,8 @@ export const CreateTargetModal = ({
   const [progress, setProgress] = useState(0);
   const [importance, setImportance] = useState<"low" | "normal" | "crucial">("normal");
   const [showOnHome, setShowOnHome] = useState(false);
-
-  // Map domain slugs to IDs
-  const getDomainId = (slug: string) => {
-    const map: Record<string, string | undefined> = {
-      business: businessDomainId,
-      sport: sportDomainId,
-      social: socialDomainId,
-      sante: santeDomainId,
-    };
-    return map[slug];
-  };
+  
+  const { data: domainId } = useDomainSlugToId(domain);
 
   useEffect(() => {
     if (editingTarget) {
@@ -99,7 +88,6 @@ export const CreateTargetModal = ({
   const handleSubmit = () => {
     if (!title.trim() || !domain || !startDate || !deadline) return;
 
-    const domainId = getDomainId(domain);
     if (!domainId) {
       console.error("Domain ID not found for slug:", domain);
       return;
@@ -184,12 +172,17 @@ export const CreateTargetModal = ({
                   <SelectValue placeholder="Choisir un domaine" />
                 </SelectTrigger>
                 <SelectContent className="bg-black/90 border-white/[0.1]">
-                  <SelectItem value="business" className="text-white">Business</SelectItem>
-                  <SelectItem value="sport" className="text-white">Sport</SelectItem>
-                  <SelectItem value="social" className="text-white">Social</SelectItem>
-                  <SelectItem value="sante" className="text-white">Santé</SelectItem>
-                  <SelectItem value="developpement" className="text-white">Développement</SelectItem>
-                  <SelectItem value="finance" className="text-white">Finance</SelectItem>
+                  {isLoadingDomains ? (
+                    <SelectItem value="" disabled className="text-white/50">
+                      Chargement...
+                    </SelectItem>
+                  ) : (
+                    dbDomains.map((d) => (
+                      <SelectItem key={d.id} value={d.slug} className="text-white">
+                        {d.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

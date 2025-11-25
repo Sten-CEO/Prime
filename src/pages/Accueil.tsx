@@ -17,6 +17,7 @@ import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useOverviewData } from "@/hooks/useOverviewData";
+import { useDomains } from "@/hooks/useDomains";
 
 const targets = [
   { id: 1, title: "Lancer le nouveau produit", progress: 75, deadline: "30 Nov 2025", status: "in-progress" as const, completed: false },
@@ -42,24 +43,20 @@ const Accueil = () => {
   const [insightFilter, setInsightFilter] = useState<string>("Tous");
   const [currentPage, setCurrentPage] = useState(1);
   const { data: overviewItems = [], isLoading: isLoadingOverview } = useOverviewData();
+  const { domains: dbDomains, isLoading: isLoadingDomains } = useDomains();
   const [favorites, setFavorites] = useState<string[]>([]);
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
   const [primeTargets, setPrimeTargets] = useState(targets);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const itemsPerPage = 5;
+  
+  // Construire dynamiquement les filtres d'insights
+  const filters = ["Tous", ...dbDomains.map(d => d.name)];
 
   const getDomainLabel = (domainId: string) => {
-    const domains: Record<string, string> = {
-      general: "Général",
-      business: "Business",
-      sport: "Sport",
-      social: "Social",
-      sante: "Santé",
-      developpement: "Développement",
-      finance: "Finance",
-    };
-    return domains[domainId] || domainId;
+    const domain = dbDomains.find(d => d.slug === domainId);
+    return domain?.name || domainId;
   };
 
   const fetchInsights = async () => {
@@ -110,8 +107,10 @@ const Accueil = () => {
   };
 
   useEffect(() => {
-    fetchInsights();
-  }, []);
+    if (dbDomains.length > 0) {
+      fetchInsights();
+    }
+  }, [dbDomains]);
 
   const handleToggleFavorite = (name: string) => {
     setFavorites(prev => 
@@ -174,8 +173,6 @@ const Accueil = () => {
     setPrimeTargets(newTargets);
     setDraggedIndex(null);
   };
-
-  const filters = ["Tous", "Business", "Sport", "Social", "Santé"];
 
   const filteredInsights = insightFilter === "Tous" 
     ? insights 
@@ -299,7 +296,7 @@ const Accueil = () => {
               
               {/* Filter buttons */}
               <div className="flex gap-2 flex-wrap">
-                {filters.map((filter) => (
+                {!isLoadingDomains && filters.map((filter) => (
                   <Button
                     key={filter}
                     onClick={() => {

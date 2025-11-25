@@ -1,17 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useState, useMemo } from "react";
 import { useDomainColors } from "@/hooks/useDomainColors";
 import { useMultiDomainPerformanceData } from "@/hooks/useMultiDomainPerformanceData";
-
-const domainMapping: Record<string, string> = {
-  "Business": "business",
-  "Sport": "sport",
-  "Social": "social",
-  "Santé": "sante",
-  "Général": "general",
-};
+import { useDomains } from "@/hooks/useDomains";
 
 const periods = [
   { label: "7j", value: "7d" },
@@ -22,14 +15,19 @@ const periods = [
 
 export const MultiDomainChart = () => {
   const { getDomainColor } = useDomainColors();
+  const { domains: dbDomains, isLoading: isLoadingDomains } = useDomains();
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
-  const [activeDomains, setActiveDomains] = useState<Record<string, boolean>>({
-    Business: true,
-    Sport: true,
-    Social: true,
-    Santé: true,
-    Général: true,
-  });
+  
+  // Construire dynamiquement la liste des domaines actifs
+  const initialActiveDomains = useMemo(() => {
+    const active: Record<string, boolean> = { Général: true };
+    dbDomains.forEach(domain => {
+      active[domain.name] = true;
+    });
+    return active;
+  }, [dbDomains]);
+  
+  const [activeDomains, setActiveDomains] = useState<Record<string, boolean>>(initialActiveDomains);
   const [compareMode, setCompareMode] = useState(false);
   const [comparedDomains, setComparedDomains] = useState<string[]>([]);
   const [mouseX, setMouseX] = useState<number | null>(null);
@@ -42,23 +40,23 @@ export const MultiDomainChart = () => {
   };
   
   const days = daysMap[selectedPeriod] || 7;
-  const domainSlugs = ["business", "sport", "social", "sante"];
+  const domainSlugs = dbDomains.map(d => d.slug);
   
   const { data: rawData, isLoading } = useMultiDomainPerformanceData(days, domainSlugs);
   
   // Transform data to match expected format
   const chartData = useMemo(() => {
-    if (!rawData) return [];
+    if (!rawData || !dbDomains.length) return [];
     
-    return rawData.map((point: any) => ({
-      day: point.date,
-      Business: point.business,
-      Sport: point.sport,
-      Social: point.social,
-      Santé: point.sante,
-      Général: point.general,
-    }));
-  }, [rawData]);
+    return rawData.map((point: any) => {
+      const dataPoint: any = { day: point.date };
+      dbDomains.forEach(domain => {
+        dataPoint[domain.name] = point[domain.slug] || 0;
+      });
+      dataPoint.Général = point.general || 0;
+      return dataPoint;
+    });
+  }, [rawData, dbDomains]);
   
   // Calculate week variation for "Général"
   const weekVariation = useMemo(() => {
@@ -77,18 +75,23 @@ export const MultiDomainChart = () => {
   }, [chartData]);
 
   const domains = useMemo(() => {
-    return Object.keys(domainMapping).map(key => {
-      const slug = domainMapping[key];
-      const hslColor = getDomainColor(slug);
-      // Général reste complètement blanc pur (RGB)
-      const isGeneral = slug === 'general';
-      return {
-        key,
-        color: isGeneral ? 'rgb(255, 255, 255)' : `hsl(${hslColor} / 0.6)`,
-        activeColor: isGeneral ? 'rgb(255, 255, 255)' : `hsl(${hslColor} / 0.9)`,
-      };
+    const domainList = dbDomains.map(domain => ({
+      key: domain.name,
+      slug: domain.slug,
+      color: domain.slug === 'general' ? 'rgb(255, 255, 255)' : `hsl(${getDomainColor(domain.slug)} / 0.6)`,
+      activeColor: domain.slug === 'general' ? 'rgb(255, 255, 255)' : `hsl(${getDomainColor(domain.slug)} / 0.9)`,
+    }));
+    
+    // Ajouter "Général" à la fin
+    domainList.push({
+      key: 'Général',
+      slug: 'general',
+      color: 'rgb(255, 255, 255)',
+      activeColor: 'rgb(255, 255, 255)',
     });
-  }, [getDomainColor]);
+    
+    return domainList;
+  }, [dbDomains, getDomainColor]);
 
   const toggleDomain = (domain: string) => {
     setActiveDomains(prev => ({ ...prev, [domain]: !prev[domain] }));
@@ -224,7 +227,7 @@ export const MultiDomainChart = () => {
           const rect = e.currentTarget.getBoundingClientRect();
           setMouseX(e.clientX - rect.left);
         }} onMouseLeave={() => setMouseX(null)}>
-          {isLoading ? (
+          {isLoading || isLoadingDomains ? (
             <div className="flex items-center justify-center h-[300px] text-white/60">
               Chargement des données...
             </div>

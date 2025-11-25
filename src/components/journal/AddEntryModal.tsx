@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useDomains } from "@/hooks/useDomains";
 
 interface AddEntryModalProps {
   open: boolean;
@@ -27,14 +28,6 @@ interface AddEntryModalProps {
   };
 }
 
-const domains = [
-  { id: "general", label: "Général" },
-  { id: "business", label: "Business" },
-  { id: "sport", label: "Sport" },
-  { id: "social", label: "Social" },
-  { id: "sante", label: "Santé" },
-];
-
 export const AddEntryModal = ({ 
   open, 
   onOpenChange, 
@@ -44,6 +37,7 @@ export const AddEntryModal = ({
   entryId,
   initialData 
 }: AddEntryModalProps) => {
+  const { domains: dbDomains, isLoading: isLoadingDomains } = useDomains();
   const [title, setTitle] = useState(initialData?.title || "");
   const [content, setContent] = useState(initialData?.content || "");
   const [domain, setDomain] = useState(initialData?.domain_id || defaultDomain || "");
@@ -457,11 +451,20 @@ export const AddEntryModal = ({
                   <SelectValue placeholder="Choisir un domaine" />
                 </SelectTrigger>
                 <SelectContent className="bg-black/90 border-white/[0.1]">
-                  {domains.map((d) => (
-                    <SelectItem key={d.id} value={d.id} className="text-white">
-                      {d.label}
+                  <SelectItem value="general" className="text-white">
+                    Général
+                  </SelectItem>
+                  {isLoadingDomains ? (
+                    <SelectItem value="" disabled className="text-white/50">
+                      Chargement...
                     </SelectItem>
-                  ))}
+                  ) : (
+                    dbDomains.map((d) => (
+                      <SelectItem key={d.id} value={d.slug} className="text-white">
+                        {d.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
