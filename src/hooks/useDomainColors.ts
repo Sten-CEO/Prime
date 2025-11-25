@@ -1,29 +1,11 @@
 import { useState, useEffect } from 'react';
-
-// Domaines disponibles dans l'application (basés sur les pages /domaines/[slug])
-const AVAILABLE_DOMAINS = ['business', 'sport', 'social', 'sante'] as const;
+import { useDomains } from './useDomains';
 
 export interface DomainColor {
   domain: string;
   color: string;
   label: string;
 }
-
-const DEFAULT_COLORS: Record<string, string> = {
-  business: '210 100% 60%',
-  sport: '142 90% 55%',
-  social: '330 100% 70%',
-  sante: '0 100% 65%',
-  general: '0 0% 100%', // Blanc pour le domaine Général
-};
-
-const DOMAIN_LABELS: Record<string, string> = {
-  business: 'Business',
-  sport: 'Sport',
-  social: 'Social',
-  sante: 'Santé',
-  general: 'Général',
-};
 
 export const COLOR_PALETTE = [
   { name: 'Bleu', value: '210 100% 60%' },
@@ -41,6 +23,7 @@ export const COLOR_PALETTE = [
 ];
 
 export const useDomainColors = () => {
+  const { domains } = useDomains();
   const [domainColors, setDomainColors] = useState<Record<string, string>>(() => {
     const stored = localStorage.getItem('prime_domain_colors');
     return stored ? JSON.parse(stored) : {};
@@ -50,37 +33,48 @@ export const useDomainColors = () => {
     localStorage.setItem('prime_domain_colors', JSON.stringify(domainColors));
   }, [domainColors]);
 
-  const setDomainColor = (domain: string, color: string) => {
+  const setDomainColor = (domainSlug: string, color: string) => {
     setDomainColors(prev => ({
       ...prev,
-      [domain]: color,
+      [domainSlug]: color,
     }));
   };
 
-  const getDomainColor = (domain: string): string => {
-    // Force white for "general" domain if no custom color is set
-    if (domain === 'general' && !domainColors[domain]) {
-      return '0 0% 100%'; // White
+  const getDomainColor = (domainSlug: string): string => {
+    // Check custom colors first
+    if (domainColors[domainSlug]) {
+      return domainColors[domainSlug];
     }
-    return domainColors[domain] || DEFAULT_COLORS[domain] || '210 100% 60%';
+    
+    // Check if domain has a color set in database
+    const domain = domains.find(d => d.slug === domainSlug);
+    if (domain?.color) {
+      return domain.color;
+    }
+
+    // Fallback to default blue
+    return '210 100% 60%';
   };
 
-  const getDomainLabel = (domain: string): string => {
-    return DOMAIN_LABELS[domain] || domain.charAt(0).toUpperCase() + domain.slice(1);
+  const getDomainLabel = (domainSlug: string): string => {
+    const domain = domains.find(d => d.slug === domainSlug);
+    return domain?.name || domainSlug.charAt(0).toUpperCase() + domainSlug.slice(1);
   };
 
   const getAllDomains = (): DomainColor[] => {
-    return AVAILABLE_DOMAINS.map(domain => ({
-      domain,
-      color: getDomainColor(domain),
-      label: getDomainLabel(domain),
+    return domains.map(domain => ({
+      domain: domain.slug,
+      color: getDomainColor(domain.slug),
+      label: domain.name,
     }));
   };
 
   const resetToDefaults = () => {
     const resetColors: Record<string, string> = {};
-    AVAILABLE_DOMAINS.forEach(domain => {
-      resetColors[domain] = DEFAULT_COLORS[domain] || '210 100% 60%';
+    domains.forEach(domain => {
+      if (domain.color) {
+        resetColors[domain.slug] = domain.color;
+      }
     });
     setDomainColors(resetColors);
   };

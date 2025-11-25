@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Home, Award, BookOpen, Target, User, Settings, Bell, Calendar, Crosshair, Sparkles, TrendingUp, Focus, Palette } from "lucide-react";
+import { Home, Award, BookOpen, Target, User, Settings, Bell, Calendar, Crosshair, Sparkles, TrendingUp, Focus, Palette, FolderCog } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/locales/translations";
 import { DomainColorModal } from "@/components/modals/DomainColorModal";
+import { ManageDomainsModal } from "@/components/modals/ManageDomainsModal";
 import bgImage from "@/assets/black-shapes-bg.jpg";
 
 const Parametres = () => {
@@ -27,6 +28,7 @@ const Parametres = () => {
   const [focusMode, setFocusMode] = useState(false);
   
   const [domainColorModalOpen, setDomainColorModalOpen] = useState(false);
+  const [manageDomainsModalOpen, setManageDomainsModalOpen] = useState(false);
 
   const handleSavePreferences = () => {
     localStorage.setItem('prime_timezone', timezone);
@@ -343,6 +345,21 @@ const Parametres = () => {
                       </div>
                     </button>
                   </div>
+
+                  <div className="backdrop-blur-xl bg-white/[0.01] border border-white/[0.05] rounded-xl p-4">
+                    <button
+                      onClick={() => setManageDomainsModalOpen(true)}
+                      className="w-full flex items-center gap-3 hover:bg-white/[0.03] transition-all rounded-lg p-1"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                        <FolderCog className="w-4 h-4 text-white/80" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-white text-sm font-medium">Gérer domaines & catégories</p>
+                        <p className="text-white/40 text-xs">Supprimer des domaines ou catégories</p>
+                      </div>
+                    </button>
+                  </div>
                 </div>
 
                 <p className="text-xs text-white/30 text-center pt-2">
@@ -357,6 +374,11 @@ const Parametres = () => {
       <DomainColorModal 
         open={domainColorModalOpen} 
         onOpenChange={setDomainColorModalOpen}
+      />
+      
+      <ManageDomainsModal 
+        open={manageDomainsModalOpen} 
+        onOpenChange={setManageDomainsModalOpen}
       />
     </div>
   );
