@@ -127,7 +127,7 @@ const DomainPerformances = () => {
       <div className="relative z-10 ml-32 min-h-screen">
         <div className="max-w-[1600px] mx-auto px-8 py-8">
           {/* High Bar */}
-          <DomainHighBar currentDomain={slug || ""} />
+          <DomainHighBar currentDomain={slug || ""} isPerformancePage={true} />
 
           {/* Page Title */}
           <div className="mb-8 mt-6">
@@ -139,8 +139,9 @@ const DomainPerformances = () => {
             </p>
           </div>
 
-          {/* Metrics Section */}
-          <div className="mb-8">
+          {/* Two Column Layout: Metrics + Free Performances */}
+          <div className="grid grid-cols-2 gap-8">
+            {/* Metrics Section */}
             <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white">Métriques Programmées</h3>
@@ -171,10 +172,8 @@ const DomainPerformances = () => {
                 )}
               </div>
             </Card>
-          </div>
 
-          {/* Free Performances Section */}
-          <div className="mb-8">
+            {/* Free Performances Section */}
             <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white">Performances Libres</h3>
