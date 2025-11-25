@@ -262,6 +262,7 @@ const Accueil = () => {
                 favorites={favorites}
                 onToggleFavorite={handleToggleFavorite}
                 onReorderItems={handleReorderItems}
+                isLoading={isLoadingOverview}
               />
             </div>
           </div>

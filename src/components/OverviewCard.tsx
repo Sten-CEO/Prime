@@ -35,9 +35,10 @@ interface OverviewCardProps {
   favorites: string[];
   onToggleFavorite: (name: string) => void;
   onReorderItems: (newOrder: OverviewItem[]) => void;
+  isLoading?: boolean;
 }
 
-export const OverviewCard = ({ items, favorites, onToggleFavorite, onReorderItems }: OverviewCardProps) => {
+export const OverviewCard = ({ items, favorites, onToggleFavorite, onReorderItems, isLoading = false }: OverviewCardProps) => {
   const navigate = useNavigate();
   const [isReorderOpen, setIsReorderOpen] = useState(false);
   const [localItems, setLocalItems] = useState(items);
@@ -88,9 +89,21 @@ export const OverviewCard = ({ items, favorites, onToggleFavorite, onReorderItem
           <span className="text-white/50 text-xs font-medium uppercase tracking-wider">Score</span>
         </div>
         <div className="space-y-6">
-          {items.length === 0 ? (
+          {isLoading ? (
             <div className="text-center py-8 text-white/50">
-              Chargement des données...
+              <div className="animate-pulse space-y-4">
+                <div className="h-4 bg-white/10 rounded w-3/4 mx-auto"></div>
+                <div className="h-4 bg-white/10 rounded w-1/2 mx-auto"></div>
+              </div>
+            </div>
+          ) : items.length === 0 ? (
+            <div className="text-center py-12 px-6">
+              <div className="text-white/70 text-base mb-3">
+                Aucune donnée disponible
+              </div>
+              <p className="text-white/50 text-sm">
+                Commencez à enregistrer vos performances pour voir vos statistiques ici
+              </p>
             </div>
           ) : (
             items.map((item) => {
