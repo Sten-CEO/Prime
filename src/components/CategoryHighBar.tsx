@@ -60,15 +60,14 @@ export const CategoryHighBar = ({ currentDomain, currentCategory }: CategoryHigh
         })}
       </div>
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => navigate(`/domaines/${currentDomain}`)}
-          className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
-          title="Vers domaine"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-      </div>
+      <button
+        onClick={() => navigate(`/domaines/${currentDomain}`)}
+        className="flex items-center gap-2 text-white/60 hover:text-white transition-all hover:scale-105"
+        title="Vers domaine"
+      >
+        <ChevronLeft className="w-5 h-5" />
+        <span className="text-sm font-medium">domaines</span>
+      </button>
     </div>
   );
 };
