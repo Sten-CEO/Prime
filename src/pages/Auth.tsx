@@ -19,6 +19,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -107,6 +108,12 @@ const Auth = () => {
             title: "Connexion réussie",
             description: "Bienvenue sur Prime.",
           });
+          // Trigger exit animation
+          setIsExiting(true);
+          // Wait for animation to complete before navigating
+          setTimeout(() => {
+            navigate("/accueil");
+          }, 1000);
         }
       }
     } catch (error) {
@@ -150,7 +157,11 @@ const Auth = () => {
       </div>
 
       {/* Auth Form (overlaying the logo) */}
-      <div className="relative z-10 w-full max-w-md px-6">
+      <div 
+        className={`relative z-10 w-full max-w-md px-6 transition-all duration-1000 ${
+          isExiting ? '-translate-y-[150vh] opacity-0' : 'translate-y-0 opacity-100'
+        }`}
+      >
         <div className="backdrop-blur-3xl bg-white/[0.03] border border-white/[0.08] rounded-3xl p-10 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
           <h1 className="text-2xl font-semibold text-white mb-2 text-center">
             {isSignUp ? "Créer un compte" : "Connectez-vous à Prime."}
