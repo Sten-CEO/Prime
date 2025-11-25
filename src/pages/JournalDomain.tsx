@@ -301,36 +301,18 @@ const JournalDomain = () => {
               </div>
             ) : (
               Object.entries(groupEntriesByMonth()).map(([monthKey, monthData]) => (
-                <div key={monthKey} className="space-y-4">
-                  <button
-                    onClick={() => navigate(`/journal/${domain}/${monthData.year}/${monthData.month}`)}
-                    className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-4 py-2 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer"
-                  >
-                    <h2 className="text-sm font-medium text-white/80 capitalize">
-                      Entrées de {monthKey}
-                    </h2>
-                  </button>
-                  
-                  <div className="space-y-4">
-                    {monthData.entries.map((entry, index) => (
-                      <div key={entry.id}>
-                        {needsWeekSeparator(entry, index > 0 ? monthData.entries[index - 1] : null) && (
-                          <div className="my-6 flex items-center gap-4">
-                            <div className="flex-1 h-px bg-white/[0.08]" />
-                          </div>
-                        )}
-                        <JournalEntryCard
-                          id={entry.id}
-                          title={entry.title}
-                          content={entry.content}
-                          domain={entry.domain_id}
-                          date={new Date(entry.entry_date)}
-                          onClick={() => setSelectedEntry(entry)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <button
+                  key={monthKey}
+                  onClick={() => navigate(`/journal/${domain}/${monthData.year}/${monthData.month}`)}
+                  className="w-full backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-6 py-4 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer text-left"
+                >
+                  <h2 className="text-lg font-medium text-white capitalize">
+                    Entrées de {monthKey}
+                  </h2>
+                  <p className="text-sm text-white/60 mt-1">
+                    {monthData.entries.length} {monthData.entries.length === 1 ? 'entrée' : 'entrées'}
+                  </p>
+                </button>
               ))
             )}
           </div>
