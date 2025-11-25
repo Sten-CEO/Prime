@@ -455,7 +455,7 @@ export const AddEntryModal = ({
                     Général
                   </SelectItem>
                   {isLoadingDomains ? (
-                    <SelectItem value="" disabled className="text-white/50">
+                    <SelectItem value="loading" disabled className="text-white/50">
                       Chargement...
                     </SelectItem>
                   ) : (
