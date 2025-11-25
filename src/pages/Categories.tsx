@@ -41,7 +41,8 @@ const Categories = () => {
 
   const activeCategoryData = categories.find(c => c.id === activeCategory);
 
-  if (!slug || !domainIdData) {
+  // Don't show error for valid domain slugs, even if domain data hasn't loaded yet
+  if (!slug) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <p>Domaine non trouvé</p>
@@ -51,6 +52,7 @@ const Categories = () => {
 
   const hasCategories = categories.length > 0;
   const isLoading = categoriesLoading;
+  const domainName = domainNames[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -172,8 +174,14 @@ const Categories = () => {
           {!hasCategories ? (
             <div className="mt-12 text-center">
               <div className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-12 max-w-md mx-auto">
-                <p className="text-white/60 text-lg mb-2">Aucune catégorie pour ce domaine</p>
-                <p className="text-white/40 text-sm">Créez votre première catégorie pour commencer</p>
+                <p className="text-white/60 text-lg mb-2">Aucune catégorie pour {domainName}</p>
+                <p className="text-white/40 text-sm mb-4">Créez votre première catégorie pour commencer à tracker vos performances</p>
+                <button
+                  onClick={handleAddCategory}
+                  className="backdrop-blur-xl bg-white/[0.08] border border-white/[0.12] rounded-xl px-6 py-2.5 hover:bg-white/[0.12] hover:border-white/[0.15] transition-all cursor-pointer text-white text-sm font-semibold"
+                >
+                  Créer une catégorie
+                </button>
               </div>
             </div>
           ) : activeCategoryData ? (
@@ -182,7 +190,7 @@ const Categories = () => {
                 <div className="lg:col-span-2">
                   <CategoryStatsBlock
                     categoryName={activeCategoryData.name}
-                    domainName={domainNames[slug]}
+                    domainName={domainName}
                     stats={computeStats()}
                   />
                 </div>

@@ -53,7 +53,7 @@ export const DomainHighBar = ({
             </>}
         </div>
 
-        <button onClick={() => navigate(`/domaines/${currentDomain}/categories/principale`)} className="flex items-center gap-2 text-white/60 hover:text-white transition-all hover:scale-105" title="Vers catégories">
+        <button onClick={() => navigate(`/domaines/${currentDomain}/categories`)} className="flex items-center gap-2 text-white/60 hover:text-white transition-all hover:scale-105" title="Vers catégories">
           <span className="text-sm font-medium">catégorie</span>
           <ChevronRight className="w-5 h-5" />
         </button>
