@@ -1,45 +1,20 @@
 import { Card } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Plus, BarChart3, PenSquare } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { AddMetricModal } from "@/components/modals/AddMetricModal";
-import { MetricStatsPanel } from "@/components/modals/MetricStatsPanel";
-import { RecordMetricModal } from "@/components/modals/RecordMetricModal";
 import { useMetrics } from "@/hooks/useMetrics";
+import { MetricCard } from "@/components/MetricCard";
 
 interface CategoryMetricsProps {
   categoryId: string;
   domainId: string;
 }
 
-const allDays = ["L", "M", "M", "J", "V", "S", "D"];
-
 export const CategoryMetrics = ({ categoryId, domainId }: CategoryMetricsProps) => {
-  const { metrics, isLoading, createMetric, updateMetric } = useMetrics(categoryId);
+  const { metrics, isLoading, updateMetric, deleteMetric } = useMetrics(categoryId);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [statsMetric, setStatsMetric] = useState<any>(null);
-  const [recordingMetric, setRecordingMetric] = useState<any>(null);
-
-  const toggleMetric = (id: string) => {
-    const metric = metrics.find(m => m.id === id);
-    if (metric) {
-      updateMetric({ id, is_active: !metric.is_active });
-    }
-  };
-
-  const handleAdd = (metric: { name: string; icon: string; days: string[] }) => {
-    createMetric({
-      name: `${metric.icon} ${metric.name}`,
-      icon: metric.icon,
-      category_id: categoryId,
-      domain_id: domainId,
-    });
-  };
-
-  const handleRecord = (data: { date: string; level: string; impact: number; note?: string }) => {
-    // Record logic will be implemented later
-  };
+  const [editingMetric, setEditingMetric] = useState<any>(null);
 
   return (
     <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] hover:bg-white/[0.03] hover:border-white/[0.25] transition-all">
@@ -54,7 +29,7 @@ export const CategoryMetrics = ({ categoryId, domainId }: CategoryMetricsProps) 
         </Button>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-3">
         {isLoading ? (
           <div className="py-8 text-center">
             <p className="text-white/40 text-sm">Chargement...</p>
@@ -66,59 +41,31 @@ export const CategoryMetrics = ({ categoryId, domainId }: CategoryMetricsProps) 
           </div>
         ) : (
           metrics.map((metric) => (
-          <div key={metric.id} className="space-y-2">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.04] transition-all group">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="text-sm text-white/80">{metric.name}</p>
-                  <button
-                    onClick={() => setRecordingMetric(metric)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-white/[0.05]"
-                    title="Noter aujourd'hui"
-                  >
-                    <PenSquare className="w-3.5 h-3.5 text-white/60" />
-                  </button>
-                  <button
-                    onClick={() => setStatsMetric(metric)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-white/[0.05]"
-                    title="Voir les statistiques"
-                  >
-                    <BarChart3 className="w-3.5 h-3.5 text-white/60" />
-                  </button>
-                </div>
-              </div>
-              <Switch
-                checked={metric.is_active}
-                onCheckedChange={() => toggleMetric(metric.id)}
-              />
-            </div>
-          </div>
+            <MetricCard
+              key={metric.id}
+              metric={{
+                ...metric,
+                domain_id: domainId,
+              }}
+              onEdit={() => setEditingMetric(metric)}
+              onDelete={() => deleteMetric(metric.id)}
+              onToggleActive={() => updateMetric({ id: metric.id, is_active: !metric.is_active })}
+            />
           ))
         )}
       </div>
 
       <AddMetricModal
-        open={showAddModal}
-        onOpenChange={setShowAddModal}
-        onAdd={handleAdd}
+        open={showAddModal || !!editingMetric}
+        onOpenChange={(open) => {
+          setShowAddModal(open);
+          if (!open) setEditingMetric(null);
+        }}
+        onAdd={() => {}}
+        domainId={domainId}
+        categories={[{ id: categoryId, name: "" }]}
+        editMetric={editingMetric}
       />
-
-      {statsMetric && (
-        <MetricStatsPanel
-          open={!!statsMetric}
-          onOpenChange={() => setStatsMetric(null)}
-          metricName={statsMetric.name}
-        />
-      )}
-
-      {recordingMetric && (
-        <RecordMetricModal
-          open={!!recordingMetric}
-          onOpenChange={() => setRecordingMetric(null)}
-          metricName={recordingMetric.name}
-          onRecord={handleRecord}
-        />
-      )}
     </Card>
   );
 };
