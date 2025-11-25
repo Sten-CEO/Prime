@@ -5,12 +5,13 @@ import { useState } from "react";
 import { ChevronDown, GripVertical } from "lucide-react";
 
 interface PrimeTargetCardProps {
-  id: number;
+  id: string | number;
   title: string;
   progress: number;
   deadline: string;
   status: "in-progress" | "completed" | "delayed";
   completed: boolean;
+  domain?: string;
   onToggle?: () => void;
   index: number;
   onDragStart: (index: number) => void;

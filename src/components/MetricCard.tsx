@@ -38,7 +38,7 @@ const getCurrentDayName = (): string => {
 };
 
 export const MetricCard = ({ metric, onEdit, onDelete, onToggleActive }: MetricCardProps) => {
-  const { recordMetricCompletion, metricRecords, isLoading } = useMetricRecords(
+  const { recordMetricCompletion, deleteMetricRecord, metricRecords, isLoading } = useMetricRecords(
     metric.domain_id,
     format(new Date(), "yyyy-MM-dd"),
     format(new Date(), "yyyy-MM-dd")
@@ -66,13 +66,23 @@ export const MetricCard = ({ metric, onEdit, onDelete, onToggleActive }: MetricC
   const handleToggleComplete = () => {
     if (!isScheduledToday) return;
     
-    recordMetricCompletion({
-      metric_id: metric.id,
-      recorded_date: today,
-      custom_impact: metric.impact_weight || undefined,
-    });
+    const todayRecord = metricRecords.find(
+      r => r.metric_id === metric.id && r.recorded_date === today
+    );
     
-    setIsCompletedToday(!isCompletedToday);
+    if (todayRecord) {
+      // Delete the existing record (uncheck)
+      deleteMetricRecord(todayRecord.id);
+      setIsCompletedToday(false);
+    } else {
+      // Create new record (check)
+      recordMetricCompletion({
+        metric_id: metric.id,
+        recorded_date: today,
+        custom_impact: metric.impact_weight || undefined,
+      });
+      setIsCompletedToday(true);
+    }
   };
 
   const displayedDays = metric.scheduled_days && metric.scheduled_days.length > 0
