@@ -1,19 +1,20 @@
 import { useParams, useNavigate } from "react-router-dom";
 import bgImage from "@/assets/black-shapes-bg.jpg";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { DomainHighBar } from "@/components/DomainHighBar";
 import { useDomains } from "@/hooks/useDomains";
-import { useMetrics } from "@/hooks/useMetrics";
-import { useFreePerformances } from "@/hooks/useFreePerformances";
+import { useMetrics, type Metric } from "@/hooks/useMetrics";
 import { useCategories } from "@/hooks/useCategories";
+import { useFreePerformanceRecords } from "@/hooks/useFreePerformanceRecords";
 import { useState } from "react";
 import { AddMetricModal } from "@/components/modals/AddMetricModal";
 import { AddFreePerformanceModal } from "@/components/modals/AddFreePerformanceModal";
+import { MetricCard } from "@/components/MetricCard";
+import { FreePerformanceCard } from "@/components/FreePerformanceCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const DomainPerformances = () => {
@@ -23,13 +24,10 @@ const DomainPerformances = () => {
   const domain = domains.find(d => d.slug === slug);
   const { categories, isLoading: categoriesLoading } = useCategories(domain?.id);
   
-  // Get all metrics for this domain
   const [showAddMetricModal, setShowAddMetricModal] = useState(false);
   const [showAddPerformanceModal, setShowAddPerformanceModal] = useState(false);
-
-  // We'll fetch all metrics/performances for all categories in this domain
-  const allMetrics: any[] = [];
-  const allPerformances: any[] = [];
+  const [editingMetric, setEditingMetric] = useState<any>(null);
+  const [editingPerformance, setEditingPerformance] = useState<any>(null);
 
   const isLoading = domainsLoading || categoriesLoading;
 
@@ -116,6 +114,7 @@ const DomainPerformances = () => {
                       categoryId={category.id}
                       categoryName={category.name}
                       domainId={domain.id}
+                      onEditMetric={setEditingMetric}
                     />
                   ))
                 )}
@@ -148,6 +147,7 @@ const DomainPerformances = () => {
                       categoryId={category.id}
                       categoryName={category.name}
                       domainId={domain.id}
+                      onEditPerformance={setEditingPerformance}
                     />
                   ))
                 )}
@@ -158,26 +158,44 @@ const DomainPerformances = () => {
       </div>
 
       <AddMetricModal
-        open={showAddMetricModal}
-        onOpenChange={setShowAddMetricModal}
+        open={showAddMetricModal || !!editingMetric}
+        onOpenChange={(open) => {
+          setShowAddMetricModal(open);
+          if (!open) setEditingMetric(null);
+        }}
         onAdd={() => {}}
         domainId={domain.id}
         categories={categories}
+        editMetric={editingMetric}
       />
 
       <AddFreePerformanceModal
-        open={showAddPerformanceModal}
-        onOpenChange={setShowAddPerformanceModal}
+        open={showAddPerformanceModal || !!editingPerformance}
+        onOpenChange={(open) => {
+          setShowAddPerformanceModal(open);
+          if (!open) setEditingPerformance(null);
+        }}
         onAdd={() => {}}
         domainId={domain.id}
         categories={categories}
+        editPerformance={editingPerformance}
       />
     </div>
   );
 };
 
 // Helper component for rendering metrics per category
-const CategoryMetricsSection = ({ categoryId, categoryName, domainId }: { categoryId: string; categoryName: string; domainId: string }) => {
+const CategoryMetricsSection = ({ 
+  categoryId, 
+  categoryName, 
+  domainId,
+  onEditMetric 
+}: { 
+  categoryId: string; 
+  categoryName: string; 
+  domainId: string;
+  onEditMetric: (metric: any) => void;
+}) => {
   const { metrics, isLoading, updateMetric, deleteMetric } = useMetrics(categoryId);
 
   if (isLoading) {
@@ -197,23 +215,19 @@ const CategoryMetricsSection = ({ categoryId, categoryName, domainId }: { catego
       {groupedMetrics.map((group, groupIndex) => (
         <div key={groupIndex}>
           {group.map((metric) => (
-            <div key={metric.id} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.04] transition-all group">
-              <div className="flex-1">
-                <p className="text-sm text-white/80">{metric.name}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={metric.is_active}
-                  onCheckedChange={() => updateMetric({ id: metric.id, is_active: !metric.is_active })}
-                />
-                <button
-                  onClick={() => deleteMetric(metric.id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-white/[0.05]"
-                >
-                  <Trash2 className="w-3.5 h-3.5 text-white/60" />
-                </button>
-              </div>
-            </div>
+            <MetricCard
+              key={metric.id}
+              metric={{
+                ...metric,
+                category_name: categoryName,
+              }}
+              onEdit={() => onEditMetric({
+                ...metric,
+                category_name: categoryName,
+              })}
+              onDelete={() => deleteMetric(metric.id)}
+              onToggleActive={() => updateMetric({ id: metric.id, is_active: !metric.is_active })}
+            />
           ))}
           {groupIndex < groupedMetrics.length - 1 && (
             <Separator className="my-3 bg-white/10" />
@@ -225,19 +239,32 @@ const CategoryMetricsSection = ({ categoryId, categoryName, domainId }: { catego
 };
 
 // Helper component for rendering free performances per category
-const CategoryPerformancesSection = ({ categoryId, categoryName, domainId }: { categoryId: string; categoryName: string; domainId: string }) => {
-  const { freePerformances, isLoading, deleteFreePerformance } = useFreePerformances(categoryId);
+const CategoryPerformancesSection = ({ 
+  categoryId, 
+  categoryName, 
+  domainId,
+  onEditPerformance 
+}: { 
+  categoryId: string; 
+  categoryName: string; 
+  domainId: string;
+  onEditPerformance: (performance: any) => void;
+}) => {
+  const { freePerformanceRecords, isLoading, deleteFreePerformanceRecord } = useFreePerformanceRecords(domainId, categoryId);
 
   if (isLoading) {
     return <Skeleton className="h-20 bg-white/5" />;
   }
 
-  if (freePerformances.length === 0) {
+  if (freePerformanceRecords.length === 0) {
     return null;
   }
 
   // Group performances by week
-  const groupedPerformances = groupByWeek(freePerformances);
+  const groupedPerformances = groupByWeek(freePerformanceRecords.map(r => ({
+    ...r,
+    created_at: r.created_at
+  })));
 
   return (
     <div className="space-y-2">
@@ -245,17 +272,18 @@ const CategoryPerformancesSection = ({ categoryId, categoryName, domainId }: { c
       {groupedPerformances.map((group, groupIndex) => (
         <div key={groupIndex}>
           {group.map((perf) => (
-            <div key={perf.id} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.04] transition-all group">
-              <div className="flex-1">
-                <p className="text-sm text-white/80">{perf.name}</p>
-              </div>
-              <button
-                onClick={() => deleteFreePerformance(perf.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-white/[0.05]"
-              >
-                <Trash2 className="w-3.5 h-3.5 text-white/60" />
-              </button>
-            </div>
+            <FreePerformanceCard
+              key={perf.id}
+              performance={{
+                ...perf,
+                category_name: categoryName,
+              }}
+              onEdit={() => onEditPerformance({
+                ...perf,
+                category_name: categoryName,
+              })}
+              onDelete={() => deleteFreePerformanceRecord(perf.id)}
+            />
           ))}
           {groupIndex < groupedPerformances.length - 1 && (
             <Separator className="my-3 bg-white/10" />

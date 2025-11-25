@@ -3,8 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
 import { useFreePerformances } from "@/hooks/useFreePerformances";
+import { useFreePerformanceRecords } from "@/hooks/useFreePerformanceRecords";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface AddFreePerformanceModalProps {
   open: boolean;
@@ -12,56 +18,83 @@ interface AddFreePerformanceModalProps {
   onAdd: (performance: any) => void;
   domainId?: string;
   categories?: Array<{ id: string; name: string }>;
+  editPerformance?: {
+    id: string;
+    label: string;
+    recorded_date: string;
+    impact_value: number;
+    category_id: string | null;
+    domain_id: string;
+  } | null;
 }
 
 const iconOptions = ["🎯", "⚡", "💪", "🧠", "❤️", "🔥", "✨", "🚀", "📈", "🎨"];
 
-export const AddFreePerformanceModal = ({ open, onOpenChange, onAdd, domainId, categories }: AddFreePerformanceModalProps) => {
-  const [name, setName] = useState("");
+export const AddFreePerformanceModal = ({ open, onOpenChange, onAdd, domainId, categories, editPerformance }: AddFreePerformanceModalProps) => {
+  const [name, setName] = useState(editPerformance?.label || "");
   const [selectedIcon, setSelectedIcon] = useState("🎯");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(editPerformance?.category_id || "");
+  const [selectedDate, setSelectedDate] = useState<Date>(editPerformance ? new Date(editPerformance.recorded_date) : new Date());
+  const [impactValue, setImpactValue] = useState<string>(editPerformance?.impact_value?.toString() || "1");
   
-  const { createFreePerformance } = useFreePerformances(selectedCategoryId || undefined);
+  const { createFreePerformance, updateFreePerformance, deleteFreePerformance } = useFreePerformances(selectedCategoryId || undefined);
+  const { createFreePerformanceRecord, deleteFreePerformanceRecord } = useFreePerformanceRecords(domainId, selectedCategoryId);
 
-  const handleAdd = () => {
-    if (!name.trim()) return;
+  const handleSubmit = () => {
+    if (!name.trim() || !domainId) return;
     
-    const performanceData = {
-      title: `${selectedIcon} ${name}`,
-      date: new Date().toISOString(),
-      level: "advanced",
-      impact: 2,
-      impactType: "positive",
-    };
-    
-    // If domainId and categories are provided, use the hook to create
+    if (editPerformance) {
+      // For edit, we need to update the record
+      // This is simplified - in a real scenario, you'd need to handle the relationship properly
+      deleteFreePerformanceRecord(editPerformance.id);
+    }
+
+    // Create new record
     if (domainId && categories && categories.length > 0) {
       if (!selectedCategoryId) return;
       
-      createFreePerformance({
-        name: `${selectedIcon} ${name}`,
-        category_id: selectedCategoryId,
+      createFreePerformanceRecord({
+        label: name,
         domain_id: domainId,
+        category_id: selectedCategoryId,
+        recorded_date: format(selectedDate, "yyyy-MM-dd"),
+        impact_value: parseFloat(impactValue) || 1,
       });
     } else {
-      // Otherwise, use the callback (for category-level components)
-      onAdd(performanceData);
+      onAdd({
+        title: name,
+        date: selectedDate.toISOString(),
+        impact: parseFloat(impactValue) || 1,
+      });
     }
     
-    // Reset form
+    resetForm();
+    onOpenChange(false);
+  };
+
+  const handleDelete = () => {
+    if (editPerformance && window.confirm("Êtes-vous sûr de vouloir supprimer cette performance ?")) {
+      deleteFreePerformanceRecord(editPerformance.id);
+      resetForm();
+      onOpenChange(false);
+    }
+  };
+
+  const resetForm = () => {
     setName("");
     setSelectedIcon("🎯");
     setSelectedCategoryId("");
-    onOpenChange(false);
+    setSelectedDate(new Date());
+    setImpactValue("1");
   };
 
   const showCategorySelector = domainId && categories && categories.length > 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="backdrop-blur-3xl bg-black/95 border border-white/[0.18] text-white max-w-md">
+      <DialogContent className="backdrop-blur-3xl bg-black/95 border border-white/[0.18] text-white max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-white">Ajouter une Performance Libre</DialogTitle>
+          <DialogTitle className="text-white">{editPerformance ? "Modifier la Performance" : "Ajouter une Performance Libre"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
@@ -112,20 +145,69 @@ export const AddFreePerformanceModal = ({ open, onOpenChange, onAdd, domainId, c
             </div>
           </div>
 
+          <div>
+            <Label className="text-white/80 text-sm mb-2 block">Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal bg-white/[0.05] border-white/[0.12] text-white hover:bg-white/[0.08]"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {format(selectedDate, "PPP", { locale: fr })}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-black/95 backdrop-blur-xl border-white/[0.12]">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => date && setSelectedDate(date)}
+                  initialFocus
+                  className="text-white"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div>
+            <Label className="text-white/80 text-sm">Impact</Label>
+            <Input
+              type="number"
+              step="0.5"
+              min="0.5"
+              value={impactValue}
+              onChange={(e) => setImpactValue(e.target.value)}
+              className="bg-white/[0.05] border-white/[0.12] text-white mt-1"
+            />
+            <p className="text-xs text-white/40 mt-1">Plus l'impact est élevé, plus cette performance pèse dans l'indice du domaine.</p>
+          </div>
+
           <div className="flex gap-2 pt-4">
+            {editPerformance && (
+              <Button
+                onClick={handleDelete}
+                variant="outline"
+                className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20"
+              >
+                Supprimer
+              </Button>
+            )}
             <Button
-              onClick={() => onOpenChange(false)}
+              onClick={() => {
+                resetForm();
+                onOpenChange(false);
+              }}
               variant="outline"
               className="flex-1 bg-white/[0.05] border-white/[0.12] text-white hover:bg-white/[0.08]"
             >
               Annuler
             </Button>
             <Button
-              onClick={handleAdd}
+              onClick={handleSubmit}
               disabled={!name.trim() || (showCategorySelector && !selectedCategoryId)}
               className="flex-1 bg-white/[0.15] border border-white/[0.2] text-white hover:bg-white/[0.2]"
             >
-              Ajouter
+              {editPerformance ? "Enregistrer" : "Ajouter"}
             </Button>
           </div>
         </div>
