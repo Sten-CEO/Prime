@@ -16,6 +16,7 @@ const Parametres = () => {
   
   const [dailyReminder, setDailyReminder] = useState(true);
   const [dailyReminderTime, setDailyReminderTime] = useState("21:00");
+  const [customReminderTime, setCustomReminderTime] = useState("21:00");
   const [weeklyReport, setWeeklyReport] = useState(true);
   const [targetAlerts, setTargetAlerts] = useState(true);
   
@@ -261,17 +262,32 @@ const Parametres = () => {
                       <Switch checked={dailyReminder} onCheckedChange={setDailyReminder} />
                     </div>
                     {dailyReminder && (
-                      <div className="pl-11 animate-fade-in">
-                        <Select value={dailyReminderTime} onValueChange={setDailyReminderTime}>
-                          <SelectTrigger className="bg-white/[0.05] border-white/[0.08] text-white w-28 h-9">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-black/90 border-white/[0.1]">
-                            <SelectItem value="20:00" className="text-white">20:00</SelectItem>
-                            <SelectItem value="21:00" className="text-white">21:00</SelectItem>
-                            <SelectItem value="22:00" className="text-white">22:00</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <div className="pl-11 animate-fade-in space-y-3">
+                        <div>
+                          <label className="text-xs text-white/50 mb-2 block">Heure prédéfinie</label>
+                          <Select value={dailyReminderTime} onValueChange={setDailyReminderTime}>
+                            <SelectTrigger className="bg-white/[0.05] border-white/[0.08] text-white h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-black/90 border-white/[0.1]">
+                              <SelectItem value="20:00" className="text-white">20:00</SelectItem>
+                              <SelectItem value="21:00" className="text-white">21:00</SelectItem>
+                              <SelectItem value="22:00" className="text-white">22:00</SelectItem>
+                              <SelectItem value="custom" className="text-white">Personnalisée</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {dailyReminderTime === "custom" && (
+                          <div className="animate-fade-in">
+                            <label className="text-xs text-white/50 mb-2 block">Heure personnalisée</label>
+                            <input
+                              type="time"
+                              value={customReminderTime}
+                              onChange={(e) => setCustomReminderTime(e.target.value)}
+                              className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/[0.15] transition-all"
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
