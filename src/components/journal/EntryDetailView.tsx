@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { AddEntryModal } from "@/components/journal/AddEntryModal";
 
 interface EntryDetailViewProps {
   id: string;
@@ -15,6 +16,7 @@ interface EntryDetailViewProps {
   date: Date;
   onBack: () => void;
   onDeleted?: () => void;
+  onEdited?: () => void;
 }
 
 export const EntryDetailView = ({
@@ -25,11 +27,13 @@ export const EntryDetailView = ({
   date,
   onBack,
   onDeleted,
+  onEdited,
 }: EntryDetailViewProps) => {
   const [selectedText, setSelectedText] = useState("");
   const [showHighlightButton, setShowHighlightButton] = useState(false);
   const [highlightPosition, setHighlightPosition] = useState({ x: 0, y: 0 });
   const [insights, setInsights] = useState<string[]>([]);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const fetchInsights = async () => {
     try {
@@ -180,7 +184,10 @@ export const EntryDetailView = ({
         </button>
 
         <div className="flex gap-2">
-          <button className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl w-10 h-10 flex items-center justify-center hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer">
+          <button 
+            onClick={() => setShowEditModal(true)}
+            className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl w-10 h-10 flex items-center justify-center hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer"
+          >
             <Edit className="w-4 h-4 text-white/70" />
           </button>
           <button 
@@ -240,6 +247,23 @@ export const EntryDetailView = ({
           </div>
         </div>
       </Card>
+
+      <AddEntryModal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        editMode={true}
+        entryId={id}
+        initialData={{
+          title,
+          content,
+          domain_id: domain,
+          entry_date: format(date, "yyyy-MM-dd"),
+        }}
+        onSuccess={() => {
+          setShowEditModal(false);
+          onEdited?.();
+        }}
+      />
     </div>
   );
 };

@@ -187,6 +187,9 @@ const JournalDomain = () => {
               setSelectedEntry(null);
               fetchEntries();
             }}
+            onEdited={() => {
+              fetchEntries();
+            }}
           />
         </div>
       </div>
