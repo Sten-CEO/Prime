@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Home, Award, BookOpen, Target, User, Settings } from "lucide-react";
-import { AddEntryModal } from "@/components/journal/AddEntryModal";
+import { Home, Award, BookOpen, Target, User, Settings, ChevronRight } from "lucide-react";
+import { DayEditor } from "@/components/journal/DayEditor";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { format, parseISO, subDays } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface JournalEntry {
   id: string;
@@ -17,49 +17,67 @@ interface JournalEntry {
   created_at: string;
 }
 
+const domains = [
+  { id: "general", label: "Global", icon: "📝" },
+  { id: "business", label: "Business", icon: "💼" },
+  { id: "sport", label: "Sport", icon: "🥊" },
+  { id: "social", label: "Social", icon: "👥" },
+  { id: "sante", label: "Santé", icon: "❤️" },
+  { id: "developpement", label: "Dev", icon: "📚" },
+  { id: "finance", label: "Finance", icon: "💰" },
+];
+
 const Journal = () => {
   const navigate = useNavigate();
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [recentEntries, setRecentEntries] = useState<JournalEntry[]>([]);
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
 
-  const fetchEntries = async () => {
+  const fetchRecentEntries = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) {
-        toast({
-          title: "Non authentifié",
-          description: "Vous devez être connecté pour voir vos entrées",
-          variant: "destructive",
-        });
-        return;
-      }
+      if (!user) return;
 
+      // Get last 5 entries
       const { data, error } = await supabase
         .from("journal_entries")
         .select("*")
         .eq("user_id", user.id)
-        .order("entry_date", { ascending: false });
+        .order("entry_date", { ascending: false })
+        .limit(5);
 
       if (error) throw error;
 
-      setEntries(data || []);
+      setRecentEntries(data || []);
     } catch (error) {
-      console.error("Error fetching entries:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les entrées",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+      console.error("Error fetching recent entries:", error);
     }
   };
 
   useEffect(() => {
-    fetchEntries();
+    fetchRecentEntries();
   }, []);
+
+  const handleDomainClick = (domainId: string) => {
+    if (domainId === "general") {
+      setSelectedDomain(null);
+    } else {
+      navigate(`/journal/${domainId}`);
+    }
+  };
+
+  const handleEntryClick = (entry: JournalEntry) => {
+    // Navigate to domain journal with month filter
+    const date = parseISO(entry.entry_date);
+    const year = format(date, "yyyy");
+    const month = format(date, "MM");
+    navigate(`/journal/${entry.domain_id}/${year}/${month}`);
+  };
+
+  const getDomainLabel = (domainId: string) => {
+    const domain = domains.find(d => d.id === domainId);
+    return domain ? domain.label : domainId;
+  };
 
   return (
     <div className="min-h-screen bg-black relative">
@@ -126,125 +144,73 @@ const Journal = () => {
       {/* Content */}
       <div className="relative z-10 ml-32 min-h-screen">
         <div className="max-w-5xl mx-auto p-8 space-y-8">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-white">Journal</h1>
+          {/* Header */}
+          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+            <h1 className="text-3xl font-bold text-white mb-2">Journal</h1>
+            <p className="text-white/60 text-sm mb-6">
+              Écris, analyse, surligne. Tes réflexions deviennent des insights.
+            </p>
+
+            {/* Domain Selector */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {domains.map((domain) => (
+                <button
+                  key={domain.id}
+                  onClick={() => handleDomainClick(domain.id)}
+                  className="backdrop-blur-xl bg-white/[0.05] border border-white/[0.08] rounded-full px-4 py-2 hover:bg-white/[0.08] hover:border-white/[0.12] transition-all cursor-pointer text-white text-sm font-medium flex items-center gap-2"
+                >
+                  <span>{domain.icon}</span>
+                  <span>{domain.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Day Editor */}
+          <DayEditor onInsightCreated={fetchRecentEntries} />
+
+          {/* Recent Entries */}
+          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Entrées récentes</h2>
             
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-6 py-3 hover:bg-white/[0.04] hover:border-white/[0.12] hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4 text-white/70" />
-              <span className="text-white text-sm font-medium">Nouvelle entrée</span>
-            </button>
-          </div>
-
-          <div
-            onClick={() => setShowAddModal(true)}
-            className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3 cursor-pointer hover:bg-white/[0.04] hover:border-white/[0.12] transition-all"
-          >
-            <Input
-              placeholder="Écrire une entrée rapide..."
-              className="bg-transparent border-none text-white placeholder:text-white/40 cursor-pointer h-8 px-0"
-              readOnly
-            />
-          </div>
-
-          <div className="space-y-4">
-            {loading ? (
-              <div className="text-center text-white/60 py-12">
-                Chargement des entrées...
-              </div>
-            ) : entries.length === 0 ? (
-              <div className="text-center text-white/60 py-12">
-                Aucune entrée de journal. Commencez par en créer une !
-              </div>
+            {recentEntries.length === 0 ? (
+              <p className="text-white/50 text-sm text-center py-8">
+                Aucune entrée récente
+              </p>
             ) : (
-              (() => {
-                // Group entries by domain
-                const entriesByDomain = entries.reduce((acc, entry) => {
-                  if (!acc[entry.domain_id]) {
-                    acc[entry.domain_id] = [];
-                  }
-                  acc[entry.domain_id].push(entry);
-                  return acc;
-                }, {} as Record<string, JournalEntry[]>);
-
-                const getDomainLabel = (domainId: string) => {
-                  const domains: Record<string, string> = {
-                    general: "Général",
-                    business: "Business",
-                    sport: "Sport",
-                    social: "Social",
-                    sante: "Santé",
-                    developpement: "Développement",
-                    finance: "Finance",
-                  };
-                  return domains[domainId] || domainId;
-                };
-
-                // Separate general entries from other domains
-                const generalEntries = entriesByDomain["general"] || [];
-                const otherDomains = Object.entries(entriesByDomain).filter(([domainId]) => domainId !== "general");
-
-                return (
-                  <>
-                    {/* Journal général bloc */}
-                    {generalEntries.length > 0 ? (
-                      <div
-                        onClick={() => navigate(`/journal/general`)}
-                        className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3 cursor-pointer hover:bg-white/[0.04] hover:border-white/[0.12] transition-all"
-                      >
-                        <div className="flex items-center justify-between">
-                          <h2 className="text-sm font-medium text-white/70">Journal général</h2>
+              <div className="space-y-3">
+                {recentEntries.map((entry) => (
+                  <button
+                    key={entry.id}
+                    onClick={() => handleEntryClick(entry)}
+                    className="w-full backdrop-blur-xl bg-white/[0.03] border border-white/[0.05] rounded-xl p-4 hover:bg-white/[0.05] hover:border-white/[0.08] transition-all cursor-pointer text-left group"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-sm font-semibold text-white px-4 py-1.5 rounded-full bg-gradient-to-br from-white/[0.15] to-white/[0.08] border border-white/[0.25] shadow-[0_0_15px_rgba(255,255,255,0.1)] backdrop-blur-sm">
+                            {getDomainLabel(entry.domain_id)}
+                          </span>
                           <span className="text-xs text-white/40">
-                            {generalEntries.length} {generalEntries.length === 1 ? "entrée" : "entrées"}
+                            {format(parseISO(entry.entry_date), "d MMMM yyyy", { locale: fr })}
                           </span>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3">
-                        <h2 className="text-sm font-medium text-white/70">Journal général</h2>
-                        <p className="text-xs text-white/40 mt-1">Aucune entrée générale</p>
-                      </div>
-                    )}
-
-                    {/* Other domain entries */}
-                    {otherDomains.map(([domainId, domainEntries]) => (
-                      <div
-                        key={domainId}
-                        onClick={() => navigate(`/journal/${domainId}`)}
-                        className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer group"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <h2 className="text-2xl font-bold text-white bg-gradient-to-r from-white via-white/95 to-white/80 bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
-                            Journal {getDomainLabel(domainId)}
-                          </h2>
-                          <span className="text-sm text-white/40">
-                            {domainEntries.length} {domainEntries.length === 1 ? "entrée" : "entrées"}
-                          </span>
-                        </div>
-                        <p className="text-sm text-white/60">
-                          Dernière entrée le {new Date(domainEntries[0].entry_date).toLocaleDateString("fr-FR", { 
-                            day: "numeric", 
-                            month: "long", 
-                            year: "numeric" 
-                          })}
+                        
+                        <p className="text-sm text-white/60 line-clamp-2">
+                          {entry.content.substring(0, 120)}
+                          {entry.content.length > 120 ? "..." : ""}
                         </p>
                       </div>
-                    ))}
-                  </>
-                );
-              })()
+                      
+                      <ChevronRight className="w-5 h-5 text-white/40 group-hover:text-white/70 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                    </div>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
       </div>
-
-      <AddEntryModal
-        open={showAddModal}
-        onOpenChange={setShowAddModal}
-        onSuccess={fetchEntries}
-      />
     </div>
   );
 };
