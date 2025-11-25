@@ -261,6 +261,20 @@ const Categories = () => {
   };
 
   const computeStats = () => {
+    if (!activeCategoryData) {
+      return {
+        avgScore7d: 0,
+        avgScore30d: 0,
+        filledDaysPercent: 0,
+        emptyDaysPercent: 100,
+        activeMetricsCount: 0,
+        metricsCompletionRate: 0,
+        performancesRatedCount: 0,
+        trend: "stable" as const,
+        trendMessage: "Aucune donnée disponible",
+      };
+    }
+    
     const activeMetricsCount = activeCategoryData.metrics.filter(m => m.enabled).length;
     const performancesRatedCount = activeCategoryData.performances.length;
     
@@ -359,12 +373,12 @@ const Categories = () => {
                 <p className="text-white/40 text-sm">Créez votre première catégorie pour commencer</p>
               </div>
             </div>
-          ) : (
+          ) : activeCategoryData ? (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                 <div className="lg:col-span-2">
                   <CategoryStatsBlock
-                    categoryName={activeCategoryData!.name}
+                    categoryName={activeCategoryData.name}
                     domainName={domainNames[slug]}
                     stats={computeStats()}
                   />
@@ -373,15 +387,15 @@ const Categories = () => {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <CategoryPerformances 
-                  categoryName={activeCategoryData!.name}
-                  performances={activeCategoryData!.performances}
+                  categoryName={activeCategoryData.name}
+                  performances={activeCategoryData.performances}
                 />
-                <CategoryMetrics metrics={activeCategoryData!.metrics} />
+                <CategoryMetrics metrics={activeCategoryData.metrics} />
               </div>
 
-              <CategoryManualNote categoryName={activeCategoryData!.name} />
+              <CategoryManualNote categoryName={activeCategoryData.name} />
             </>
-          )}
+          ) : null}
         </div>
       </div>
 
