@@ -337,6 +337,66 @@ export type Database = {
           },
         ]
       }
+      objectives: {
+        Row: {
+          archived_at: string | null
+          category_id: string | null
+          completed_at: string | null
+          created_at: string
+          deadline: string
+          description: string | null
+          domain_id: string
+          id: string
+          importance: string
+          notes: string | null
+          progress: number
+          show_on_home: boolean
+          start_date: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          category_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          deadline: string
+          description?: string | null
+          domain_id: string
+          id?: string
+          importance?: string
+          notes?: string | null
+          progress?: number
+          show_on_home?: boolean
+          start_date?: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          category_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          deadline?: string
+          description?: string | null
+          domain_id?: string
+          id?: string
+          importance?: string
+          notes?: string | null
+          progress?: number
+          show_on_home?: boolean
+          start_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       quick_notes: {
         Row: {
           content: string

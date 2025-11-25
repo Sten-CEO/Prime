@@ -288,7 +288,7 @@ const Domaines = () => {
           {/* Objectives */}
           <div className="mb-8">
             <DomainObjectives 
-              objectives={domain.objectives}
+              domainSlug={slug || "business"}
               onAddObjective={() => setShowCreateModal(true)}
             />
           </div>

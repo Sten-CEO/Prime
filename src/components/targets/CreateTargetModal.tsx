@@ -6,9 +6,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { useObjectives } from "@/hooks/useObjectives";
+import { useDomainSlugToId } from "@/hooks/useDomainSlugToId";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PrimeTarget {
   id: string;
@@ -43,6 +44,12 @@ export const CreateTargetModal = ({
   defaultDomain,
   defaultCategory,
 }: CreateTargetModalProps) => {
+  const { createObjective, updateObjective, calculateStatus } = useObjectives();
+  const { data: businessDomainId } = useDomainSlugToId("business");
+  const { data: sportDomainId } = useDomainSlugToId("sport");
+  const { data: socialDomainId } = useDomainSlugToId("social");
+  const { data: santeDomainId } = useDomainSlugToId("sante");
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [domain, setDomain] = useState(defaultDomain || "");
@@ -52,6 +59,17 @@ export const CreateTargetModal = ({
   const [progress, setProgress] = useState(0);
   const [importance, setImportance] = useState<"low" | "normal" | "crucial">("normal");
   const [showOnHome, setShowOnHome] = useState(false);
+
+  // Map domain slugs to IDs
+  const getDomainId = (slug: string) => {
+    const map: Record<string, string | undefined> = {
+      business: businessDomainId,
+      sport: sportDomainId,
+      social: socialDomainId,
+      sante: santeDomainId,
+    };
+    return map[slug];
+  };
 
   useEffect(() => {
     if (editingTarget) {
@@ -81,22 +99,45 @@ export const CreateTargetModal = ({
   const handleSubmit = () => {
     if (!title.trim() || !domain || !startDate || !deadline) return;
 
-    const targetData = {
+    const domainId = getDomainId(domain);
+    if (!domainId) {
+      console.error("Domain ID not found for slug:", domain);
+      return;
+    }
+
+    const status = calculateStatus(progress, deadline);
+
+    const objectiveData = {
       title: title.trim(),
       description: description.trim(),
-      domain,
-      category: category || undefined,
-      startDate,
+      domain_id: domainId,
+      category_id: null, // TODO: Map category to ID
+      start_date: startDate,
       deadline,
       progress,
       importance,
-      showOnHome,
+      status,
+      show_on_home: showOnHome,
+      notes: null,
     };
 
     if (editingTarget) {
+      // Update existing objective
+      const targetData = {
+        title: title.trim(),
+        description: description.trim(),
+        domain,
+        category: category || undefined,
+        startDate,
+        deadline,
+        progress,
+        importance,
+        showOnHome,
+      };
       onSave({ ...editingTarget, ...targetData });
     } else {
-      onSave(targetData);
+      // Create new objective
+      createObjective(objectiveData);
     }
 
     onOpenChange(false);
