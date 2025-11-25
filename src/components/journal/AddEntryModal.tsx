@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +16,14 @@ interface AddEntryModalProps {
   onOpenChange: (open: boolean) => void;
   defaultDomain?: string;
   onSuccess?: () => void;
+  editMode?: boolean;
+  entryId?: string;
+  initialData?: {
+    title: string;
+    content: string;
+    domain_id: string;
+    entry_date: string;
+  };
 }
 
 const domains = [
@@ -28,11 +36,21 @@ const domains = [
   { id: "finance", label: "Finance" },
 ];
 
-export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: AddEntryModalProps) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [domain, setDomain] = useState(defaultDomain || "");
-  const [date, setDate] = useState<Date>(new Date());
+export const AddEntryModal = ({ 
+  open, 
+  onOpenChange, 
+  defaultDomain, 
+  onSuccess,
+  editMode = false,
+  entryId,
+  initialData 
+}: AddEntryModalProps) => {
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [content, setContent] = useState(initialData?.content || "");
+  const [domain, setDomain] = useState(initialData?.domain_id || defaultDomain || "");
+  const [date, setDate] = useState<Date>(
+    initialData?.entry_date ? new Date(initialData.entry_date) : new Date()
+  );
   const [loading, setLoading] = useState(false);
   const [insightMode, setInsightMode] = useState(false);
   const [selectedText, setSelectedText] = useState("");
@@ -40,6 +58,22 @@ export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: 
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [insights, setInsights] = useState<string[]>([]);
   const [tempInsights, setTempInsights] = useState<string[]>([]);
+
+  // Reset form when modal opens with initial data
+  useEffect(() => {
+    if (open && initialData) {
+      setTitle(initialData.title);
+      setContent(initialData.content);
+      setDomain(initialData.domain_id);
+      setDate(new Date(initialData.entry_date));
+    } else if (open && !initialData) {
+      setTitle("");
+      setContent("");
+      setDomain(defaultDomain || "");
+      setDate(new Date());
+      setTempInsights([]);
+    }
+  }, [open, initialData, defaultDomain]);
 
   const handleTextSelection = () => {
     if (!insightMode) return;
@@ -90,50 +124,89 @@ export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: 
       if (!user) {
         toast({
           title: "Non authentifié",
-          description: "Vous devez être connecté pour créer une entrée",
+          description: editMode ? "Vous devez être connecté pour modifier une entrée" : "Vous devez être connecté pour créer une entrée",
           variant: "destructive",
         });
         return;
       }
 
-      const { data: entryData, error: entryError } = await supabase
-        .from("journal_entries")
-        .insert({
-          user_id: user.id,
-          title: title.trim(),
-          content: content.trim(),
-          domain_id: domain,
-          entry_date: format(date, "yyyy-MM-dd"),
-          has_insight: tempInsights.length > 0,
-        })
-        .select()
-        .single();
+      if (editMode && entryId) {
+        // Update existing entry
+        const { error: entryError } = await supabase
+          .from("journal_entries")
+          .update({
+            title: title.trim(),
+            content: content.trim(),
+            domain_id: domain,
+            entry_date: format(date, "yyyy-MM-dd"),
+            has_insight: tempInsights.length > 0,
+          })
+          .eq("id", entryId);
 
-      if (entryError) throw entryError;
+        if (entryError) throw entryError;
 
-      // Insert insights if any
-      if (tempInsights.length > 0 && entryData) {
-        const insightRecords = tempInsights.map(phrase => ({
-          user_id: user.id,
-          entry_id: entryData.id,
-          domain_id: domain,
-          phrase,
-          insight_date: format(date, "yyyy-MM-dd"),
-        }));
+        // Handle insights for edit mode
+        if (tempInsights.length > 0) {
+          const insightRecords = tempInsights.map(phrase => ({
+            user_id: user.id,
+            entry_id: entryId,
+            domain_id: domain,
+            phrase,
+            insight_date: format(date, "yyyy-MM-dd"),
+          }));
 
-        const { error: insightsError } = await supabase
-          .from("insights")
-          .insert(insightRecords);
+          const { error: insightsError } = await supabase
+            .from("insights")
+            .insert(insightRecords);
 
-        if (insightsError) throw insightsError;
+          if (insightsError) throw insightsError;
+        }
+
+        toast({
+          title: "Entrée modifiée",
+          description: "Votre entrée a été mise à jour avec succès",
+        });
+      } else {
+        // Create new entry
+        const { data: entryData, error: entryError } = await supabase
+          .from("journal_entries")
+          .insert({
+            user_id: user.id,
+            title: title.trim(),
+            content: content.trim(),
+            domain_id: domain,
+            entry_date: format(date, "yyyy-MM-dd"),
+            has_insight: tempInsights.length > 0,
+          })
+          .select()
+          .single();
+
+        if (entryError) throw entryError;
+
+        // Insert insights if any
+        if (tempInsights.length > 0 && entryData) {
+          const insightRecords = tempInsights.map(phrase => ({
+            user_id: user.id,
+            entry_id: entryData.id,
+            domain_id: domain,
+            phrase,
+            insight_date: format(date, "yyyy-MM-dd"),
+          }));
+
+          const { error: insightsError } = await supabase
+            .from("insights")
+            .insert(insightRecords);
+
+          if (insightsError) throw insightsError;
+        }
+
+        toast({
+          title: "Entrée créée",
+          description: tempInsights.length > 0 
+            ? `Votre entrée avec ${tempInsights.length} insight(s) a été enregistrée`
+            : "Votre entrée de journal a été enregistrée",
+        });
       }
-
-      toast({
-        title: "Entrée créée",
-        description: tempInsights.length > 0 
-          ? `Votre entrée avec ${tempInsights.length} insight(s) a été enregistrée`
-          : "Votre entrée de journal a été enregistrée",
-      });
 
       setTitle("");
       setContent("");
@@ -146,10 +219,10 @@ export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: 
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      console.error("Error creating entry:", error);
+      console.error("Error saving entry:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de créer l'entrée",
+        description: editMode ? "Impossible de modifier l'entrée" : "Impossible de créer l'entrée",
         variant: "destructive",
       });
     } finally {
@@ -162,7 +235,7 @@ export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: 
       <DialogContent className="backdrop-blur-xl bg-black/80 border border-white/[0.08] text-white max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            Nouvelle entrée de journal
+            {editMode ? "Modifier l'entrée" : "Nouvelle entrée de journal"}
           </DialogTitle>
         </DialogHeader>
 
