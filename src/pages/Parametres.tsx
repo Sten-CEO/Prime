@@ -11,8 +11,8 @@ import { Language } from "@/locales/translations";
 const Parametres = () => {
   const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
-  const [timezone, setTimezone] = useState("Europe/Paris");
-  const [dateFormat, setDateFormat] = useState("DD/MM/YYYY");
+  const [timezone, setTimezone] = useState(() => localStorage.getItem('prime_timezone') || "Europe/Paris");
+  const [dateFormat, setDateFormat] = useState(() => localStorage.getItem('prime_dateformat') || "DD/MM/YYYY");
   
   const [dailyReminder, setDailyReminder] = useState(true);
   const [dailyReminderTime, setDailyReminderTime] = useState("21:00");
@@ -24,6 +24,8 @@ const Parametres = () => {
   const [focusMode, setFocusMode] = useState(false);
 
   const handleSavePreferences = () => {
+    localStorage.setItem('prime_timezone', timezone);
+    localStorage.setItem('prime_dateformat', dateFormat);
     toast({
       title: t.preferencesUpdated,
       description: "Vos préférences ont été enregistrées avec succès",

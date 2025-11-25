@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Plus, ArrowLeft, Home, Award, BookOpen, Target, User, Settings } from "lucide-react";
@@ -9,6 +8,8 @@ import { AddEntryModal } from "@/components/journal/AddEntryModal";
 import { EntryDetailView } from "@/components/journal/EntryDetailView";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { format, startOfWeek, isSameWeek, parseISO } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface JournalEntry {
   id: string;
@@ -72,6 +73,36 @@ const JournalDomain = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Group entries by month
+  const groupEntriesByMonth = () => {
+    const grouped: Record<string, JournalEntry[]> = {};
+    
+    entries.forEach((entry) => {
+      const date = parseISO(entry.entry_date);
+      const monthKey = format(date, "MMMM yyyy", { locale: fr });
+      
+      if (!grouped[monthKey]) {
+        grouped[monthKey] = [];
+      }
+      grouped[monthKey].push(entry);
+    });
+    
+    return grouped;
+  };
+
+  // Check if we need a week separator
+  const needsWeekSeparator = (currentEntry: JournalEntry, previousEntry: JournalEntry | null) => {
+    if (!previousEntry) return false;
+    
+    const currentDate = parseISO(currentEntry.entry_date);
+    const previousDate = parseISO(previousEntry.entry_date);
+    
+    // Get timezone from localStorage or default to Europe/Paris
+    const timezone = localStorage.getItem('prime_timezone') || 'Europe/Paris';
+    
+    return !isSameWeek(currentDate, previousDate, { weekStartsOn: 1, locale: fr });
   };
 
   useEffect(() => {
@@ -227,11 +258,10 @@ const JournalDomain = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate(`/domaines/${domain}`)}
-                className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-4 py-2 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer flex items-center gap-2"
+                onClick={() => navigate("/journal")}
+                className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-full p-2 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4 text-white/70" />
-                <span className="text-white/70 text-sm">Retour au domaine</span>
               </button>
               <h1 className="text-3xl font-bold text-white">
                 Journal – {getDomainLabel(domain || "")}
@@ -258,7 +288,7 @@ const JournalDomain = () => {
             />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-8">
             {loading ? (
               <div className="text-center text-white/60 py-12">
                 Chargement des entrées...
@@ -268,16 +298,34 @@ const JournalDomain = () => {
                 Aucune entrée pour ce domaine. Commencez par en créer une !
               </div>
             ) : (
-              entries.map((entry) => (
-                <JournalEntryCard
-                  key={entry.id}
-                  id={entry.id}
-                  title={entry.title}
-                  content={entry.content}
-                  domain={entry.domain_id}
-                  date={new Date(entry.entry_date)}
-                  onClick={() => setSelectedEntry(entry)}
-                />
+              Object.entries(groupEntriesByMonth()).map(([monthKey, monthEntries]) => (
+                <div key={monthKey} className="space-y-4">
+                  <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-4 py-2 inline-block">
+                    <h2 className="text-sm font-medium text-white/80 capitalize">
+                      Entrées de {monthKey}
+                    </h2>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {monthEntries.map((entry, index) => (
+                      <div key={entry.id}>
+                        {needsWeekSeparator(entry, index > 0 ? monthEntries[index - 1] : null) && (
+                          <div className="my-6 flex items-center gap-4">
+                            <div className="flex-1 h-px bg-white/[0.08]" />
+                          </div>
+                        )}
+                        <JournalEntryCard
+                          id={entry.id}
+                          title={entry.title}
+                          content={entry.content}
+                          domain={entry.domain_id}
+                          date={new Date(entry.entry_date)}
+                          onClick={() => setSelectedEntry(entry)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ))
             )}
           </div>
