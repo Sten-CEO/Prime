@@ -295,38 +295,6 @@ export const MultiDomainChart = () => {
             </LineChart>
           </ResponsiveContainer>
         </div>
-
-        {/* Domain toggles */}
-        <div className="flex gap-3 mt-4 justify-center flex-wrap">
-          {domains.map(({ key, color }) => (
-            <button
-              key={key}
-              onClick={() => {
-                if (compareMode) {
-                  selectForCompare(key);
-                } else {
-                  toggleDomain(key);
-                }
-              }}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
-                compareMode && comparedDomains.includes(key)
-                  ? "bg-white/[0.15] border border-white/[0.3]"
-                  : activeDomains[key]
-                  ? "bg-white/[0.08] border border-white/[0.15]"
-                  : "bg-white/[0.02] border border-white/[0.08] opacity-50"
-              }`}
-            >
-              <div 
-                className="w-3 h-3 rounded-full"
-                style={{ 
-                  backgroundColor: color,
-                  boxShadow: activeDomains[key] ? `0 0 8px ${color}` : 'none'
-                }}
-              />
-              <span className="text-white text-xs">{key}</span>
-            </button>
-          ))}
-        </div>
       </div>
     </Card>
   );
