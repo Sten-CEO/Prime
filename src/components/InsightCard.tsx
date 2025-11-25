@@ -22,6 +22,18 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
   const { getDomainColor } = useDomainColors();
   const domainHslColor = getDomainColor(domain_id);
   const [open, setOpen] = useState(false);
+
+  const getJournalUrl = () => {
+    // Parse the date string to extract year and month
+    const parsedDate = new Date(date);
+    const year = parsedDate.getFullYear();
+    const month = parsedDate.getMonth() + 1; // +1 because getMonth() returns 0-11
+    
+    if (domain_id === 'general') {
+      return '/journal';
+    }
+    return `/journal/${domain_id}/${year}/${month}`;
+  };
   
   // Pour le domaine Général, utiliser blanc pur RGB
   const isGeneral = domain_id === 'general';
@@ -79,14 +91,11 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
             <Button 
               className="flex-1 backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
               onClick={() => {
-                console.log("Navigating to journal for domain:", domain_id);
+                const journalUrl = getJournalUrl();
+                console.log("Navigating to journal:", journalUrl);
                 setOpen(false);
                 setTimeout(() => {
-                  if (domain_id === 'general') {
-                    navigate('/journal');
-                  } else {
-                    navigate(`/journal/${domain_id}`);
-                  }
+                  navigate(journalUrl);
                 }, 100);
               }}
             >
