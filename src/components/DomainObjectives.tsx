@@ -18,9 +18,10 @@ interface Objective {
 
 interface DomainObjectivesProps {
   objectives: Objective[];
+  onAddObjective?: () => void;
 }
 
-export const DomainObjectives = ({ objectives: initialObjectives }: DomainObjectivesProps) => {
+export const DomainObjectives = ({ objectives: initialObjectives, onAddObjective }: DomainObjectivesProps) => {
   const [objectives, setObjectives] = useState(initialObjectives);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -83,13 +84,28 @@ export const DomainObjectives = ({ objectives: initialObjectives }: DomainObject
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white ml-2">Objectifs Actifs</h3>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg backdrop-blur-xl bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all text-white/70 hover:text-white text-sm">
+        <button 
+          onClick={onAddObjective}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg backdrop-blur-xl bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all text-white/70 hover:text-white text-sm"
+        >
           <Plus className="w-4 h-4" />
           Ajouter
         </button>
       </div>
 
-      <div className="space-y-1">
+      {objectives.length === 0 ? (
+        <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl p-8 text-center">
+          <p className="text-white/40 mb-4">Aucun objectif actif pour ce domaine</p>
+          <button 
+            onClick={onAddObjective}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg backdrop-blur-xl bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all text-white/70 hover:text-white text-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Créer un objectif
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-1">
         {objectives.map((objective, index) => (
           <div key={objective.id}>
             <DropZone index={index} onDrop={handleDrop} />
@@ -180,9 +196,10 @@ export const DomainObjectives = ({ objectives: initialObjectives }: DomainObject
               )}
             </div>
           </div>
-        ))}
-        <DropZone index={objectives.length} onDrop={handleDrop} />
-      </div>
+          ))}
+          <DropZone index={objectives.length} onDrop={handleDrop} />
+        </div>
+      )}
     </div>
   );
 };

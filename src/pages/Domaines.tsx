@@ -9,6 +9,9 @@ import { DomainPerformances } from "@/components/DomainPerformances";
 import { DomainCategoryStats } from "@/components/DomainCategoryStats";
 import { DomainMetrics } from "@/components/DomainMetrics";
 import { DomainObjectives } from "@/components/DomainObjectives";
+import { CreateTargetModal } from "@/components/targets/CreateTargetModal";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 const domainData = {
   business: {
@@ -171,6 +174,16 @@ const Domaines = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const domain = slug ? domainData[slug as keyof typeof domainData] : null;
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  const handleCreateTarget = (target: any) => {
+    // TODO: Intégrer avec Supabase pour créer l'objectif
+    toast({
+      title: "Objectif créé",
+      description: "Le nouvel objectif a été ajouté avec succès",
+    });
+    setShowCreateModal(false);
+  };
 
   if (!domain) {
     return (
@@ -273,11 +286,12 @@ const Domaines = () => {
           </div>
 
           {/* Objectives */}
-          {domain.objectives.length > 0 && (
-            <div className="mb-8">
-              <DomainObjectives objectives={domain.objectives} />
-            </div>
-          )}
+          <div className="mb-8">
+            <DomainObjectives 
+              objectives={domain.objectives}
+              onAddObjective={() => setShowCreateModal(true)}
+            />
+          </div>
 
           {/* Score + Chart + Category Stats */}
           <div className="grid grid-cols-[1fr_auto] gap-8">
@@ -294,6 +308,14 @@ const Domaines = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de création d'objectif */}
+      <CreateTargetModal
+        open={showCreateModal}
+        onOpenChange={setShowCreateModal}
+        onSave={handleCreateTarget}
+        defaultDomain={slug}
+      />
     </div>
   );
 };
