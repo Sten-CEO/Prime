@@ -131,12 +131,12 @@ export const AddMetricModal = ({ open, onOpenChange, onAdd, domainId, categories
           {showCategorySelector && (
             <div>
               <Label className="text-white/80 text-sm">Catégorie</Label>
-              <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
+              <Select value={selectedCategoryId} onValueChange={(value) => setSelectedCategoryId(value || undefined)}>
                 <SelectTrigger className="w-full bg-white/[0.05] border-white/[0.12] text-white mt-1">
                   <SelectValue placeholder="Choisir une catégorie" />
                 </SelectTrigger>
                 <SelectContent className="bg-black/95 backdrop-blur-xl border-white/[0.12]">
-                  {categories!.map((category) => (
+                  {categories!.filter(cat => cat.id && cat.id.trim() !== '').map((category) => (
                     <SelectItem key={category.id} value={category.id} className="text-white/80">
                       {category.name}
                     </SelectItem>
