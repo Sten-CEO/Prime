@@ -54,7 +54,9 @@ export type Database = {
       }
       domains: {
         Row: {
+          color: string | null
           created_at: string
+          icon: string | null
           id: string
           name: string
           slug: string
@@ -62,7 +64,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          color?: string | null
           created_at?: string
+          icon?: string | null
           id?: string
           name: string
           slug: string
@@ -70,7 +74,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          color?: string | null
           created_at?: string
+          icon?: string | null
           id?: string
           name?: string
           slug?: string
