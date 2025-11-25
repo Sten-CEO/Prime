@@ -124,14 +124,20 @@ const JournalDomain = () => {
               <Separator className="w-10 bg-white/20 mx-auto my-2" />
             </div>
             
-            <div className="flex-none flex flex-col gap-4 mt-8">
-              <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
-                <User className="w-5 h-5 text-gray-400 opacity-70" />
-              </button>
-              <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
-                <Settings className="w-5 h-5 text-gray-400 opacity-70" />
-              </button>
-            </div>
+          <div className="flex-none flex flex-col gap-4 mt-8">
+            <button 
+              onClick={() => navigate("/profil")}
+              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+            >
+              <User className="w-5 h-5 text-gray-400 opacity-70" />
+            </button>
+            <button 
+              onClick={() => navigate("/parametres")}
+              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+            >
+              <Settings className="w-5 h-5 text-gray-400 opacity-70" />
+            </button>
+          </div>
           </div>
         </div>
 
@@ -199,10 +205,16 @@ const JournalDomain = () => {
           </div>
           
           <div className="flex-none flex flex-col gap-4 mt-8">
-            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
+            <button 
+              onClick={() => navigate("/profil")}
+              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+            >
               <User className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
-            <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
+            <button 
+              onClick={() => navigate("/parametres")}
+              className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+            >
               <Settings className="w-5 h-5 text-gray-400 opacity-70" />
             </button>
           </div>
