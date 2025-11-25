@@ -1,129 +1,159 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PenLine, ArrowRight, Send } from "lucide-react";
-import { useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Send, ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
-const recentEntries = [
-  { id: 1, date: "24 Nov", preview: "Excellente session de sport ce matin...", full: "Excellente session de sport ce matin. J'ai couru 10km en moins d'une heure, c'est un nouveau record personnel ! Je me sens énergisé et prêt à attaquer la journée." },
-  { id: 2, date: "23 Nov", preview: "Réunion productive avec l'équipe...", full: "Réunion productive avec l'équipe aujourd'hui. Nous avons défini les grandes lignes du nouveau projet et l'ambiance était vraiment positive. J'ai hâte de voir les résultats." },
-  { id: 3, date: "22 Nov", preview: "Moment de méditation très bénéfique...", full: "Moment de méditation très bénéfique ce matin. 20 minutes de silence m'ont permis de clarifier mes pensées et d'aborder la journée avec plus de sérénité. Je devrais faire ça plus souvent." },
-];
+interface QuickNote {
+  id: string;
+  content: string;
+  created_at: string;
+}
 
 export const QuickJournalCard = () => {
-  const [showQuickEntry, setShowQuickEntry] = useState(false);
-  const [quickEntryText, setQuickEntryText] = useState("");
+  const navigate = useNavigate();
+  const [quickNote, setQuickNote] = useState("");
+  const [recentNotes, setRecentNotes] = useState<QuickNote[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleQuickEntry = () => {
-    if (quickEntryText.trim()) {
+  const fetchRecentNotes = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("quick_notes")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(4);
+
+      if (error) throw error;
+
+      setRecentNotes(data || []);
+    } catch (error) {
+      console.error("Error fetching quick notes:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecentNotes();
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!quickNote.trim()) {
       toast({
-        title: "Entrée enregistrée",
-        description: "Votre note a été ajoutée au journal.",
+        title: "Erreur",
+        description: "Veuillez saisir une note",
+        variant: "destructive",
       });
-      setQuickEntryText("");
-      setShowQuickEntry(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Non authentifié",
+          description: "Vous devez être connecté",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase.from("quick_notes").insert({
+        user_id: user.id,
+        content: quickNote.trim(),
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Note ajoutée",
+        description: "Votre note a été enregistrée avec succès",
+      });
+
+      setQuickNote("");
+      fetchRecentNotes();
+    } catch (error) {
+      console.error("Error adding quick note:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter la note",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
     }
   };
 
   return (
-    <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white drop-shadow-lg">Journal</h2>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => window.location.href = '/journal'}
-            className="text-xs text-white/60 hover:text-white hover:bg-white/[0.08]"
-          >
-            Voir tout
-            <ArrowRight className="w-3 h-3 ml-1" />
-          </Button>
-        </div>
-        
-        {!showQuickEntry ? (
-          <Button 
-            onClick={() => setShowQuickEntry(true)}
-            className="w-full backdrop-blur-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.2] text-white rounded-2xl h-12 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.2)]"
-          >
-            <PenLine className="w-4 h-4 mr-2" />
-            Écrire une entrée rapide
-          </Button>
+    <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-3xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] hover:bg-white/[0.03] hover:border-white/[0.25] transition-all">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-white">Journal rapide</h2>
+        <Button
+          onClick={() => navigate("/quick-notes")}
+          variant="ghost"
+          className="text-white/60 hover:text-white text-sm"
+        >
+          Voir tout
+          <ArrowRight className="w-4 h-4 ml-2" />
+        </Button>
+      </div>
+
+      <div className="flex gap-3 mb-6">
+        <Input
+          value={quickNote}
+          onChange={(e) => setQuickNote(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="Écrire une note rapide..."
+          className="flex-1 backdrop-blur-xl bg-white/[0.04] border border-white/[0.12] text-white placeholder:text-white/40 h-12 rounded-xl"
+          disabled={loading}
+        />
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="backdrop-blur-xl bg-white/[0.08] border border-white/[0.15] rounded-xl px-5 hover:bg-white/[0.12] hover:border-white/[0.2] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Send className="w-4 h-4 text-white" />
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium text-white/60 mb-3">Entrées récentes</h3>
+        {recentNotes.length === 0 ? (
+          <p className="text-white/40 text-sm text-center py-8">
+            Aucune note pour le moment
+          </p>
         ) : (
-          <div className="space-y-3 animate-accordion-down">
-            <Textarea 
-              value={quickEntryText}
-              onChange={(e) => setQuickEntryText(e.target.value)}
-              placeholder="Notez vos pensées du moment..."
-              className="min-h-[100px] backdrop-blur-xl bg-white/[0.04] border-white/[0.15] text-white placeholder:text-white/40 resize-none"
-            />
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleQuickEntry}
-                className="flex-1 backdrop-blur-2xl bg-success/20 hover:bg-success/30 border border-success/40 text-white"
-              >
-                <Send className="w-4 h-4 mr-2" />
-                Enregistrer
-              </Button>
-              <Button 
-                onClick={() => setShowQuickEntry(false)}
-                variant="ghost"
-                className="text-white/60 hover:text-white hover:bg-white/[0.08]"
-              >
-                Annuler
-              </Button>
+          recentNotes.map((note) => (
+            <div
+              key={note.id}
+              className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all"
+            >
+              <p className="text-white/70 text-sm mb-2">{note.content}</p>
+              <p className="text-white/40 text-xs">
+                {format(new Date(note.created_at), "d MMM", { locale: fr })}
+              </p>
             </div>
-          </div>
+          ))
         )}
-        
-        <div className="space-y-2">
-          <h3 className="text-xs font-medium text-white/60">Entrées récentes</h3>
-          {recentEntries.map((entry) => (
-            <Dialog key={entry.id}>
-              <DialogTrigger asChild>
-                <div 
-                  className="p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] backdrop-blur-2xl border border-white/[0.12] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]"
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="text-xs text-white/50 min-w-[50px]">{entry.date}</span>
-                    <p className="text-sm text-white/80 line-clamp-1">{entry.preview}</p>
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="backdrop-blur-xl bg-black/90 border-white/[0.15] text-white">
-                <DialogHeader>
-                  <DialogTitle className="text-white">Entrée du {entry.date}</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <p className="text-white/90">{entry.full}</p>
-                  <div className="flex gap-2">
-                    <Button 
-                      className="flex-1 backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
-                    >
-                      Modifier
-                    </Button>
-                    <Button 
-                      className="flex-1 backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
-                      onClick={() => window.location.href = '/journal'}
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Voir dans Journal
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          ))}
-        </div>
       </div>
     </Card>
   );
 };
-
-const ExternalLink = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-  </svg>
-);
