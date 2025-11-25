@@ -66,19 +66,6 @@ const Accueil = () => {
     return domains[domainId] || domainId;
   };
 
-  const getDomainColor = (domainId: string): "pink" | "purple" | "blue" => {
-    const colors: Record<string, "pink" | "purple" | "blue"> = {
-      business: "purple",
-      sport: "blue",
-      social: "pink",
-      sante: "blue",
-      developpement: "purple",
-      finance: "purple",
-      general: "blue",
-    };
-    return colors[domainId] || "blue";
-  };
-
   const fetchInsights = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -106,7 +93,7 @@ const Accueil = () => {
         id: insight.id,
         text: insight.phrase,
         date: format(new Date(insight.insight_date), "d MMM", { locale: fr }),
-        highlightColor: getDomainColor(insight.domain_id),
+        highlightColor: "blue" as const, // Non utilisé maintenant, couleur dynamique dans InsightCard
         category: getDomainLabel(insight.domain_id),
         domain_id: insight.domain_id,
       }));

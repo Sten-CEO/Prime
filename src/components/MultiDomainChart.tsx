@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useState, useMemo } from "react";
+import { useDomainColors } from "@/hooks/useDomainColors";
 
 const mockData = [
   { day: "Lun", Business: 80, Sport: 70, Social: 60, Santé: 90 },
@@ -13,12 +14,12 @@ const mockData = [
   { day: "Dim", Business: 80, Sport: 70, Social: 90, Santé: 80 },
 ];
 
-const domains = [
-  { key: "Business", color: "rgba(34, 211, 238, 0.6)", activeColor: "rgba(34, 211, 238, 0.9)" },
-  { key: "Sport", color: "rgba(16, 185, 129, 0.6)", activeColor: "rgba(16, 185, 129, 0.9)" },
-  { key: "Social", color: "rgba(244, 114, 182, 0.6)", activeColor: "rgba(244, 114, 182, 0.9)" },
-  { key: "Santé", color: "rgba(168, 85, 247, 0.6)", activeColor: "rgba(168, 85, 247, 0.9)" },
-];
+const domainMapping: Record<string, string> = {
+  "Business": "business",
+  "Sport": "sport",
+  "Social": "social",
+  "Santé": "sante",
+};
 
 const periods = [
   { label: "7j", value: "7d" },
@@ -28,6 +29,7 @@ const periods = [
 ];
 
 export const MultiDomainChart = () => {
+  const { getDomainColor } = useDomainColors();
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
   const [activeDomains, setActiveDomains] = useState<Record<string, boolean>>({
     Business: true,
@@ -40,6 +42,18 @@ export const MultiDomainChart = () => {
   const [mouseX, setMouseX] = useState<number | null>(null);
   
   const weekVariation = "+18% cette semaine";
+
+  const domains = useMemo(() => {
+    return Object.keys(domainMapping).map(key => {
+      const slug = domainMapping[key];
+      const hslColor = getDomainColor(slug);
+      return {
+        key,
+        color: `hsl(${hslColor} / 0.6)`,
+        activeColor: `hsl(${hslColor} / 0.9)`,
+      };
+    });
+  }, [getDomainColor]);
 
   const toggleDomain = (domain: string) => {
     setActiveDomains(prev => ({ ...prev, [domain]: !prev[domain] }));
