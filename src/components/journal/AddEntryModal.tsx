@@ -20,6 +20,7 @@ interface AddEntryModalProps {
 }
 
 const domains = [
+  { id: "general", label: "Général" },
   { id: "business", label: "Business" },
   { id: "sport", label: "Sport" },
   { id: "social", label: "Social" },

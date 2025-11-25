@@ -137,13 +137,17 @@ const Journal = () => {
 
           <div
             onClick={() => setShowAddModal(true)}
-            className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 cursor-pointer hover:bg-white/[0.04] hover:border-white/[0.12] transition-all"
+            className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3 cursor-pointer hover:bg-white/[0.04] hover:border-white/[0.12] transition-all"
           >
             <Input
               placeholder="Écrire une entrée rapide..."
-              className="bg-transparent border-none text-white placeholder:text-white/40 cursor-pointer"
+              className="bg-transparent border-none text-white placeholder:text-white/40 cursor-pointer h-8 px-0"
               readOnly
             />
+          </div>
+
+          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-2">
+            <h2 className="text-sm font-medium text-white/70">Journal général</h2>
           </div>
 
           <div className="space-y-4">
@@ -168,6 +172,7 @@ const Journal = () => {
 
                 const getDomainLabel = (domainId: string) => {
                   const domains: Record<string, string> = {
+                    general: "Général",
                     business: "Business",
                     sport: "Sport",
                     social: "Social",

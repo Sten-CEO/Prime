@@ -30,6 +30,7 @@ const JournalMonth = () => {
 
   const getDomainLabel = (domainId: string) => {
     const domains: Record<string, string> = {
+      general: "Général",
       business: "Business",
       sport: "Sport",
       social: "Social",
