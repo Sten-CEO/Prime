@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
@@ -285,12 +285,17 @@ export const AddEntryModal = ({
                   transform: "translateX(-50%)",
                 }}
               >
-                <div className="backdrop-blur-xl bg-primary/20 border border-primary/30 rounded-xl px-4 py-3 shadow-[0_0_20px_rgba(139,92,246,0.3)] min-w-[200px]">
-                  <p className="text-white text-xs mb-2">Ajouter en Insight ?</p>
+                <div className="backdrop-blur-2xl bg-gradient-to-br from-primary/25 to-primary/15 border border-primary/40 rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(139,92,246,0.4)] min-w-[240px]">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                    </div>
+                    <p className="text-white text-sm font-medium">Ajouter en Insight ?</p>
+                  </div>
                   <div className="flex gap-2">
                     <button
                       onClick={handleConfirmInsight}
-                      className="flex-1 bg-primary/30 hover:bg-primary/40 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
+                      className="flex-1 backdrop-blur-xl bg-primary/40 hover:bg-primary/50 border border-primary/50 hover:border-primary/60 text-white text-sm font-medium px-4 py-2 rounded-xl transition-all hover:shadow-[0_0_16px_rgba(139,92,246,0.5)] hover:-translate-y-0.5"
                     >
                       Confirmer
                     </button>
@@ -300,7 +305,7 @@ export const AddEntryModal = ({
                         setSelectedText("");
                         window.getSelection()?.removeAllRanges();
                       }}
-                      className="flex-1 bg-white/[0.05] hover:bg-white/[0.08] text-white/70 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                      className="flex-1 backdrop-blur-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.1] hover:border-white/[0.15] text-white/70 hover:text-white text-sm px-4 py-2 rounded-xl transition-all"
                     >
                       Annuler
                     </button>
