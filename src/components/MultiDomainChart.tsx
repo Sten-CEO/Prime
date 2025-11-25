@@ -100,10 +100,12 @@ export const MultiDomainChart = () => {
     return Object.keys(domainMapping).map(key => {
       const slug = domainMapping[key];
       const hslColor = getDomainColor(slug);
+      // Général reste complètement blanc sans opacité
+      const isGeneral = slug === 'general';
       return {
         key,
-        color: `hsl(${hslColor} / 0.6)`,
-        activeColor: `hsl(${hslColor} / 0.9)`,
+        color: isGeneral ? `hsl(${hslColor})` : `hsl(${hslColor} / 0.6)`,
+        activeColor: isGeneral ? `hsl(${hslColor})` : `hsl(${hslColor} / 0.9)`,
       };
     });
   }, [getDomainColor]);
