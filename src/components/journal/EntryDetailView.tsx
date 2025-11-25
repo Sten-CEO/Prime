@@ -136,31 +136,24 @@ export const EntryDetailView = ({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
+        <button
           onClick={onBack}
-          className="text-white/70 hover:text-white hover:bg-white/[0.05]"
+          className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-4 py-2 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer flex items-center gap-2"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Retour
-        </Button>
+          <ArrowLeft className="w-4 h-4 text-white/70" />
+          <span className="text-white/70 text-sm">Retour</span>
+        </button>
 
         <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white/70 hover:text-white hover:bg-white/[0.05]"
-          >
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
+          <button className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl w-10 h-10 flex items-center justify-center hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer">
+            <Edit className="w-4 h-4 text-white/70" />
+          </button>
+          <button 
             onClick={handleDelete}
-            className="text-red-500/70 hover:text-red-500 hover:bg-red-500/[0.05]"
+            className="backdrop-blur-xl bg-red-500/[0.05] border border-red-500/[0.2] rounded-xl w-10 h-10 flex items-center justify-center hover:bg-red-500/[0.1] hover:border-red-500/[0.3] transition-all cursor-pointer"
           >
-            <Trash2 className="w-4 h-4" />
-          </Button>
+            <Trash2 className="w-4 h-4 text-red-500/70" />
+          </button>
         </div>
       </div>
 
@@ -195,14 +188,13 @@ export const EntryDetailView = ({
                   transform: "translateX(-50%)",
                 }}
               >
-                <Button
+                <button
                   onClick={handleHighlight}
-                  size="sm"
-                  className="bg-primary hover:bg-primary/90 shadow-lg"
+                  className="backdrop-blur-xl bg-primary/20 border border-primary/30 rounded-2xl px-4 py-2 hover:bg-primary/30 hover:border-primary/40 transition-all cursor-pointer shadow-[0_0_20px_rgba(139,92,246,0.3)] flex items-center gap-2"
                 >
-                  <Highlighter className="w-4 h-4 mr-2" />
-                  Surligner comme Insight
-                </Button>
+                  <Highlighter className="w-4 h-4 text-primary" />
+                  <span className="text-white text-sm font-medium">Surligner comme Insight</span>
+                </button>
               </div>
             )}
           </div>
