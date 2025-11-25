@@ -106,10 +106,7 @@ export const useMetricRecords = (domainId?: string, startDate?: string, endDate?
       queryClient.invalidateQueries({ queryKey: ["metric_records"] });
       queryClient.invalidateQueries({ queryKey: ["domain_stats"] });
       queryClient.invalidateQueries({ queryKey: ["category_stats"] });
-      toast({
-        title: "Métrique enregistrée",
-        description: "La métrique a été marquée comme complétée.",
-      });
+      queryClient.invalidateQueries({ queryKey: ["metrics"] });
     },
     onError: (error: Error) => {
       toast({
@@ -133,10 +130,7 @@ export const useMetricRecords = (domainId?: string, startDate?: string, endDate?
       queryClient.invalidateQueries({ queryKey: ["metric_records"] });
       queryClient.invalidateQueries({ queryKey: ["domain_stats"] });
       queryClient.invalidateQueries({ queryKey: ["category_stats"] });
-      toast({
-        title: "Enregistrement supprimé",
-        description: "L'enregistrement de la métrique a été supprimé.",
-      });
+      queryClient.invalidateQueries({ queryKey: ["metrics"] });
     },
     onError: (error: Error) => {
       toast({
