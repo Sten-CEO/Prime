@@ -1,4 +1,4 @@
-import { MoreVertical, CheckCircle2 } from "lucide-react";
+import { MoreVertical, CheckCircle2, ChevronDown } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import {
   DropdownMenu,
@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
 interface PrimeTarget {
   id: string;
@@ -44,6 +45,8 @@ export const PrimeTargetCard = ({
   onEdit,
   getDomainLabel,
 }: PrimeTargetCardProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
   const getStatusColor = () => {
     switch (target.status) {
       case "on-track":
@@ -125,28 +128,62 @@ export const PrimeTargetCard = ({
   }
 
   return (
-    <div className="backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] rounded-xl p-4 hover:bg-white/[0.06] transition-all">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <h4 className="text-white font-medium mb-1">{target.title}</h4>
-          <div className="flex items-center gap-2 text-xs text-white/50">
-            <span>{getDomainLabel(target.domain)}</span>
-            {target.category && (
-              <>
-                <span>•</span>
-                <span>{target.category}</span>
-              </>
-            )}
+    <div className="backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] rounded-xl overflow-hidden hover:bg-white/[0.04] transition-all">
+      {/* Vue minimaliste - toujours visible */}
+      <div 
+        className="flex items-center justify-between p-3 cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex-1 flex items-center gap-3">
+          <button
+            className={`w-6 h-6 rounded-lg hover:bg-white/[0.1] flex items-center justify-center transition-all ${
+              isExpanded ? 'rotate-180' : ''
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
+          >
+            <ChevronDown className="w-4 h-4 text-white/60" />
+          </button>
+          
+          <div className="flex-1 min-w-0">
+            <h4 className="text-white font-medium text-sm truncate">{target.title}</h4>
+            <div className="flex items-center gap-2 text-xs text-white/40 mt-0.5">
+              <span>{getDomainLabel(target.domain)}</span>
+              {target.category && (
+                <>
+                  <span>•</span>
+                  <span>{target.category}</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor()}`}>
-            {getStatusLabel()}
-          </span>
+
+        <div className="flex items-center gap-2 ml-3">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-white/70">{target.progress}%</span>
+            <div className="w-16 h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full transition-all ${
+                  target.status === "on-track" ? "bg-green-500" :
+                  target.status === "at-risk" ? "bg-orange-500" :
+                  target.status === "late" ? "bg-red-500" :
+                  "bg-white/50"
+                }`}
+                style={{ width: `${target.progress}%` }}
+              />
+            </div>
+          </div>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="w-8 h-8 rounded-lg hover:bg-white/[0.1] flex items-center justify-center transition-colors">
-                <MoreVertical className="w-4 h-4 text-white/60" />
+              <button 
+                className="w-7 h-7 rounded-lg hover:bg-white/[0.1] flex items-center justify-center transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="w-3.5 h-3.5 text-white/60" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-black/90 border-white/[0.1]">
@@ -172,49 +209,61 @@ export const PrimeTargetCard = ({
         </div>
       </div>
 
-      <div className="space-y-3">
-        {/* Barre de progression */}
-        <div>
-          <div className="flex justify-between text-xs text-white/50 mb-2">
-            <span>Progression</span>
-            <span>{target.progress}%</span>
+      {/* Détails - visible quand déployé */}
+      <div 
+        className={`overflow-hidden transition-all duration-300 ${
+          isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-3 pb-3 pt-0 space-y-3 border-t border-white/[0.05]">
+          {/* Barre de progression complète */}
+          <div className="pt-3">
+            <div className="flex justify-between text-xs text-white/50 mb-2">
+              <span>Progression complète</span>
+              <span className={`px-2 py-0.5 rounded-full border text-xs ${getStatusColor()}`}>
+                {getStatusLabel()}
+              </span>
+            </div>
+            <Progress value={target.progress} className={`h-2 ${getProgressColor()}`} />
           </div>
-          <Progress value={target.progress} className={`h-2 ${getProgressColor()}`} />
+
+          {/* Description */}
+          {target.description && (
+            <p className="text-xs text-white/60">{target.description}</p>
+          )}
+
+          {/* Dates */}
+          <div className="flex justify-between text-xs text-white/50 pt-1">
+            <div>
+              <span className="text-white/40">Début:</span> {new Date(target.startDate).toLocaleDateString("fr-FR")}
+            </div>
+            <div>
+              <span className="text-white/40">Deadline:</span> {new Date(target.deadline).toLocaleDateString("fr-FR")}
+            </div>
+          </div>
+
+          {/* Badge d'importance */}
+          {target.importance === "crucial" && (
+            <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+              ⭐ Crucial
+            </span>
+          )}
+
+          {/* Bouton objectif atteint */}
+          {target.status !== "completed" && target.status !== "archived" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onComplete?.();
+              }}
+              className="w-full flex items-center justify-center gap-2 backdrop-blur-xl bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 hover:bg-white/[0.08] transition-all text-white/70 text-sm"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              Objectif atteint
+            </button>
+          )}
         </div>
-
-        {/* Dates */}
-        <div className="flex justify-between text-xs text-white/50">
-          <div>
-            <span className="text-white/40">Début:</span> {new Date(target.startDate).toLocaleDateString("fr-FR")}
-          </div>
-          <div>
-            <span className="text-white/40">Deadline:</span> {new Date(target.deadline).toLocaleDateString("fr-FR")}
-          </div>
-        </div>
-
-        {/* Description courte */}
-        {target.description && (
-          <p className="text-xs text-white/60 line-clamp-2">{target.description}</p>
-        )}
-
-        {/* Badge d'importance */}
-        {target.importance === "crucial" && (
-          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
-            ⭐ Crucial
-          </span>
-        )}
       </div>
-
-      {/* Checkbox pour marquer comme terminé */}
-      {target.status !== "completed" && target.status !== "archived" && (
-        <button
-          onClick={onComplete}
-          className="mt-3 w-full flex items-center justify-center gap-2 backdrop-blur-xl bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 hover:bg-white/[0.08] transition-all text-white/70 text-sm"
-        >
-          <CheckCircle2 className="w-4 h-4" />
-          Objectif atteint
-        </button>
-      )}
     </div>
   );
 };
