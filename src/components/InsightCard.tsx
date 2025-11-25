@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
   const navigate = useNavigate();
   const { getDomainColor } = useDomainColors();
   const domainHslColor = getDomainColor(domain_id);
+  const [open, setOpen] = useState(false);
   
   // Pour le domaine Général, utiliser blanc pur RGB
   const isGeneral = domain_id === 'general';
@@ -36,7 +38,7 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-4 hover:bg-white/[0.03] hover:border-white/[0.25] transition-all relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] cursor-pointer">
           <div className="space-y-2">
@@ -79,7 +81,10 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
               onClick={() => {
                 console.log("Button clicked, entry_id:", entry_id);
                 if (entry_id) {
-                  navigate(`/journal/entry/${entry_id}`);
+                  setOpen(false);
+                  setTimeout(() => {
+                    navigate(`/journal/entry/${entry_id}`);
+                  }, 100);
                 } else {
                   console.error("No entry_id available");
                 }
