@@ -2,36 +2,57 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { useMetrics } from "@/hooks/useMetrics";
 
 interface AddMetricModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (metric: { name: string; icon: string; days: string[] }) => void;
+  domainId?: string;
+  categories?: Array<{ id: string; name: string }>;
 }
 
 const iconOptions = ["💧", "🏃", "📚", "🧘", "🥗", "😴", "☕", "🎵", "🌞", "🌙"];
-const allDays = ["L", "M", "M", "J", "V", "S", "D"];
 
-export const AddMetricModal = ({ open, onOpenChange, onAdd }: AddMetricModalProps) => {
+export const AddMetricModal = ({ open, onOpenChange, onAdd, domainId, categories }: AddMetricModalProps) => {
   const [name, setName] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("💧");
-  const [selectedDays, setSelectedDays] = useState<string[]>(["L", "M", "M", "J", "V"]);
-
-  const toggleDay = (day: string) => {
-    setSelectedDays(prev =>
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    );
-  };
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  
+  const { createMetric } = useMetrics(selectedCategoryId || undefined);
 
   const handleAdd = () => {
-    if (!name.trim() || selectedDays.length === 0) return;
-    onAdd({ name, icon: selectedIcon, days: selectedDays });
+    if (!name.trim()) return;
+    
+    // If domainId and categories are provided, use the hook to create
+    if (domainId && categories && categories.length > 0) {
+      if (!selectedCategoryId) return;
+      
+      createMetric({
+        name,
+        icon: selectedIcon,
+        category_id: selectedCategoryId,
+        domain_id: domainId,
+      });
+    } else {
+      // Otherwise, use the callback (for category-level components)
+      onAdd({
+        name,
+        icon: selectedIcon,
+        days: [],
+      });
+    }
+    
+    // Reset form
     setName("");
     setSelectedIcon("💧");
-    setSelectedDays(["L", "M", "M", "J", "V"]);
+    setSelectedCategoryId("");
     onOpenChange(false);
   };
+
+  const showCategorySelector = domainId && categories && categories.length > 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -50,6 +71,24 @@ export const AddMetricModal = ({ open, onOpenChange, onAdd }: AddMetricModalProp
               className="bg-white/[0.05] border-white/[0.12] text-white mt-1"
             />
           </div>
+
+          {showCategorySelector && (
+            <div>
+              <Label className="text-white/80 text-sm">Catégorie</Label>
+              <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
+                <SelectTrigger className="w-full bg-white/[0.05] border-white/[0.12] text-white mt-1">
+                  <SelectValue placeholder="Choisir une catégorie" />
+                </SelectTrigger>
+                <SelectContent className="bg-black/95 backdrop-blur-xl border-white/[0.12]">
+                  {categories!.map((category) => (
+                    <SelectItem key={category.id} value={category.id} className="text-white/80">
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <Label className="text-white/80 text-sm mb-2 block">Icône</Label>
@@ -70,28 +109,6 @@ export const AddMetricModal = ({ open, onOpenChange, onAdd }: AddMetricModalProp
             </div>
           </div>
 
-          <div>
-            <Label className="text-white/80 text-sm mb-2 block">Jours actifs</Label>
-            <div className="flex gap-2">
-              {allDays.map((day) => (
-                <button
-                  key={day}
-                  onClick={() => toggleDay(day)}
-                  className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
-                    selectedDays.includes(day)
-                      ? "bg-white/[0.15] border border-white/[0.3] text-white shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                      : "bg-white/[0.05] border border-white/[0.12] text-white/50 hover:bg-white/[0.08]"
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-white/50 mt-2">
-              {selectedDays.length} jour(s) sélectionné(s)
-            </p>
-          </div>
-
           <div className="flex gap-2 pt-4">
             <Button
               onClick={() => onOpenChange(false)}
@@ -102,7 +119,7 @@ export const AddMetricModal = ({ open, onOpenChange, onAdd }: AddMetricModalProp
             </Button>
             <Button
               onClick={handleAdd}
-              disabled={!name.trim() || selectedDays.length === 0}
+              disabled={!name.trim() || (showCategorySelector && !selectedCategoryId)}
               className="flex-1 bg-white/[0.15] border border-white/[0.2] text-white hover:bg-white/[0.2]"
             >
               Ajouter
