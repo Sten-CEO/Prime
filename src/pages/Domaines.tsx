@@ -13,6 +13,7 @@ import { CreateTargetModal } from "@/components/targets/CreateTargetModal";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useDomains } from "@/hooks/useDomains";
+import { useCategories } from "@/hooks/useCategories";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Domaines = () => {
@@ -23,6 +24,15 @@ const Domaines = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const domain = domains.find(d => d.slug === slug);
+  const { categories } = useCategories(domain?.id);
+
+  // Map categories to the format expected by DomainScoreChart
+  const mappedCategories = categories.map(cat => ({
+    id: cat.id,
+    name: cat.name,
+    color: cat.color || undefined,
+    score: 0,
+  }));
 
   const handleCreateTarget = (target: any) => {
     toast({
@@ -167,7 +177,7 @@ const Domaines = () => {
               domainSlug={slug || ""}
               score={0}
               variation="+0%"
-              categories={[]}
+              categories={mappedCategories}
             />
             <div className="w-[400px]">
               <DomainCategoryStats />
