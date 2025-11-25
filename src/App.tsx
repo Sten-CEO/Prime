@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -18,34 +19,42 @@ import PrimeHistory from "./pages/PrimeHistory";
 import PrimeTargets from "./pages/PrimeTargets";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/accueil" element={<Accueil />} />
-        <Route path="/domaines" element={<Domaines />} />
-        <Route path="/domaines/:slug" element={<Domaines />} />
-        <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
-        <Route path="/journal" element={<Journal />} />
-        <Route path="/journal/entry/:id" element={<JournalEntry />} />
-        <Route path="/journal/:domain" element={<JournalDomain />} />
-        <Route path="/journal/:domain/:year/:month" element={<JournalMonth />} />
-        <Route path="/quick-notes" element={<QuickNotes />} />
-        <Route path="/profil" element={<Profil />} />
-        <Route path="/parametres" element={<Parametres />} />
-        <Route path="/prime-targets" element={<PrimeTargets />} />
-        <Route path="/prime-history" element={<PrimeHistory />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Toaster />
+        <Sonner />
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/accueil" element={<Accueil />} />
+          <Route path="/domaines" element={<Domaines />} />
+          <Route path="/domaines/:slug" element={<Domaines />} />
+          <Route path="/domaines/:slug/categories/:category" element={<Categories />} />
+          <Route path="/journal" element={<Journal />} />
+          <Route path="/journal/entry/:id" element={<JournalEntry />} />
+          <Route path="/journal/:domain" element={<JournalDomain />} />
+          <Route path="/journal/:domain/:year/:month" element={<JournalMonth />} />
+          <Route path="/quick-notes" element={<QuickNotes />} />
+          <Route path="/profil" element={<Profil />} />
+          <Route path="/parametres" element={<Parametres />} />
+          <Route path="/prime-targets" element={<PrimeTargets />} />
+          <Route path="/prime-history" element={<PrimeHistory />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
