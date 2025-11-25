@@ -174,10 +174,9 @@ export const EntryDetailView = ({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-4 py-2 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer flex items-center gap-2"
+          className="backdrop-blur-xl bg-white/[0.02] border-none rounded-full p-2 hover:bg-white/[0.04] transition-all cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 text-white/70" />
-          <span className="text-white/70 text-sm">Retour</span>
         </button>
 
         <div className="flex gap-2">
