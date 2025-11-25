@@ -88,10 +88,33 @@ export const AddEntryModal = ({
       const rect = range?.getBoundingClientRect();
       
       if (rect) {
-        setPopupPosition({
-          x: rect.left + rect.width / 2,
-          y: rect.top - 60,
-        });
+        // Popup dimensions (approximate)
+        const popupWidth = 240;
+        const popupHeight = 120;
+        
+        // Calculate initial position (centered above selection)
+        let x = rect.left + rect.width / 2;
+        let y = rect.top - 60;
+        
+        // Adjust horizontal position if popup goes off screen
+        const screenWidth = window.innerWidth;
+        const halfPopupWidth = popupWidth / 2;
+        
+        if (x - halfPopupWidth < 20) {
+          // Too far left
+          x = halfPopupWidth + 20;
+        } else if (x + halfPopupWidth > screenWidth - 20) {
+          // Too far right
+          x = screenWidth - halfPopupWidth - 20;
+        }
+        
+        // Adjust vertical position if popup goes off top of screen
+        if (y < 20) {
+          // Position below selection instead
+          y = rect.bottom + 10;
+        }
+        
+        setPopupPosition({ x, y });
         setShowInsightPopup(true);
       }
     }
