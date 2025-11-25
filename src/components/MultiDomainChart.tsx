@@ -170,6 +170,44 @@ export const MultiDomainChart = () => {
     }
   };
 
+  const CustomLegend = ({ payload }: any) => {
+    return (
+      <div className="flex gap-3 justify-center flex-wrap mb-2">
+        {payload.map((entry: any) => {
+          const domainKey = entry.value;
+          const isActive = activeDomains[domainKey];
+          const isCompared = compareMode && comparedDomains.includes(domainKey);
+          const domain = domains.find(d => d.key === domainKey);
+          const color = domain?.color || entry.color;
+          
+          return (
+            <button
+              key={domainKey}
+              onClick={() => {
+                if (compareMode) {
+                  selectForCompare(domainKey);
+                } else {
+                  toggleDomain(domainKey);
+                }
+              }}
+              className="flex items-center gap-2 transition-all cursor-pointer"
+              style={{ opacity: isActive ? 1 : 0.3 }}
+            >
+              <div 
+                className="w-3 h-3 rounded-full"
+                style={{ 
+                  backgroundColor: color,
+                  boxShadow: isActive ? `0 0 6px ${color}` : 'none'
+                }}
+              />
+              <span className="text-white text-xs">{domainKey}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -260,17 +298,7 @@ export const MultiDomainChart = () => {
                 style={{ fontSize: '12px', fill: 'white' }}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Legend 
-                onClick={(data) => {
-                  const domainKey = data.value;
-                  if (compareMode) {
-                    selectForCompare(domainKey);
-                  } else {
-                    toggleDomain(domainKey);
-                  }
-                }}
-                wrapperStyle={{ cursor: 'pointer' }}
-              />
+              <Legend content={<CustomLegend />} />
               {domains.map(({ key, color, activeColor }) => {
                 const isActive = activeDomains[key];
                 const isCompared = compareMode && comparedDomains.includes(key);
