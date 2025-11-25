@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format, startOfWeek, isSameWeek, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
+import bgImage from "@/assets/black-shapes-bg.jpg";
 
 interface JournalEntry {
   id: string;
@@ -115,9 +116,9 @@ const JournalDomain = () => {
   if (selectedEntry) {
     return (
       <div className="min-h-screen bg-black relative">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
+        <div 
+          className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+          style={{ backgroundImage: `url(${bgImage})` }}
         />
 
         {/* Glass Sidebar */}
@@ -198,9 +199,9 @@ const JournalDomain = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+        style={{ backgroundImage: `url(${bgImage})` }}
       />
 
       {/* Glass Sidebar */}

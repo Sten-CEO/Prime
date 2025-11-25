@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language } from "@/locales/translations";
 import { DomainColorModal } from "@/components/modals/DomainColorModal";
+import bgImage from "@/assets/black-shapes-bg.jpg";
 
 const Parametres = () => {
   const navigate = useNavigate();
@@ -38,9 +39,9 @@ const Parametres = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+        style={{ backgroundImage: `url(${bgImage})` }}
       />
 
       {/* Glass Sidebar */}
