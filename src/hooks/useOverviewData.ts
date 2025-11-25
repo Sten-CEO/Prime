@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { subDays } from "date-fns";
-import { Briefcase, Dumbbell, Users, Heart } from "lucide-react";
+import { Briefcase, Dumbbell, Users, Heart, GraduationCap, DollarSign, Target, Book, Music, Palette, Code, Coffee, Star, Zap } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 interface OverviewItem {
@@ -12,18 +12,21 @@ interface OverviewItem {
   slug: string;
 }
 
-const domainIcons: Record<string, LucideIcon> = {
-  business: Briefcase,
-  sport: Dumbbell,
-  social: Users,
-  sante: Heart,
-};
-
-const domainNames: Record<string, string> = {
-  business: "Business",
-  sport: "Sport",
-  social: "Social",
-  sante: "Santé",
+const ICON_MAP: Record<string, LucideIcon> = {
+  "briefcase": Briefcase,
+  "dumbbell": Dumbbell,
+  "users": Users,
+  "heart": Heart,
+  "graduation-cap": GraduationCap,
+  "dollar-sign": DollarSign,
+  "target": Target,
+  "book": Book,
+  "music": Music,
+  "palette": Palette,
+  "code": Code,
+  "coffee": Coffee,
+  "star": Star,
+  "zap": Zap,
 };
 
 export const useOverviewData = () => {
@@ -41,9 +44,8 @@ export const useOverviewData = () => {
       // Get all domains for the user
       const { data: domains } = await supabase
         .from("domains")
-        .select("id, slug, name")
-        .eq("user_id", user.id)
-        .in("slug", ["business", "sport", "social", "sante"]);
+        .select("id, slug, name, icon")
+        .eq("user_id", user.id);
 
       if (!domains || domains.length === 0) return [];
 
@@ -74,8 +76,8 @@ export const useOverviewData = () => {
         const trend = calculateTrend(scoreWithBonus, previousScore);
 
         overviewItems.push({
-          name: domainNames[domain.slug] || domain.name,
-          icon: domainIcons[domain.slug] || Briefcase,
+          name: domain.name,
+          icon: ICON_MAP[domain.icon || "briefcase"] || Briefcase,
           score: Math.round(scoreWithBonus),
           trend,
           slug: domain.slug,

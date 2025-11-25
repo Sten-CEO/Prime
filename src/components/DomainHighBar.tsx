@@ -1,4 +1,4 @@
-import { Briefcase, Dumbbell, Users, Heart, GraduationCap, DollarSign, Target, Book, Music, Palette, Code, Coffee, Star, Zap, Plus } from "lucide-react";
+import { Briefcase, Dumbbell, Users, Heart, GraduationCap, DollarSign, Target, Book, Music, Palette, Code, Coffee, Star, Zap, Plus, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDomains } from "@/hooks/useDomains";
 import { useState } from "react";
@@ -71,6 +71,14 @@ export const DomainHighBar = ({ currentDomain }: DomainHighBarProps) => {
             </>
           )}
         </div>
+
+        <button
+          onClick={() => navigate(`/domaines/${currentDomain}/categories/principale`)}
+          className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
+          title="Vers catégories"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
       </div>
 
       <CreateDomainModal open={showCreateModal} onOpenChange={setShowCreateModal} />
