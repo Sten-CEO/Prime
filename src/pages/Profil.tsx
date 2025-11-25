@@ -6,6 +6,7 @@ import { Home, Award, BookOpen, Target, User, Settings, Upload, LogOut } from "l
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import bgImage from "@/assets/black-shapes-bg.jpg";
 
 const Profil = () => {
   const navigate = useNavigate();
@@ -213,9 +214,9 @@ const Profil = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+        style={{ backgroundImage: `url(${bgImage})` }}
       />
 
       {/* Glass Sidebar */}

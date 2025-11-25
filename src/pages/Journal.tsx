@@ -7,6 +7,7 @@ import { Plus, Home, Award, BookOpen, Target, User, Settings } from "lucide-reac
 import { AddEntryModal } from "@/components/journal/AddEntryModal";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import bgImage from "@/assets/black-shapes-bg.jpg";
 
 interface JournalEntry {
   id: string;
@@ -63,9 +64,9 @@ const Journal = () => {
 
   return (
     <div className="min-h-screen bg-black relative">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+        style={{ backgroundImage: `url(${bgImage})` }}
       />
 
       {/* Glass Sidebar */}
