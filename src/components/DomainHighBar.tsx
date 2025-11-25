@@ -34,6 +34,15 @@ export const DomainHighBar = ({ currentDomain, isPerformancePage = false }: Doma
   return (
     <>
       <div className="flex items-center justify-center gap-8 mb-8">
+        <button
+          onClick={() => navigate('/domaines')}
+          className="flex items-center gap-2 text-white/60 hover:text-white transition-all hover:scale-105"
+          title="Vers domaines"
+        >
+          <span className="text-sm font-medium">domaines</span>
+          <ChevronRight className="w-5 h-5" />
+        </button>
+
         <div className="flex items-center gap-3 backdrop-blur-3xl bg-white/[0.02] border border-white/[0.18] rounded-full px-6 py-3 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
           {isLoading ? (
             <div className="w-40 h-10 animate-pulse bg-white/[0.05] rounded-full" />
@@ -75,9 +84,10 @@ export const DomainHighBar = ({ currentDomain, isPerformancePage = false }: Doma
 
         <button
           onClick={() => navigate(`/domaines/${currentDomain}/categories/principale`)}
-          className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
+          className="flex items-center gap-2 text-white/60 hover:text-white transition-all hover:scale-105"
           title="Vers catégories"
         >
+          <span className="text-sm font-medium">catégorie</span>
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
