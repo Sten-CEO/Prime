@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Trash2 } from "lucide-react";
+import { useDomainColors } from "@/hooks/useDomainColors";
 
 interface InsightCardProps {
   id: string;
@@ -14,10 +15,14 @@ interface InsightCardProps {
 }
 
 export const InsightCard = ({ id, text, date, highlightColor, category = "Business", domain_id, onDelete }: InsightCardProps) => {
-  const highlightColors = {
-    pink: "bg-aura-pink/20 border-aura-pink/40 shadow-[0_0_20px_rgba(244,114,182,0.4)]",
-    purple: "bg-aura-purple/20 border-aura-purple/40 shadow-[0_0_20px_rgba(168,85,247,0.4)]",
-    blue: "bg-aura-cyan/20 border-aura-cyan/40 shadow-[0_0_20px_rgba(34,211,238,0.4)]",
+  const { getDomainColor } = useDomainColors();
+  const domainHslColor = getDomainColor(domain_id);
+  
+  // Utilise la couleur personnalisée du domaine avec des opacités appropriées
+  const highlightStyle = {
+    backgroundColor: `hsl(${domainHslColor} / 0.2)`,
+    borderColor: `hsl(${domainHslColor} / 0.4)`,
+    boxShadow: `0 0 20px hsl(${domainHslColor} / 0.4)`,
   };
 
   return (
@@ -25,7 +30,10 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
       <DialogTrigger asChild>
         <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-4 hover:bg-white/[0.03] hover:border-white/[0.25] transition-all relative overflow-hidden shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] cursor-pointer">
           <div className="space-y-2">
-            <p className={`text-sm text-white px-2 py-1 rounded-lg border backdrop-blur-lg shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] ${highlightColors[highlightColor]}`}>
+            <p 
+              className="text-sm text-white px-2 py-1 rounded-lg border backdrop-blur-lg shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]"
+              style={highlightStyle}
+            >
               {text}
             </p>
             <div className="flex items-center justify-between">
@@ -40,7 +48,10 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
           <DialogTitle className="text-white">Insight complet</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className={`p-4 rounded-lg border ${highlightColors[highlightColor]}`}>
+          <div 
+            className="p-4 rounded-lg border"
+            style={highlightStyle}
+          >
             <p className="text-white">{text}</p>
           </div>
           <div className="space-y-2">
