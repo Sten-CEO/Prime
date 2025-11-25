@@ -11,7 +11,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { OverviewCard } from "@/components/OverviewCard";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 const initialOverviewItems = [
   { name: "Business", icon: Briefcase, score: 85, trend: "+12%" },
@@ -27,15 +31,14 @@ const targets = [
   { id: 4, title: "Lire 12 livres cette année", progress: 30, deadline: "31 Déc 2025", status: "delayed" as const, completed: false },
 ];
 
-const allInsights = [
-  { text: "La régularité est la clé du succès à long terme", date: "24 Nov", highlightColor: "purple" as const, category: "Business" },
-  { text: "Excellente synergie entre sport et productivité", date: "23 Nov", highlightColor: "blue" as const, category: "Sport" },
-  { text: "Besoin de plus de temps pour les relations sociales", date: "22 Nov", highlightColor: "pink" as const, category: "Social" },
-  { text: "Les matinées sont mes moments les plus productifs", date: "21 Nov", highlightColor: "purple" as const, category: "Business" },
-  { text: "La méditation améliore ma concentration", date: "20 Nov", highlightColor: "blue" as const, category: "Santé" },
-  { text: "Importance de l'équilibre vie pro/perso", date: "19 Nov", highlightColor: "pink" as const, category: "Social" },
-  { text: "Mes performances sportives s'améliorent", date: "18 Nov", highlightColor: "blue" as const, category: "Sport" },
-];
+interface Insight {
+  id: string;
+  text: string;
+  date: string;
+  highlightColor: "pink" | "purple" | "blue";
+  category: string;
+  domain_id: string;
+}
 
 const Accueil = () => {
   const navigate = useNavigate();
@@ -44,10 +47,86 @@ const Accueil = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [overviewItems, setOverviewItems] = useState(initialOverviewItems);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [insights, setInsights] = useState(allInsights);
+  const [insights, setInsights] = useState<Insight[]>([]);
+  const [loading, setLoading] = useState(true);
   const [primeTargets, setPrimeTargets] = useState(targets);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const itemsPerPage = 5;
+
+  const getDomainLabel = (domainId: string) => {
+    const domains: Record<string, string> = {
+      general: "Général",
+      business: "Business",
+      sport: "Sport",
+      social: "Social",
+      sante: "Santé",
+      developpement: "Développement",
+      finance: "Finance",
+    };
+    return domains[domainId] || domainId;
+  };
+
+  const getDomainColor = (domainId: string): "pink" | "purple" | "blue" => {
+    const colors: Record<string, "pink" | "purple" | "blue"> = {
+      business: "purple",
+      sport: "blue",
+      social: "pink",
+      sante: "blue",
+      developpement: "purple",
+      finance: "purple",
+      general: "blue",
+    };
+    return colors[domainId] || "blue";
+  };
+
+  const fetchInsights = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Non authentifié",
+          description: "Vous devez être connecté",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("insights")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("hidden_from_home", false)
+        .order("insight_date", { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      const formattedInsights: Insight[] = (data || []).map(insight => ({
+        id: insight.id,
+        text: insight.phrase,
+        date: format(new Date(insight.insight_date), "d MMM", { locale: fr }),
+        highlightColor: getDomainColor(insight.domain_id),
+        category: getDomainLabel(insight.domain_id),
+        domain_id: insight.domain_id,
+      }));
+
+      setInsights(formattedInsights);
+    } catch (error) {
+      console.error("Error fetching insights:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les insights",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInsights();
+  }, []);
 
   const handleToggleFavorite = (name: string) => {
     setFavorites(prev => 
@@ -59,8 +138,29 @@ const Accueil = () => {
     setOverviewItems(newOrder);
   };
 
-  const handleDeleteInsight = (index: number) => {
-    setInsights(prev => prev.filter((_, i) => i !== index));
+  const handleDeleteInsight = async (insightId: string) => {
+    try {
+      const { error } = await supabase
+        .from("insights")
+        .update({ hidden_from_home: true })
+        .eq("id", insightId);
+
+      if (error) throw error;
+
+      setInsights(prev => prev.filter(insight => insight.id !== insightId));
+
+      toast({
+        title: "Insight masqué",
+        description: "L'insight a été retiré de l'accueil mais reste dans votre entrée de journal",
+      });
+    } catch (error) {
+      console.error("Error hiding insight:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de masquer l'insight",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDragStart = (index: number) => {
@@ -234,18 +334,23 @@ const Accueil = () => {
 
               <ScrollArea className="h-[500px] pr-4">
                 <div className="space-y-3">
-                  {paginatedInsights.map((insight, index) => {
-                    const originalIndex = insights.findIndex(i => 
-                      i.text === insight.text && i.date === insight.date
-                    );
-                    return (
+                  {loading ? (
+                    <div className="text-center text-white/60 py-12">
+                      Chargement des insights...
+                    </div>
+                  ) : paginatedInsights.length === 0 ? (
+                    <div className="text-center text-white/60 py-12">
+                      Aucun insight pour le moment. Créez des entrées de journal avec des insights pour les voir ici.
+                    </div>
+                  ) : (
+                    paginatedInsights.map((insight) => (
                       <InsightCard 
-                        key={originalIndex} 
+                        key={insight.id} 
                         {...insight} 
-                        onDelete={() => handleDeleteInsight(originalIndex)}
+                        onDelete={() => handleDeleteInsight(insight.id)}
                       />
-                    );
-                  })}
+                    ))
+                  )}
                 </div>
               </ScrollArea>
 
