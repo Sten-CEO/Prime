@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Briefcase, Dumbbell, Users, Heart, GraduationCap, DollarSign, Target, Book, Music, Palette, Code, Coffee, Star, Zap } from "lucide-react";
+import { ChevronLeft, Briefcase, Dumbbell, Users, Heart, GraduationCap, DollarSign, Target, Book, Music, Palette, Code, Coffee, Star, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDomains } from "@/hooks/useDomains";
 
@@ -67,13 +67,6 @@ export const CategoryHighBar = ({ currentDomain, currentCategory }: CategoryHigh
           title="Vers domaine"
         >
           <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => navigate(`/domaines/${currentDomain}/categories/${currentCategory}`)}
-          className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white transition-all hover:scale-110"
-          title="Rester sur catégorie"
-        >
-          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
     </div>
