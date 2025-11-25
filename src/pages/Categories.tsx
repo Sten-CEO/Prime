@@ -192,7 +192,7 @@ const Categories = () => {
       // Renommer
       setCategoriesData(prev => ({
         ...prev,
-        [slug]: prev[slug].map(c =>
+        [slug]: (prev[slug] || []).map(c =>
           c.id === editingCategory.id ? { ...c, name, color } : c
         ),
       }));
@@ -210,7 +210,7 @@ const Categories = () => {
       };
       setCategoriesData(prev => ({
         ...prev,
-        [slug]: [...prev[slug], newCategory],
+        [slug]: [...(prev[slug] || []), newCategory],
       }));
       setActiveCategory(newCategory.id);
       toast({ title: "Catégorie créée", description: `"${name}" a été ajoutée avec succès.` });
@@ -218,7 +218,7 @@ const Categories = () => {
   };
 
   const handleDeleteCategory = (categoryId: string) => {
-    if (currentDomainCategories.length === 1) {
+    if (currentDomainCategories.length <= 1) {
       toast({ 
         title: "Impossible de supprimer", 
         description: "Il doit rester au moins une catégorie.",
@@ -229,7 +229,7 @@ const Categories = () => {
 
     setCategoriesData(prev => ({
       ...prev,
-      [slug]: prev[slug].filter(c => c.id !== categoryId),
+      [slug]: (prev[slug] || []).filter(c => c.id !== categoryId),
     }));
 
     if (activeCategory === categoryId) {
@@ -253,7 +253,7 @@ const Categories = () => {
       };
       setCategoriesData(prev => ({
         ...prev,
-        [slug]: [...prev[slug], duplicated],
+        [slug]: [...(prev[slug] || []), duplicated],
       }));
       setActiveCategory(duplicated.id);
       toast({ title: "Catégorie dupliquée", description: `"${duplicated.name}" a été créée.` });
