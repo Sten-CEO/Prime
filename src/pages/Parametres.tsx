@@ -106,8 +106,8 @@ const Parametres = () => {
               {/* Préférences générales */}
               <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-5">
                 <h2 className="text-xl font-semibold text-white flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center">
-                    <Settings className="w-4 h-4 text-white/70" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] flex items-center justify-center border border-white/[0.1] shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+                    <Settings className="w-5 h-5 text-white" />
                   </div>
                   {t.generalPreferences}
                 </h2>
@@ -187,8 +187,8 @@ const Parametres = () => {
               {/* Affichage & expérience */}
               <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-4">
                 <h2 className="text-xl font-semibold text-white flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white/70" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] flex items-center justify-center border border-white/[0.1] shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+                    <Sparkles className="w-5 h-5 text-white" />
                   </div>
                   {t.displayExperience}
                 </h2>
@@ -196,8 +196,8 @@ const Parametres = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between py-3 border-b border-white/[0.05]">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-primary/70" />
+                      <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                        <Sparkles className="w-4 h-4 text-white/80" />
                       </div>
                       <div>
                         <p className="text-white text-sm font-medium">{t.visualAnimations}</p>
@@ -209,8 +209,8 @@ const Parametres = () => {
 
                   <div className="flex items-center justify-between py-3 border-b border-white/[0.05]">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
-                        <TrendingUp className="w-4 h-4 text-primary/70" />
+                      <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                        <TrendingUp className="w-4 h-4 text-white/80" />
                       </div>
                       <div>
                         <p className="text-white text-sm font-medium">{t.showEmptyDays}</p>
@@ -222,8 +222,8 @@ const Parametres = () => {
 
                   <div className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
-                        <Focus className="w-4 h-4 text-primary/70" />
+                      <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                        <Focus className="w-4 h-4 text-white/80" />
                       </div>
                       <div>
                         <p className="text-white text-sm font-medium">{t.focusMode}</p>
@@ -240,8 +240,8 @@ const Parametres = () => {
             <div className="space-y-6">
               <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] space-y-4">
                 <h2 className="text-xl font-semibold text-white flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center">
-                    <Bell className="w-4 h-4 text-white/70" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] flex items-center justify-center border border-white/[0.1] shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+                    <Bell className="w-5 h-5 text-white" />
                   </div>
                   {t.remindersNotifications}
                 </h2>
@@ -250,8 +250,8 @@ const Parametres = () => {
                   <div className="backdrop-blur-xl bg-white/[0.01] border border-white/[0.05] rounded-xl p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
-                          <Bell className="w-4 h-4 text-primary/70" />
+                        <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                          <Bell className="w-4 h-4 text-white/80" />
                         </div>
                         <div>
                           <p className="text-white text-sm font-medium">{t.dailyReminder}</p>
@@ -279,8 +279,8 @@ const Parametres = () => {
                   <div className="backdrop-blur-xl bg-white/[0.01] border border-white/[0.05] rounded-xl p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
-                          <Calendar className="w-4 h-4 text-primary/70" />
+                        <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                          <Calendar className="w-4 h-4 text-white/80" />
                         </div>
                         <div>
                           <p className="text-white text-sm font-medium">{t.weeklyReport}</p>
@@ -294,8 +294,8 @@ const Parametres = () => {
                   <div className="backdrop-blur-xl bg-white/[0.01] border border-white/[0.05] rounded-xl p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center">
-                          <Crosshair className="w-4 h-4 text-primary/70" />
+                        <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+                          <Crosshair className="w-4 h-4 text-white/80" />
                         </div>
                         <div>
                           <p className="text-white text-sm font-medium">{t.targetAlerts}</p>
