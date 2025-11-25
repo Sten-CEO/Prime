@@ -283,6 +283,7 @@ const Domaines = () => {
           <div className="grid grid-cols-[1fr_auto] gap-8">
             <DomainScoreChart
               domainName={domain.name}
+              domainSlug={slug || "business"}
               score={domain.score}
               variation={domain.variation}
               categories={domain.categories}
