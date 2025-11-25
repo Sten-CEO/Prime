@@ -13,6 +13,9 @@ export interface Metric {
   default_impact_simple: number;
   default_impact_advanced: number;
   default_impact_exceptional: number;
+  impact_weight: number | null;
+  scheduled_days: string[] | null;
+  difficulty_level: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -51,6 +54,8 @@ export const useMetrics = (categoryId?: string) => {
       icon?: string; 
       category_id: string;
       domain_id: string;
+      impact_weight?: number;
+      scheduled_days?: string[];
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
@@ -64,6 +69,8 @@ export const useMetrics = (categoryId?: string) => {
           default_impact_simple: 20,
           default_impact_advanced: 50,
           default_impact_exceptional: 80,
+          impact_weight: metric.impact_weight || 1,
+          scheduled_days: metric.scheduled_days || [],
         })
         .select()
         .single();
@@ -93,6 +100,10 @@ export const useMetrics = (categoryId?: string) => {
       name?: string; 
       icon?: string;
       is_active?: boolean;
+      impact_weight?: number;
+      scheduled_days?: string[];
+      category_id?: string;
+      domain_id?: string;
     }) => {
       const { id, ...updates } = metric;
       const { data, error } = await supabase
