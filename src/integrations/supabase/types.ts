@@ -14,6 +14,151 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          domain_id: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          domain_id: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          domain_id?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_domain_id_fkey"
+            columns: ["domain_id"]
+            isOneToOne: false
+            referencedRelation: "domains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      domains: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      free_performance_records: {
+        Row: {
+          created_at: string
+          free_performance_id: string
+          id: string
+          impact_value: number
+          recorded_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          free_performance_id: string
+          id?: string
+          impact_value: number
+          recorded_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          free_performance_id?: string
+          id?: string
+          impact_value?: number
+          recorded_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "free_performance_records_free_performance_id_fkey"
+            columns: ["free_performance_id"]
+            isOneToOne: false
+            referencedRelation: "free_performances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      free_performances: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          domain_id: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          domain_id: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          domain_id?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "free_performances_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "free_performances_domain_id_fkey"
+            columns: ["domain_id"]
+            isOneToOne: false
+            referencedRelation: "domains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insights: {
         Row: {
           category_id: string | null
@@ -93,6 +238,104 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      metric_records: {
+        Row: {
+          created_at: string
+          custom_impact: number | null
+          id: string
+          metric_id: string
+          performance_level: string
+          recorded_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_impact?: number | null
+          id?: string
+          metric_id: string
+          performance_level: string
+          recorded_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_impact?: number | null
+          id?: string
+          metric_id?: string
+          performance_level?: string
+          recorded_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metric_records_metric_id_fkey"
+            columns: ["metric_id"]
+            isOneToOne: false
+            referencedRelation: "metrics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metrics: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          default_impact_advanced: number
+          default_impact_exceptional: number
+          default_impact_simple: number
+          domain_id: string
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          default_impact_advanced?: number
+          default_impact_exceptional?: number
+          default_impact_simple?: number
+          domain_id: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          default_impact_advanced?: number
+          default_impact_exceptional?: number
+          default_impact_simple?: number
+          domain_id?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metrics_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metrics_domain_id_fkey"
+            columns: ["domain_id"]
+            isOneToOne: false
+            referencedRelation: "domains"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quick_notes: {
         Row: {
