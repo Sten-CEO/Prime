@@ -14,6 +14,7 @@ const DEFAULT_COLORS: Record<string, string> = {
   sport: '142 90% 55%',
   social: '330 100% 70%',
   sante: '0 100% 65%',
+  general: '0 0% 100%', // Blanc pour le domaine Général
 };
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -21,6 +22,7 @@ const DOMAIN_LABELS: Record<string, string> = {
   sport: 'Sport',
   social: 'Social',
   sante: 'Santé',
+  general: 'Général',
 };
 
 export const COLOR_PALETTE = [
