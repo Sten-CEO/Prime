@@ -153,15 +153,6 @@ const Domaines = () => {
             </button>
           </div>
 
-          {/* Performances + Metrics */}
-          <div className="grid grid-cols-2 gap-8 mb-8">
-            <DomainMetrics domainName={domain.name} domainSlug={slug || ""} />
-            <DomainPerformances
-              domainName={domain.name}
-              performances={[]}
-            />
-          </div>
-
           {/* Objectives */}
           <div className="mb-8">
             <DomainObjectives 

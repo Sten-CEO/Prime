@@ -236,10 +236,13 @@ const Categories = () => {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <CategoryPerformances 
-                  categoryName={activeCategoryData.name}
-                  performances={[]}
+                  categoryId={activeCategoryData.id}
+                  domainId={domainIdData || ""}
                 />
-                <CategoryMetrics metrics={[]} />
+                <CategoryMetrics 
+                  categoryId={activeCategoryData.id}
+                  domainId={domainIdData || ""}
+                />
               </div>
 
               <CategoryManualNote categoryName={activeCategoryData.name} />
