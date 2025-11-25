@@ -90,6 +90,10 @@ export const AddEntryModal = ({
   const handleConfirmInsight = () => {
     if (selectedText && !tempInsights.includes(selectedText)) {
       setTempInsights(prev => [...prev, selectedText]);
+      toast({
+        title: "Insight ajouté",
+        description: "Le texte a été ajouté aux insights",
+      });
     }
     setSelectedText("");
     window.getSelection()?.removeAllRanges();
@@ -252,16 +256,15 @@ export const AddEntryModal = ({
                 type="button"
                 id="insight-button"
                 onClick={() => setInsightMode(!insightMode)}
-                className={`group flex items-center gap-2 text-xs px-4 py-2.5 rounded-xl transition-all font-medium ${
+                className={`group flex items-center justify-center w-9 h-9 rounded-lg transition-all ${
                   insightMode 
-                    ? 'backdrop-blur-xl bg-white/[0.12] text-white border border-white/[0.15] shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_24px_rgba(255,255,255,0.25)]' 
-                    : 'backdrop-blur-xl bg-white/[0.03] text-white/60 border border-white/[0.08] hover:bg-white/[0.05] hover:text-white/80 hover:border-white/[0.12]'
+                    ? 'backdrop-blur-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_24px_rgba(255,255,255,0.25)]' 
+                    : 'backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.05] hover:border-white/[0.12]'
                 }`}
               >
-                <Sparkles className={`w-3.5 h-3.5 transition-all ${
+                <Sparkles className={`w-4 h-4 transition-all ${
                   insightMode ? 'text-white' : 'text-white/50 group-hover:text-white/70'
                 }`} />
-                Insight
               </button>
             </div>
             <Textarea
