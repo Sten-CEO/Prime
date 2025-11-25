@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Home, Award, BookOpen, Target, User, Settings, Plus, TrendingUp, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Home, Award, BookOpen, Target, User, Settings, Plus, TrendingUp, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
 import { PrimeTargetCard } from "@/components/targets/PrimeTargetCard";
 import { CreateTargetModal } from "@/components/targets/CreateTargetModal";
 import { TargetDetailPanel } from "@/components/targets/TargetDetailPanel";
 import bgImage from "@/assets/black-shapes-bg.jpg";
+import { useObjectives } from "@/hooks/useObjectives";
+import { useDomains } from "@/hooks/useDomains";
 
 interface PrimeTarget {
   id: string;
@@ -27,7 +29,9 @@ interface PrimeTarget {
 const PrimeTargets = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [targets, setTargets] = useState<PrimeTarget[]>([]);
+  const { objectives, isLoading, updateObjective, deleteObjective } = useObjectives();
+  const { domains } = useDomains();
+  
   const [selectedTarget, setSelectedTarget] = useState<PrimeTarget | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTarget, setEditingTarget] = useState<PrimeTarget | null>(null);
@@ -37,6 +41,26 @@ const PrimeTargets = () => {
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPeriod, setFilterPeriod] = useState("all");
+
+  // Convert Supabase objectives to PrimeTarget format
+  const targets: PrimeTarget[] = objectives.map(obj => {
+    const domain = domains.find(d => d.id === obj.domain_id);
+    return {
+      id: obj.id,
+      title: obj.title,
+      description: obj.description || "",
+      domain: domain?.slug || "",
+      category: obj.category_id || undefined,
+      startDate: obj.start_date,
+      deadline: obj.deadline,
+      progress: obj.progress,
+      importance: obj.importance,
+      status: obj.status as any,
+      showOnHome: obj.show_on_home,
+      completedAt: obj.completed_at || undefined,
+      archivedAt: obj.archived_at || undefined,
+    };
+  });
 
   // Stats
   const activeTargets = targets.filter(t => !["completed", "archived"].includes(t.status));
@@ -50,141 +74,72 @@ const PrimeTargets = () => {
     ? Math.round((targets.filter(t => t.status === "completed").length / targets.length) * 100)
     : 0;
 
-  // Données de démo
+  // Open target from URL parameter
   useEffect(() => {
-    const demoTargets: PrimeTarget[] = [
-      {
-        id: "1",
-        title: "Lancer mon entreprise SaaS",
-        description: "Développer et lancer la première version de mon SaaS",
-        domain: "business",
-        category: "Entrepreneuriat",
-        startDate: "2025-11-01",
-        deadline: "2025-12-31",
-        progress: 65,
-        importance: "crucial",
-        status: "on-track",
-        showOnHome: true,
-      },
-      {
-        id: "2",
-        title: "Courir un semi-marathon",
-        description: "Participer au semi-marathon de Paris",
-        domain: "sport",
-        startDate: "2025-11-15",
-        deadline: "2025-11-30",
-        progress: 40,
-        importance: "normal",
-        status: "at-risk",
-        showOnHome: true,
-      },
-      {
-        id: "3",
-        title: "Terminer la formation en développement",
-        description: "Compléter le bootcamp de développement web",
-        domain: "developpement",
-        startDate: "2025-10-01",
-        deadline: "2025-11-20",
-        progress: 85,
-        importance: "crucial",
-        status: "late",
-        showOnHome: false,
-      },
-      {
-        id: "4",
-        title: "Économiser 10 000€",
-        description: "Atteindre l'objectif d'épargne pour l'investissement",
-        domain: "finance",
-        startDate: "2025-09-01",
-        deadline: "2025-12-31",
-        progress: 100,
-        importance: "crucial",
-        status: "completed",
-        showOnHome: true,
-        completedAt: "2025-11-20",
-      },
-      {
-        id: "5",
-        title: "Organiser un dîner avec 10 amis",
-        description: "Réunir tous mes amis pour un grand dîner",
-        domain: "social",
-        startDate: "2025-10-01",
-        deadline: "2025-10-15",
-        progress: 50,
-        importance: "low",
-        status: "archived",
-        showOnHome: false,
-        archivedAt: "2025-10-20",
-      },
-    ];
-    setTargets(demoTargets);
-
-    // Si un ID d'objectif est passé en paramètre, l'ouvrir
     const targetId = searchParams.get("target");
     if (targetId) {
-      const target = demoTargets.find(t => t.id === targetId);
+      const target = targets.find(t => t.id === targetId);
       if (target) setSelectedTarget(target);
     }
-  }, [searchParams]);
+  }, [searchParams, targets]);
 
-  const handleCreateTarget = (target: Omit<PrimeTarget, "id" | "status">) => {
-    const newTarget: PrimeTarget = {
-      ...target,
-      id: Date.now().toString(),
-      status: target.progress === 100 ? "completed" : "on-track",
-    };
-    setTargets([...targets, newTarget]);
+  const handleCreateTarget = (target: Omit<PrimeTarget, "id" | "status"> | PrimeTarget) => {
     setShowCreateModal(false);
   };
 
   const handleUpdateTarget = (updatedTarget: PrimeTarget) => {
-    setTargets(targets.map(t => t.id === updatedTarget.id ? updatedTarget : t));
+    const domainForUpdate = domains.find(d => d.slug === updatedTarget.domain);
+    if (!domainForUpdate) return;
+
+    updateObjective({
+      id: updatedTarget.id,
+      title: updatedTarget.title,
+      description: updatedTarget.description,
+      domain_id: domainForUpdate.id,
+      start_date: updatedTarget.startDate,
+      deadline: updatedTarget.deadline,
+      progress: updatedTarget.progress,
+      importance: updatedTarget.importance,
+      status: updatedTarget.status as any,
+      show_on_home: updatedTarget.showOnHome,
+    });
     setSelectedTarget(updatedTarget);
   };
 
   const handleMarkComplete = (targetId: string) => {
+    updateObjective({
+      id: targetId,
+      progress: 100,
+      status: "completed",
+      completed_at: new Date().toISOString(),
+    });
     const target = targets.find(t => t.id === targetId);
-    if (target) {
-      const updated = {
-        ...target,
-        progress: 100,
-        status: "completed" as const,
-        completedAt: new Date().toISOString(),
-      };
-      setTargets(targets.map(t => t.id === targetId ? updated : t));
-      if (selectedTarget?.id === targetId) setSelectedTarget(updated);
+    if (target && selectedTarget?.id === targetId) {
+      setSelectedTarget({ ...target, progress: 100, status: "completed" });
     }
   };
 
   const handleArchive = (targetId: string) => {
-    const target = targets.find(t => t.id === targetId);
-    if (target) {
-      const updated = {
-        ...target,
-        status: "archived" as const,
-        archivedAt: new Date().toISOString(),
-      };
-      setTargets(targets.map(t => t.id === targetId ? updated : t));
-      if (selectedTarget?.id === targetId) setSelectedTarget(updated);
+    updateObjective({
+      id: targetId,
+      status: "archived",
+      archived_at: new Date().toISOString(),
+    });
+    if (selectedTarget?.id === targetId) {
+      setSelectedTarget(null);
     }
   };
 
   const handleDelete = (targetId: string) => {
-    setTargets(targets.filter(t => t.id !== targetId));
-    if (selectedTarget?.id === targetId) setSelectedTarget(null);
+    deleteObjective(targetId);
+    if (selectedTarget?.id === targetId) {
+      setSelectedTarget(null);
+    }
   };
 
-  const getDomainLabel = (domainId: string) => {
-    const domains: Record<string, string> = {
-      general: "Général",
-      business: "Business",
-      sport: "Sport",
-      social: "Social",
-      sante: "Santé",
-      developpement: "Développement",
-      finance: "Finance",
-    };
-    return domains[domainId] || domainId;
+  const getDomainLabel = (domainSlug: string) => {
+    const domain = domains.find(d => d.slug === domainSlug);
+    return domain?.name || domainSlug;
   };
 
   // Filtrer les objectifs
@@ -202,6 +157,20 @@ const PrimeTargets = () => {
   const late = activeFiltered.filter(t => t.status === "late");
   const completed = filteredTargets.filter(t => t.status === "completed");
   const archived = filteredTargets.filter(t => t.status === "archived");
+
+  if (isLoading) {
+    return (
+      <div className="relative min-h-screen w-full bg-black">
+        <div 
+          className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+          style={{ backgroundImage: `url(${bgImage})` }}
+        />
+        <div className="relative z-10 ml-32 min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-white/40" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen w-full bg-black">
@@ -313,12 +282,11 @@ const PrimeTargets = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-black/90 border-white/[0.1]">
                   <SelectItem value="all" className="text-white">Tous les domaines</SelectItem>
-                  <SelectItem value="business" className="text-white">Business</SelectItem>
-                  <SelectItem value="sport" className="text-white">Sport</SelectItem>
-                  <SelectItem value="social" className="text-white">Social</SelectItem>
-                  <SelectItem value="sante" className="text-white">Santé</SelectItem>
-                  <SelectItem value="developpement" className="text-white">Développement</SelectItem>
-                  <SelectItem value="finance" className="text-white">Finance</SelectItem>
+                  {domains.map(domain => (
+                    <SelectItem key={domain.id} value={domain.slug} className="text-white">
+                      {domain.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
