@@ -30,9 +30,7 @@ export const InsightCard = ({ id, text, date, insight_date, highlightColor, cate
     const year = parsedDate.getFullYear();
     const month = parsedDate.getMonth() + 1; // +1 because getMonth() returns 0-11
     
-    if (domain_id === 'general') {
-      return '/journal';
-    }
+    // Tous les domaines, y compris 'general', utilisent le même format d'URL
     return `/journal/${domain_id}/${year}/${month}`;
   };
   
