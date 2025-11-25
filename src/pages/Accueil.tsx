@@ -1,5 +1,5 @@
 import bgImage from "@/assets/black-shapes-bg.jpg";
-import { Home, Award, BookOpen, Target, User, Settings, Briefcase, Dumbbell, Users, Heart } from "lucide-react";
+import { Home, Award, BookOpen, Target, User, Settings } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PrimeTargetCard } from "@/components/PrimeTargetCard";
@@ -16,13 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-
-const initialOverviewItems = [
-  { name: "Business", icon: Briefcase, score: 85, trend: "+12%" },
-  { name: "Sport", icon: Dumbbell, score: 78, trend: "+8%" },
-  { name: "Social", icon: Users, score: 69, trend: "-3%" },
-  { name: "Santé", icon: Heart, score: 92, trend: "+15%" },
-];
+import { useOverviewData } from "@/hooks/useOverviewData";
 
 const targets = [
   { id: 1, title: "Lancer le nouveau produit", progress: 75, deadline: "30 Nov 2025", status: "in-progress" as const, completed: false },
@@ -47,7 +41,7 @@ const Accueil = () => {
   const location = useLocation();
   const [insightFilter, setInsightFilter] = useState<string>("Tous");
   const [currentPage, setCurrentPage] = useState(1);
-  const [overviewItems, setOverviewItems] = useState(initialOverviewItems);
+  const { data: overviewItems = [], isLoading: isLoadingOverview } = useOverviewData();
   const [favorites, setFavorites] = useState<string[]>([]);
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,8 +119,9 @@ const Accueil = () => {
     );
   };
 
-  const handleReorderItems = (newOrder: typeof initialOverviewItems) => {
-    setOverviewItems(newOrder);
+  const handleReorderItems = () => {
+    // Reorder functionality disabled when using real-time data
+    // Items are ordered by domain configuration
   };
 
   const handleDeleteInsight = async (insightId: string) => {
