@@ -1,14 +1,22 @@
-import { ChevronLeft, ChevronRight, Briefcase, Dumbbell, Users, Heart, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Briefcase, Dumbbell, Users, Heart, GraduationCap, DollarSign, Target, Book, Music, Palette, Code, Coffee, Star, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDomains } from "@/hooks/useDomains";
-import * as LucideIcons from "lucide-react";
 
 const ICON_MAP: Record<string, any> = {
-  briefcase: Briefcase,
-  dumbbell: Dumbbell,
-  users: Users,
-  heart: Heart,
-  sparkles: Sparkles,
+  "briefcase": Briefcase,
+  "dumbbell": Dumbbell,
+  "users": Users,
+  "heart": Heart,
+  "graduation-cap": GraduationCap,
+  "dollar-sign": DollarSign,
+  "target": Target,
+  "book": Book,
+  "music": Music,
+  "palette": Palette,
+  "code": Code,
+  "coffee": Coffee,
+  "star": Star,
+  "zap": Zap,
 };
 
 interface CategoryHighBarProps {
@@ -20,11 +28,6 @@ export const CategoryHighBar = ({ currentDomain, currentCategory }: CategoryHigh
   const navigate = useNavigate();
   const { domains, isLoading } = useDomains();
 
-  const getDomainIcon = (iconName?: string) => {
-    if (!iconName) return Sparkles;
-    const icon = ICON_MAP[iconName.toLowerCase()] || (LucideIcons as any)[iconName];
-    return icon || Sparkles;
-  };
 
   if (isLoading) {
     return <div className="h-16" />;
@@ -34,7 +37,7 @@ export const CategoryHighBar = ({ currentDomain, currentCategory }: CategoryHigh
     <div className="flex items-center justify-center gap-8 mb-8">
       <div className="flex items-center gap-3 backdrop-blur-3xl bg-white/[0.02] border border-white/[0.18] rounded-full px-6 py-3 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)]">
         {domains.map((domain) => {
-          const Icon = getDomainIcon(domain.icon || undefined);
+          const Icon = ICON_MAP[domain.icon || "briefcase"] || Briefcase;
           const isActive = currentDomain === domain.slug;
           return (
             <button
