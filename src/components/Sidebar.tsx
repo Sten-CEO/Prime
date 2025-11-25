@@ -1,28 +1,38 @@
 import { Home, Award, BookOpen, Target, User, Settings, LayoutGrid, List, Gauge } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState } from "react";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAttributMenuOpen, setIsAttributMenuOpen] = useState(false);
+
+  // Extraire le slug du domaine depuis l'URL actuelle, sinon utiliser "business" par défaut
+  const getCurrentDomainSlug = () => {
+    const path = location.pathname;
+    const domainMatch = path.match(/\/(domaines|categories)\/([^\/]+)/);
+    return domainMatch ? domainMatch[2] : "business";
+  };
+
+  const currentDomain = getCurrentDomainSlug();
 
   const attributMenuItems = [
     { 
       icon: LayoutGrid, 
       label: "Domaines", 
-      onClick: () => navigate("/domaines/business") 
+      onClick: () => navigate(`/domaines/${currentDomain}`) 
     },
     { 
       icon: List, 
       label: "Catégories", 
-      onClick: () => navigate("/categories/business") 
+      onClick: () => navigate(`/categories/${currentDomain}`) 
     },
     { 
       icon: Gauge, 
       label: "Performances", 
-      onClick: () => navigate("/domaines/business/performances") 
+      onClick: () => navigate(`/domaines/${currentDomain}/performances`) 
     },
   ];
 
@@ -49,7 +59,7 @@ export const Sidebar = () => {
           <Popover open={isAttributMenuOpen} onOpenChange={setIsAttributMenuOpen}>
             <PopoverTrigger asChild>
               <button 
-                onClick={() => navigate("/domaines/business")}
+                onClick={() => navigate(`/domaines/${currentDomain}`)}
                 onMouseEnter={() => setIsAttributMenuOpen(true)}
                 onMouseLeave={() => setIsAttributMenuOpen(false)}
                 className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
