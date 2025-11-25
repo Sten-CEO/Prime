@@ -68,7 +68,7 @@ export const MultiDomainChart = () => {
           {payload.map((entry: any) => (
             <div key={entry.name} className="flex items-center justify-between gap-3 text-xs">
               <span className="text-white/70">{entry.name}</span>
-              <span className="text-white font-semibold">{entry.value}/100</span>
+              <span className="text-white font-semibold">{entry.value}</span>
               <span className="text-success text-xs">+5</span>
             </div>
           ))}
