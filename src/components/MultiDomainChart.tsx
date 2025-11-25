@@ -277,8 +277,8 @@ export const MultiDomainChart = () => {
                     stroke={strokeColor}
                     strokeWidth={2.5}
                     opacity={opacity}
-                    dot={{ fill: strokeColor, r: 4, filter: `drop-shadow(0 0 4px ${strokeColor})` }}
-                    activeDot={{ r: 6 }}
+                    dot={{ fill: strokeColor, r: 2, filter: `drop-shadow(0 0 4px ${strokeColor})` }}
+                    activeDot={{ r: 4 }}
                   />
                 );
               })}
