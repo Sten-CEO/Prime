@@ -57,6 +57,12 @@ export const CreateDomainModal = ({ open, onOpenChange }: CreateDomainModalProps
 
     const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
     
+    // Ensure slug is not empty
+    if (!slug) {
+      console.error("Cannot create domain: slug is empty after sanitization");
+      return;
+    }
+    
     createDomain({
       name: name.trim(),
       slug,

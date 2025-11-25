@@ -459,7 +459,7 @@ export const AddEntryModal = ({
                       Chargement...
                     </SelectItem>
                   ) : (
-                    dbDomains.map((d) => (
+                    dbDomains.filter(d => d.slug && d.slug.trim()).map((d) => (
                       <SelectItem key={d.id} value={d.slug} className="text-white">
                         {d.name}
                       </SelectItem>
