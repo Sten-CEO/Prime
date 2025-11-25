@@ -5,13 +5,13 @@ interface CategoryStatsBlockProps {
   categoryName: string;
   domainName: string;
   stats: {
-    avgScore7d: number;
-    avgScore30d: number;
-    filledDaysPercent: number;
-    emptyDaysPercent: number;
-    activeMetricsCount: number;
-    metricsCompletionRate: number;
-    performancesRatedCount: number;
+    avgScore7d: number | string;
+    avgScore30d: number | string;
+    filledDaysPercent: number | string;
+    emptyDaysPercent: number | string;
+    activeMetricsCount: number | string;
+    metricsCompletionRate: number | string;
+    performancesRatedCount: number | string;
     trend: "up" | "down" | "stable";
     trendMessage: string;
   };
@@ -70,7 +70,8 @@ export const CategoryStatsBlock = ({ categoryName, domainName, stats }: Category
                 <p className="text-[10px] text-white/60 uppercase tracking-wide">{stat.label}</p>
               </div>
               <p className={`text-xl font-bold ${stat.color}`}>
-                {stat.value}<span className="text-sm text-white/60">{stat.suffix}</span>
+                {typeof stat.value === 'number' ? stat.value : stat.value}
+                {typeof stat.value === 'number' && <span className="text-sm text-white/60">{stat.suffix}</span>}
               </p>
             </div>
           );

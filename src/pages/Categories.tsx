@@ -176,13 +176,13 @@ const Categories = () => {
   const computeStats = () => {
     if (!activeCategoryData) {
       return {
-        avgScore7d: 0,
-        avgScore30d: 0,
-        filledDaysPercent: 0,
-        emptyDaysPercent: 100,
-        activeMetricsCount: 0,
-        metricsCompletionRate: 0,
-        performancesRatedCount: 0,
+        avgScore7d: "-",
+        avgScore30d: "-",
+        filledDaysPercent: "-",
+        emptyDaysPercent: "-",
+        activeMetricsCount: "-",
+        metricsCompletionRate: "-",
+        performancesRatedCount: "-",
         trend: "stable" as const,
         trendMessage: "Aucune donnée disponible",
       };
@@ -191,13 +191,31 @@ const Categories = () => {
     const activeMetricsCount = activeCategoryData.metrics.filter(m => m.enabled).length;
     const performancesRatedCount = activeCategoryData.performances.length;
     
+    // Si aucune donnée n'a été enregistrée, retourner "-"
+    const hasData = activeMetricsCount > 0 || performancesRatedCount > 0;
+    
+    if (!hasData) {
+      return {
+        avgScore7d: "-",
+        avgScore30d: "-",
+        filledDaysPercent: "-",
+        emptyDaysPercent: "-",
+        activeMetricsCount: activeMetricsCount,
+        metricsCompletionRate: "-",
+        performancesRatedCount: performancesRatedCount,
+        trend: "stable" as const,
+        trendMessage: "Aucune donnée enregistrée",
+      };
+    }
+    
+    // TODO: Calculer les vraies statistiques depuis Supabase
     return {
-      avgScore7d: Math.floor(Math.random() * 20 + 75),
-      avgScore30d: Math.floor(Math.random() * 20 + 70),
-      filledDaysPercent: Math.floor(Math.random() * 30 + 65),
-      emptyDaysPercent: Math.floor(Math.random() * 35 + 5),
+      avgScore7d: "-",
+      avgScore30d: "-",
+      filledDaysPercent: "-",
+      emptyDaysPercent: "-",
       activeMetricsCount,
-      metricsCompletionRate: Math.floor(Math.random() * 30 + 65),
+      metricsCompletionRate: "-",
       performancesRatedCount,
       trend: activeCategoryData.variation.startsWith("+") ? "up" as const : activeCategoryData.variation.startsWith("-") ? "down" as const : "stable" as const,
       trendMessage: activeCategoryData.variation.startsWith("+") 
