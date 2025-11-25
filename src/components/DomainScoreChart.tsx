@@ -1,8 +1,11 @@
 import { Card } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useDomainColors } from "@/hooks/useDomainColors";
+import { subDays, subMonths, format as formatDate } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface Category {
   id: string;
@@ -13,6 +16,7 @@ interface Category {
 
 interface DomainScoreChartProps {
   domainName: string;
+  domainSlug: string;
   score: number;
   variation: string;
   categories?: Category[];
@@ -20,59 +24,87 @@ interface DomainScoreChartProps {
 
 const generateMockData = (days: number, categories?: Category[]) => {
   const data = [];
-  const insights = [
-    "Excellente productivité",
-    "Bonne régularité",
-    "Légère baisse d'énergie",
-    "Performance optimale",
-    "Besoin de repos",
-    "Progression constante",
-    "Concentration au top"
-  ];
+  const today = new Date();
   
-  let prevScore = 85;
-  const categoryScores: { [key: string]: number } = {};
-  categories?.forEach(cat => {
-    categoryScores[cat.id] = cat.score;
-  });
-  
-  for (let i = days; i >= 0; i--) {
-    const hasData = Math.random() > 0.2;
-    const scoreValue = hasData ? Math.max(50, Math.min(100, prevScore + (Math.random() - 0.5) * 10)) : null;
-    if (scoreValue) prevScore = scoreValue;
-    
-    const dataPoint: any = {
-      date: `J-${i}`,
-      score: scoreValue,
-      prevScore: hasData ? prevScore : null,
-      hasData,
-      variation: hasData && scoreValue ? `${scoreValue > prevScore ? '+' : ''}${((scoreValue - prevScore) / prevScore * 100).toFixed(1)}%` : null,
-      insight: hasData ? insights[Math.floor(Math.random() * insights.length)] : "Jour non rempli"
-    };
-    
-    // Add category scores
-    categories?.forEach(cat => {
-      const catHasData = Math.random() > 0.2;
-      if (catHasData) {
-        const catScore = Math.max(50, Math.min(100, categoryScores[cat.id] + (Math.random() - 0.5) * 10));
-        categoryScores[cat.id] = catScore;
-        dataPoint[cat.id] = catScore;
-      } else {
-        dataPoint[cat.id] = null;
-      }
-    });
-    
-    data.push(dataPoint);
+  if (days === 365) {
+    // 12 mois: 1 point par mois
+    for (let i = 11; i >= 0; i--) {
+      const date = subMonths(today, i);
+      const monthLabel = formatDate(date, "MMM", { locale: fr });
+      
+      const hasData = Math.random() > 0.2;
+      const scoreValue = hasData ? Math.floor(Math.random() * 30) + 70 : null;
+      
+      const dataPoint: any = {
+        date: monthLabel,
+        score: scoreValue,
+        hasData,
+      };
+      
+      categories?.forEach(cat => {
+        const catHasData = Math.random() > 0.2;
+        dataPoint[cat.id] = catHasData ? Math.floor(Math.random() * 30) + 65 : null;
+      });
+      
+      data.push(dataPoint);
+    }
+  } else if (days === 90) {
+    // 90 jours: 1 point par semaine (13 semaines)
+    for (let i = 12; i >= 0; i--) {
+      const date = subDays(today, i * 7);
+      const weekLabel = `S${13 - i}`;
+      
+      const hasData = Math.random() > 0.2;
+      const scoreValue = hasData ? Math.floor(Math.random() * 30) + 70 : null;
+      
+      const dataPoint: any = {
+        date: weekLabel,
+        score: scoreValue,
+        hasData,
+      };
+      
+      categories?.forEach(cat => {
+        const catHasData = Math.random() > 0.2;
+        dataPoint[cat.id] = catHasData ? Math.floor(Math.random() * 30) + 65 : null;
+      });
+      
+      data.push(dataPoint);
+    }
+  } else {
+    // 7, 14 ou 30 jours: 1 point par jour
+    for (let i = days - 1; i >= 0; i--) {
+      const date = subDays(today, i);
+      const dayLabel = days <= 7 
+        ? formatDate(date, "EEE", { locale: fr }).slice(0, 3)
+        : formatDate(date, "d MMM", { locale: fr });
+      
+      const hasData = Math.random() > 0.2;
+      const scoreValue = hasData ? Math.floor(Math.random() * 30) + 70 : null;
+      
+      const dataPoint: any = {
+        date: dayLabel,
+        score: scoreValue,
+        hasData,
+      };
+      
+      categories?.forEach(cat => {
+        const catHasData = Math.random() > 0.2;
+        dataPoint[cat.id] = catHasData ? Math.floor(Math.random() * 30) + 65 : null;
+      });
+      
+      data.push(dataPoint);
+    }
   }
   
-  const movingAvg = data.map((point, idx) => {
-    const window = data.slice(Math.max(0, idx - 2), idx + 1).filter(p => p.hasData);
-    const avg = window.length > 0 ? window.reduce((sum, p) => sum + (p.score || 0), 0) / window.length : null;
-    return { ...point, movingAvg: avg };
-  });
-  
-  return movingAvg;
+  return data;
 };
+
+const periods = [
+  { label: "7j", value: "7d" },
+  { label: "30j", value: "30d" },
+  { label: "90j", value: "90d" },
+  { label: "12m", value: "12m" },
+];
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -127,17 +159,36 @@ const defaultCategoryColors: { [key: string]: string } = {
   bienetre: "rgba(168, 85, 247, 0.8)",
 };
 
-export const DomainScoreChart = ({ domainName, score, variation, categories = [] }: DomainScoreChartProps) => {
-  const [period, setPeriod] = useState("7j");
+export const DomainScoreChart = ({ domainName, domainSlug, score, variation, categories = [] }: DomainScoreChartProps) => {
+  const { getDomainColor } = useDomainColors();
+  const domainHslColor = getDomainColor(domainSlug);
+  const [selectedPeriod, setSelectedPeriod] = useState("7d");
   const [activeCategories, setActiveCategories] = useState<Record<string, boolean>>(
     categories.reduce((acc, cat) => ({ ...acc, [cat.id]: true }), {})
   );
+  const [compareMode, setCompareMode] = useState(false);
+  const [comparedCategories, setComparedCategories] = useState<string[]>([]);
   
-  const days = period === "7j" ? 7 : period === "14j" ? 14 : period === "30j" ? 30 : period === "90j" ? 90 : 365;
-  const data = generateMockData(days, categories);
+  const days = selectedPeriod === "7d" ? 7 : selectedPeriod === "30d" ? 30 : selectedPeriod === "90d" ? 90 : 365;
+  const data = useMemo(() => generateMockData(days, categories), [days, categories]);
 
   const toggleCategory = (categoryId: string) => {
     setActiveCategories(prev => ({ ...prev, [categoryId]: !prev[categoryId] }));
+  };
+
+  const toggleCompareMode = () => {
+    setCompareMode(!compareMode);
+    if (!compareMode) {
+      setComparedCategories([]);
+    }
+  };
+
+  const selectForCompare = (categoryId: string) => {
+    if (comparedCategories.includes(categoryId)) {
+      setComparedCategories(comparedCategories.filter(c => c !== categoryId));
+    } else if (comparedCategories.length < 2) {
+      setComparedCategories([...comparedCategories, categoryId]);
+    }
   };
 
   return (
@@ -159,20 +210,40 @@ export const DomainScoreChart = ({ domainName, score, variation, categories = []
         </div>
 
         <div className="flex items-center gap-2">
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-20 h-8 bg-white/[0.05] border-white/[0.12] text-white/80 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-black/95 backdrop-blur-xl border-white/[0.12]">
-              <SelectItem value="7j" className="text-white/80">7j</SelectItem>
-              <SelectItem value="14j" className="text-white/80">14j</SelectItem>
-              <SelectItem value="30j" className="text-white/80">30j</SelectItem>
-              <SelectItem value="90j" className="text-white/80">90j</SelectItem>
-              <SelectItem value="12m" className="text-white/80">12 mois</SelectItem>
-            </SelectContent>
-          </Select>
+          {/* Period selector */}
+          <div className="flex gap-1 backdrop-blur-xl bg-white/[0.04] border border-white/[0.1] rounded-lg p-1">
+            {periods.map((period) => (
+              <Button
+                key={period.value}
+                onClick={() => setSelectedPeriod(period.value)}
+                variant="ghost"
+                size="sm"
+                className={`h-7 px-3 text-xs transition-all ${
+                  selectedPeriod === period.value
+                    ? "bg-white/[0.15] text-white"
+                    : "text-white/60 hover:text-white hover:bg-white/[0.08]"
+                }`}
+              >
+                {period.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* Compare button */}
+          <Button
+            onClick={toggleCompareMode}
+            variant="ghost"
+            size="sm"
+            className={`h-7 px-3 text-xs transition-all ${
+              compareMode
+                ? "bg-aura-cyan/20 text-aura-cyan border border-aura-cyan/40"
+                : "text-white/60 hover:text-white hover:bg-white/[0.08]"
+            }`}
+          >
+            Comparer
+          </Button>
           
-          <button 
+          <button
             onClick={downloadChart}
             className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.12] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all group"
             title="Exporter les données"
@@ -196,94 +267,41 @@ export const DomainScoreChart = ({ domainName, score, variation, categories = []
               tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }}
             />
             <Tooltip content={<CustomTooltip />} />
-            {/* Moving average line */}
-            <Line
-              type="monotone"
-              dataKey="movingAvg"
-              stroke="rgba(255,255,255,0.3)"
-              strokeWidth={1}
-              dot={false}
-              strokeDasharray="2 2"
-              connectNulls={true}
-            />
+            <Legend />
             
             {/* Category lines */}
             {categories.map((cat) => {
               const isActive = activeCategories[cat.id];
+              const isCompared = compareMode && comparedCategories.includes(cat.id);
+              const opacity = compareMode 
+                ? (isCompared ? 1 : 0.15)
+                : (isActive ? 1 : 0.15);
               const color = cat.color || defaultCategoryColors[cat.id] || "rgba(100, 100, 100, 0.8)";
               
-              return isActive && (
+              return (
                 <Line
                   key={cat.id}
                   type="monotone"
                   dataKey={cat.id}
                   stroke={color}
                   strokeWidth={2}
-                  dot={(props) => {
-                    const { cx, cy, payload } = props;
-                    if (!payload[cat.id]) {
-                      return null;
-                    }
-                    return (
-                      <circle
-                        cx={cx}
-                        cy={cy}
-                        r={3}
-                        fill={color}
-                        stroke={color}
-                        strokeWidth={1.5}
-                        style={{
-                          filter: `drop-shadow(0 0 4px ${color})`
-                        }}
-                      />
-                    );
-                  }}
+                  opacity={opacity}
+                  dot={{ fill: color, r: 2, filter: `drop-shadow(0 0 4px ${color})` }}
+                  activeDot={{ r: 4 }}
                   connectNulls={false}
-                  animationDuration={800}
-                  animationEasing="ease-in-out"
                 />
               );
             })}
             
-            {/* Main domain line (white) */}
+            {/* Main domain line - uses domain color */}
             <Line
               type="monotone"
               dataKey="score"
-              stroke="rgba(255,255,255,0.9)"
+              stroke={`hsl(${domainHslColor})`}
               strokeWidth={3}
-              dot={(props) => {
-                const { cx, cy, payload } = props;
-                if (!payload.hasData) {
-                  return (
-                    <circle
-                      cx={cx}
-                      cy={cy}
-                      r={3}
-                      fill="transparent"
-                      stroke="rgba(255,255,255,0.4)"
-                      strokeWidth={1.5}
-                      strokeDasharray="2 2"
-                    />
-                  );
-                }
-                return (
-                  <circle
-                    cx={cx}
-                    cy={cy}
-                    r={5}
-                    fill="rgba(255,255,255,0.9)"
-                    stroke="rgba(255,255,255,0.3)"
-                    strokeWidth={2}
-                    className="cursor-pointer transition-all hover:r-6"
-                    style={{
-                      filter: "drop-shadow(0 0 6px rgba(255,255,255,0.6))"
-                    }}
-                  />
-                );
-              }}
+              dot={{ fill: `hsl(${domainHslColor})`, r: 2, filter: `drop-shadow(0 0 4px hsl(${domainHslColor}))` }}
+              activeDot={{ r: 4 }}
               connectNulls={false}
-              animationDuration={800}
-              animationEasing="ease-in-out"
             />
           </LineChart>
         </ResponsiveContainer>
@@ -295,22 +313,26 @@ export const DomainScoreChart = ({ domainName, score, variation, categories = []
           {categories.map((cat) => {
             const color = cat.color || defaultCategoryColors[cat.id] || "rgba(100, 100, 100, 0.8)";
             const isActive = activeCategories[cat.id];
+            const isCompared = compareMode && comparedCategories.includes(cat.id);
             
             return (
               <button
                 key={cat.id}
-                onClick={() => toggleCategory(cat.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
-                  isActive
-                    ? "bg-white/[0.08] border border-white/[0.15]"
-                    : "bg-white/[0.02] border border-white/[0.08] opacity-50"
-                }`}
+                onClick={() => {
+                  if (compareMode) {
+                    selectForCompare(cat.id);
+                  } else {
+                    toggleCategory(cat.id);
+                  }
+                }}
+                className="flex items-center gap-2 transition-all cursor-pointer"
+                style={{ opacity: isActive ? 1 : 0.3 }}
               >
                 <div 
                   className="w-3 h-3 rounded-full"
                   style={{ 
                     backgroundColor: color,
-                    boxShadow: isActive ? `0 0 8px ${color}` : 'none'
+                    boxShadow: isActive ? `0 0 6px ${color}` : 'none'
                   }}
                 />
                 <span className="text-white text-xs">{cat.name}</span>
