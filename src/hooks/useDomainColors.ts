@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useDomains } from './useDomains';
 
 export interface DomainColor {
   domain: string;
@@ -22,8 +21,14 @@ export const COLOR_PALETTE = [
   { name: 'Lime', value: '80 90% 55%' },
 ];
 
+const DEFAULT_COLORS: Record<string, string> = {
+  business: '210 100% 60%',
+  sport: '142 90% 55%',
+  social: '330 100% 70%',
+  sante: '0 100% 65%',
+};
+
 export const useDomainColors = () => {
-  const { domains } = useDomains();
   const [domainColors, setDomainColors] = useState<Record<string, string>>(() => {
     const stored = localStorage.getItem('prime_domain_colors');
     return stored ? JSON.parse(stored) : {};
@@ -41,50 +46,17 @@ export const useDomainColors = () => {
   };
 
   const getDomainColor = (domainSlug: string): string => {
-    // Check custom colors first
-    if (domainColors[domainSlug]) {
-      return domainColors[domainSlug];
-    }
-    
-    // Check if domain has a color set in database
-    const domain = domains.find(d => d.slug === domainSlug);
-    if (domain?.color) {
-      return domain.color;
-    }
-
-    // Fallback to default blue
-    return '210 100% 60%';
-  };
-
-  const getDomainLabel = (domainSlug: string): string => {
-    const domain = domains.find(d => d.slug === domainSlug);
-    return domain?.name || domainSlug.charAt(0).toUpperCase() + domainSlug.slice(1);
-  };
-
-  const getAllDomains = (): DomainColor[] => {
-    return domains.map(domain => ({
-      domain: domain.slug,
-      color: getDomainColor(domain.slug),
-      label: domain.name,
-    }));
+    return domainColors[domainSlug] || DEFAULT_COLORS[domainSlug] || '210 100% 60%';
   };
 
   const resetToDefaults = () => {
-    const resetColors: Record<string, string> = {};
-    domains.forEach(domain => {
-      if (domain.color) {
-        resetColors[domain.slug] = domain.color;
-      }
-    });
-    setDomainColors(resetColors);
+    setDomainColors({});
   };
 
   return {
     domainColors,
     setDomainColor,
     getDomainColor,
-    getDomainLabel,
-    getAllDomains,
     resetToDefaults,
   };
 };

@@ -1,8 +1,9 @@
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useDomainColors, COLOR_PALETTE } from "@/hooks/useDomainColors";
+import { useDomains } from "@/hooks/useDomains";
 import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface DomainColorModalProps {
   open: boolean;
@@ -10,14 +11,15 @@ interface DomainColorModalProps {
 }
 
 export const DomainColorModal = ({ open, onOpenChange }: DomainColorModalProps) => {
-  const { getAllDomains, setDomainColor } = useDomainColors();
+  const { setDomainColor, getDomainColor } = useDomainColors();
+  const { domains, isLoading } = useDomains();
   const [step, setStep] = useState<'select-domain' | 'select-color'>('select-domain');
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>('');
 
-  const handleDomainSelect = (domain: string, currentColor: string) => {
-    setSelectedDomain(domain);
-    setSelectedColor(currentColor);
+  const handleDomainSelect = (domainSlug: string) => {
+    setSelectedDomain(domainSlug);
+    setSelectedColor(getDomainColor(domainSlug));
     setStep('select-color');
   };
 
@@ -44,8 +46,7 @@ export const DomainColorModal = ({ open, onOpenChange }: DomainColorModalProps) 
     setSelectedDomain(null);
   };
 
-  const domains = getAllDomains();
-  const currentDomain = domains.find(d => d.domain === selectedDomain);
+  const currentDomain = domains.find(d => d.slug === selectedDomain);
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -55,26 +56,30 @@ export const DomainColorModal = ({ open, onOpenChange }: DomainColorModalProps) 
             {step === 'select-domain' ? 'Choisir un domaine' : `Choisir une couleur`}
           </DialogTitle>
           {step === 'select-color' && currentDomain && (
-            <p className="text-white/50 text-sm">{currentDomain.label}</p>
+            <p className="text-white/50 text-sm">{currentDomain.name}</p>
           )}
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {step === 'select-domain' ? (
             <div className="space-y-2">
-              {domains.map((domain) => (
-                <button
-                  key={domain.domain}
-                  onClick={() => handleDomainSelect(domain.domain, domain.color)}
-                  className="w-full flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.15] transition-all group"
-                >
-                  <span className="text-white font-medium">{domain.label}</span>
-                  <div
-                    className="w-8 h-8 rounded-lg border-2 border-white/20 group-hover:border-white/40 transition-all"
-                    style={{ backgroundColor: `hsl(${domain.color})` }}
-                  />
-                </button>
-              ))}
+              {isLoading ? (
+                <div className="text-white/50 text-center py-4">Chargement...</div>
+              ) : (
+                domains.map((domain) => (
+                  <button
+                    key={domain.id}
+                    onClick={() => handleDomainSelect(domain.slug)}
+                    className="w-full flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.15] transition-all group"
+                  >
+                    <span className="text-white font-medium">{domain.name}</span>
+                    <div
+                      className="w-8 h-8 rounded-lg border-2 border-white/20 group-hover:border-white/40 transition-all"
+                      style={{ backgroundColor: `hsl(${getDomainColor(domain.slug)})` }}
+                    />
+                  </button>
+                ))
+              )}
             </div>
           ) : (
             <div className="space-y-4">
