@@ -17,13 +17,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useOverviewData } from "@/hooks/useOverviewData";
 import { useDomains } from "@/hooks/useDomains";
-
-const targets = [
-  { id: 1, title: "Lancer le nouveau produit", progress: 75, deadline: "30 Nov 2025", status: "in-progress" as const, completed: false },
-  { id: 2, title: "Courir un marathon", progress: 45, deadline: "15 Déc 2025", status: "in-progress" as const, completed: false },
-  { id: 3, title: "Méditer 30 jours consécutifs", progress: 90, deadline: "28 Nov 2025", status: "in-progress" as const, completed: false },
-  { id: 4, title: "Lire 12 livres cette année", progress: 30, deadline: "31 Déc 2025", status: "delayed" as const, completed: false },
-];
+import { useObjectives } from "@/hooks/useObjectives";
 
 interface Insight {
   id: string;
@@ -43,12 +37,29 @@ const Accueil = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { data: overviewItems = [], isLoading: isLoadingOverview } = useOverviewData();
   const { domains: dbDomains, isLoading: isLoadingDomains } = useDomains();
+  const { objectives, isLoading: isLoadingObjectives } = useObjectives();
   const [favorites, setFavorites] = useState<string[]>([]);
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
-  const [primeTargets, setPrimeTargets] = useState(targets);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const itemsPerPage = 5;
+  
+  // Get prime targets from objectives (only those with show_on_home = true and not completed/archived)
+  const primeTargets = objectives
+    .filter(obj => obj.show_on_home && !["completed", "archived"].includes(obj.status))
+    .slice(0, 3) // Maximum 3 targets on home page
+    .map(obj => {
+      const domain = dbDomains.find(d => d.id === obj.domain_id);
+      return {
+        id: obj.id,
+        title: obj.title,
+        progress: obj.progress,
+        deadline: format(new Date(obj.deadline), "d MMM yyyy", { locale: fr }),
+        status: obj.status === "on_track" ? "in-progress" as const : obj.status === "at_risk" ? "in-progress" as const : "delayed" as const,
+        completed: obj.status === "completed",
+        domain: domain?.name || "",
+      };
+    });
   
   // Construire dynamiquement les filtres d'insights
   const filters = ["Tous", ...dbDomains.map(d => d.name)];
@@ -148,29 +159,18 @@ const Accueil = () => {
   };
 
   const handleDragStart = (index: number) => {
-    setDraggedIndex(index);
+    // Drag disabled for real objectives
+    return;
   };
 
   const handleDragEnd = () => {
-    setDraggedIndex(null);
+    // Drag disabled for real objectives
+    return;
   };
 
   const handleDrop = (targetIndex: number) => {
-    if (draggedIndex === null) return;
-    
-    const newTargets = [...primeTargets];
-    const draggedItem = newTargets[draggedIndex];
-    
-    // Remove the dragged item
-    newTargets.splice(draggedIndex, 1);
-    
-    // Insert at the new position
-    // If we're dropping after the original position, we need to adjust
-    const insertIndex = draggedIndex < targetIndex ? targetIndex - 1 : targetIndex;
-    newTargets.splice(insertIndex, 0, draggedItem);
-    
-    setPrimeTargets(newTargets);
-    setDraggedIndex(null);
+    // Drag disabled for real objectives
+    return;
   };
 
   const filteredInsights = insightFilter === "Tous" 
@@ -216,22 +216,39 @@ const Accueil = () => {
             <div className="space-y-6">
               <NavigationButtons />
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-white ml-2">Prime Targets</h2>
-                <div className="space-y-1">
-                  {primeTargets.map((target, index) => (
-                    <div key={target.id}>
-                      <DropZone index={index} onDrop={handleDrop} />
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-white ml-2">Prime Targets</h2>
+                  <Button
+                    onClick={() => navigate("/prime-targets")}
+                    variant="ghost"
+                    className="text-white/60 hover:text-white text-sm"
+                  >
+                    Voir tout
+                  </Button>
+                </div>
+                {isLoadingObjectives ? (
+                  <div className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6">
+                    <p className="text-white/40 text-sm text-center">Chargement...</p>
+                  </div>
+                ) : primeTargets.length === 0 ? (
+                  <div className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6">
+                    <p className="text-white/40 text-sm text-center mb-2">Aucun objectif actif</p>
+                    <p className="text-white/30 text-xs text-center">Créez vos premiers objectifs Prime depuis la page dédiée</p>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    {primeTargets.map((target, index) => (
                       <PrimeTargetCard 
+                        key={target.id}
                         {...target} 
                         index={index}
                         onDragStart={handleDragStart}
                         onDragEnd={handleDragEnd}
-                        isDragging={draggedIndex === index}
+                        isDragging={false}
                       />
-                    </div>
-                  ))}
-                  <DropZone index={primeTargets.length} onDrop={handleDrop} />
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             
