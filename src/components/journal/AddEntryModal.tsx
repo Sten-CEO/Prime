@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Sparkles } from "lucide-react";
+import { CalendarIcon, Sparkles, Bold, Italic, Underline, Strikethrough } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,6 +58,7 @@ export const AddEntryModal = ({
   const [showInsightPopup, setShowInsightPopup] = useState(false);
   const [insights, setInsights] = useState<string[]>([]);
   const [tempInsights, setTempInsights] = useState<string[]>([]);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Reset form when modal opens with initial data
   useEffect(() => {
@@ -66,6 +67,9 @@ export const AddEntryModal = ({
       setContent(initialData.content);
       setDomain(initialData.domain_id);
       setDate(new Date(initialData.entry_date));
+      if (contentRef.current) {
+        contentRef.current.innerHTML = initialData.content;
+      }
     } else if (open && !initialData) {
       setTitle("");
       setContent("");
@@ -75,8 +79,16 @@ export const AddEntryModal = ({
       setInsightMode(false);
       setSelectedText("");
       setShowInsightPopup(false);
+      if (contentRef.current) {
+        contentRef.current.innerHTML = "";
+      }
     }
   }, [open, initialData, defaultDomain]);
+
+  const applyFormat = (command: string) => {
+    document.execCommand(command, false);
+    contentRef.current?.focus();
+  };
 
   const handleTextSelection = () => {
     if (!insightMode) return;
@@ -93,6 +105,18 @@ export const AddEntryModal = ({
   const handleConfirmInsight = () => {
     if (selectedText && !tempInsights.includes(selectedText)) {
       setTempInsights(prev => [...prev, selectedText]);
+      
+      // Wrap selected text with insight span
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const span = document.createElement('span');
+        span.className = 'insight-highlight';
+        span.textContent = selectedText;
+        range.deleteContents();
+        range.insertNode(span);
+      }
+      
       toast({
         title: "Insight ajouté",
         description: "Le texte a été ajouté aux insights",
@@ -110,7 +134,9 @@ export const AddEntryModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!title.trim() || !content.trim() || !domain) {
+    const contentText = contentRef.current?.innerText || "";
+    
+    if (!title.trim() || !contentText.trim() || !domain) {
       toast({
         title: "Champs requis",
         description: "Veuillez remplir tous les champs",
@@ -139,7 +165,7 @@ export const AddEntryModal = ({
           .from("journal_entries")
           .update({
             title: title.trim(),
-            content: content.trim(),
+            content: contentText.trim(),
             domain_id: domain,
             entry_date: format(date, "yyyy-MM-dd"),
             has_insight: tempInsights.length > 0,
@@ -176,7 +202,7 @@ export const AddEntryModal = ({
           .insert({
             user_id: user.id,
             title: title.trim(),
-            content: content.trim(),
+            content: contentText.trim(),
             domain_id: domain,
             entry_date: format(date, "yyyy-MM-dd"),
             has_insight: tempInsights.length > 0,
@@ -256,30 +282,70 @@ export const AddEntryModal = ({
           <div className="relative">
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm text-white/70">Contenu</label>
-              <button
-                type="button"
-                id="insight-button"
-                onClick={() => setInsightMode(!insightMode)}
-                className={`group flex items-center justify-center w-9 h-9 rounded-lg transition-all ${
-                  insightMode 
-                    ? 'backdrop-blur-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_24px_rgba(255,255,255,0.25)]' 
-                    : 'backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.05] hover:border-white/[0.12]'
-                }`}
-              >
-                <Sparkles className={`w-4 h-4 transition-all ${
-                  insightMode ? 'text-white' : 'text-white/50 group-hover:text-white/70'
-                }`} />
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Formatting toolbar */}
+                <div className="flex items-center gap-1 backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] rounded-lg px-2 py-1">
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('bold')}
+                    className="p-1.5 rounded hover:bg-white/[0.08] transition-colors"
+                    title="Gras"
+                  >
+                    <Bold className="w-3.5 h-3.5 text-white/60 hover:text-white/90" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('italic')}
+                    className="p-1.5 rounded hover:bg-white/[0.08] transition-colors"
+                    title="Italique"
+                  >
+                    <Italic className="w-3.5 h-3.5 text-white/60 hover:text-white/90" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('underline')}
+                    className="p-1.5 rounded hover:bg-white/[0.08] transition-colors"
+                    title="Souligner"
+                  >
+                    <Underline className="w-3.5 h-3.5 text-white/60 hover:text-white/90" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFormat('strikeThrough')}
+                    className="p-1.5 rounded hover:bg-white/[0.08] transition-colors"
+                    title="Barrer"
+                  >
+                    <Strikethrough className="w-3.5 h-3.5 text-white/60 hover:text-white/90" />
+                  </button>
+                </div>
+                
+                {/* Insight button */}
+                <button
+                  type="button"
+                  id="insight-button"
+                  onClick={() => setInsightMode(!insightMode)}
+                  className={`group flex items-center justify-center w-9 h-9 rounded-lg transition-all ${
+                    insightMode 
+                      ? 'backdrop-blur-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_24px_rgba(255,255,255,0.25)]' 
+                      : 'backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.05] hover:border-white/[0.12]'
+                  }`}
+                >
+                  <Sparkles className={`w-4 h-4 transition-all ${
+                    insightMode ? 'text-white' : 'text-white/50 group-hover:text-white/70'
+                  }`} />
+                </button>
+              </div>
             </div>
-            <Textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+            <div
+              ref={contentRef}
+              contentEditable
               onMouseUp={handleTextSelection}
               onTouchEnd={handleTextSelection}
-              placeholder="Écrivez votre entrée..."
-              className={`bg-white/[0.05] border-white/[0.1] text-white min-h-[200px] ${
-                insightMode ? 'cursor-text ring-1 ring-primary/30' : ''
+              onInput={(e) => setContent(e.currentTarget.innerText)}
+              className={`bg-white/[0.05] border border-white/[0.1] text-white min-h-[200px] rounded-md px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-white/20 ${
+                insightMode ? 'cursor-text' : ''
               }`}
+              style={{ whiteSpace: 'pre-wrap' }}
             />
             
             {showInsightPopup && insightMode && createPortal(
