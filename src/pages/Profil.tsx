@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Home, Award, BookOpen, Target, User, Settings, Upload, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Profil = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,6 +17,7 @@ const Profil = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const getUser = async () => {
@@ -47,14 +50,14 @@ const Profil = () => {
       if (error) throw error;
 
       toast({
-        title: "Profil mis à jour",
-        description: "Vos informations ont été enregistrées avec succès",
+        title: t.profileUpdated,
+        description: t.profileUpdateSuccess,
       });
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le profil",
+        title: t.error,
+        description: t.updateError,
         variant: "destructive",
       });
     } finally {
@@ -65,8 +68,8 @@ const Profil = () => {
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       toast({
-        title: "Erreur",
-        description: "Les mots de passe ne correspondent pas",
+        title: t.error,
+        description: t.passwordMismatch,
         variant: "destructive",
       });
       return;
@@ -74,8 +77,8 @@ const Profil = () => {
 
     if (newPassword.length < 6) {
       toast({
-        title: "Erreur",
-        description: "Le mot de passe doit contenir au moins 6 caractères",
+        title: t.error,
+        description: t.passwordTooShort,
         variant: "destructive",
       });
       return;
@@ -90,8 +93,8 @@ const Profil = () => {
       if (error) throw error;
 
       toast({
-        title: "Mot de passe mis à jour",
-        description: "Votre mot de passe a été changé avec succès",
+        title: t.passwordUpdated,
+        description: t.passwordUpdateSuccess,
       });
 
       setOldPassword("");
@@ -100,8 +103,8 @@ const Profil = () => {
     } catch (error) {
       console.error("Error changing password:", error);
       toast({
-        title: "Erreur",
-        description: "Impossible de changer le mot de passe",
+        title: t.error,
+        description: t.passwordUpdateError,
         variant: "destructive",
       });
     } finally {
@@ -112,6 +115,30 @@ const Profil = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/");
+  };
+
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      // TODO: Implémenter l'upload vers Supabase Storage
+      toast({
+        title: "En cours de développement",
+        description: "La fonctionnalité d'upload de photo sera bientôt disponible",
+      });
+    } catch (error) {
+      console.error("Error uploading photo:", error);
+      toast({
+        title: t.error,
+        description: "Impossible de téléverser la photo",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -175,60 +202,87 @@ const Profil = () => {
 
       {/* Content */}
       <div className="relative z-10 ml-32 min-h-screen">
-        <div className="max-w-4xl mx-auto p-8 space-y-6">
-          <h1 className="text-4xl font-bold text-white mb-8">Profil</h1>
+        <div className="max-w-5xl mx-auto p-8 space-y-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-4xl font-bold text-white">{t.profileTitle}</h1>
+            <button
+              onClick={handleLogout}
+              className="backdrop-blur-xl bg-red-500/[0.08] border border-red-500/[0.15] rounded-xl px-4 py-2 hover:bg-red-500/[0.12] hover:border-red-500/[0.25] transition-all cursor-pointer text-red-400 text-sm font-medium flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              {t.logout}
+            </button>
+          </div>
 
-          {/* Bloc 1 - En-tête profil */}
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-            <div className="flex items-center gap-6">
-              <div className="w-24 h-24 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center">
-                <span className="text-3xl font-bold text-white">{getInitials()}</span>
+          {/* Bloc 1 - Photo + Infos personnelles côte à côte */}
+          <div className="grid grid-cols-5 gap-6">
+            {/* Photo de profil */}
+            <div className="col-span-2 backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+              <h2 className="text-xl font-semibold text-white mb-6">{t.profilePhoto}</h2>
+              <div className="flex flex-col items-center gap-4">
+                <div 
+                  onClick={handlePhotoClick}
+                  className="w-32 h-32 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center cursor-pointer hover:border-primary/50 transition-all group"
+                >
+                  <span className="text-4xl font-bold text-white group-hover:scale-110 transition-transform">{getInitials()}</span>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <p className="text-white/60 text-sm text-center">{t.memberPrime}</p>
+                <button 
+                  onClick={handlePhotoClick}
+                  className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-4 py-2 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer text-white text-sm flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  {t.uploadImage}
+                </button>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">{fullName || "Utilisateur"}</h2>
-                <p className="text-white/60 text-sm">Membre Prime</p>
+            </div>
+
+            {/* Infos personnelles */}
+            <div className="col-span-3 backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
+              <h2 className="text-2xl font-semibold text-white mb-6">{t.personalInfo}</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm text-white/70 mb-2 block">{t.fullName}</label>
+                  <Input
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="bg-white/[0.05] border-white/[0.1] text-white"
+                    placeholder={t.fullName}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-white/70 mb-2 block">{t.email}</label>
+                  <Input
+                    value={email}
+                    disabled
+                    className="bg-white/[0.02] border-white/[0.08] text-white/60 cursor-not-allowed"
+                  />
+                </div>
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={loading}
+                  className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-6 py-3 hover:bg-white/[0.04] hover:border-white/[0.12] hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] text-white font-medium"
+                >
+                  {loading ? t.saving : t.saveChanges}
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Bloc 2 - Informations personnelles */}
+          {/* Bloc 2 - Sécurité */}
           <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-            <h2 className="text-2xl font-semibold text-white mb-6">Informations personnelles</h2>
+            <h2 className="text-2xl font-semibold text-white mb-6">{t.security}</h2>
+            <p className="text-lg text-white/80 mb-4">{t.changePassword}</p>
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-white/70 mb-2 block">Nom complet</label>
-                <Input
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="bg-white/[0.05] border-white/[0.1] text-white"
-                  placeholder="Votre nom complet"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-white/70 mb-2 block">Email</label>
-                <Input
-                  value={email}
-                  disabled
-                  className="bg-white/[0.02] border-white/[0.08] text-white/60 cursor-not-allowed"
-                />
-              </div>
-              <button
-                onClick={handleSaveProfile}
-                disabled={loading}
-                className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-6 py-3 hover:bg-white/[0.04] hover:border-white/[0.12] hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] text-white font-medium"
-              >
-                {loading ? "Enregistrement..." : "Enregistrer les modifications"}
-              </button>
-            </div>
-          </div>
-
-          {/* Bloc 3 - Sécurité */}
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-            <h2 className="text-2xl font-semibold text-white mb-6">Sécurité</h2>
-            <p className="text-lg text-white/80 mb-4">Changer le mot de passe</p>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm text-white/70 mb-2 block">Ancien mot de passe</label>
+                <label className="text-sm text-white/70 mb-2 block">{t.oldPassword}</label>
                 <Input
                   type="password"
                   value={oldPassword}
@@ -237,7 +291,7 @@ const Profil = () => {
                 />
               </div>
               <div>
-                <label className="text-sm text-white/70 mb-2 block">Nouveau mot de passe</label>
+                <label className="text-sm text-white/70 mb-2 block">{t.newPassword}</label>
                 <Input
                   type="password"
                   value={newPassword}
@@ -246,7 +300,7 @@ const Profil = () => {
                 />
               </div>
               <div>
-                <label className="text-sm text-white/70 mb-2 block">Confirmer le nouveau mot de passe</label>
+                <label className="text-sm text-white/70 mb-2 block">{t.confirmPassword}</label>
                 <Input
                   type="password"
                   value={confirmPassword}
@@ -255,44 +309,14 @@ const Profil = () => {
                 />
               </div>
               <p className="text-xs text-white/40">
-                Astuce : utilise un mot de passe long et unique.
+                {t.passwordHint}
               </p>
               <button
                 onClick={handleChangePassword}
                 disabled={loading}
                 className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-6 py-3 hover:bg-white/[0.04] hover:border-white/[0.12] hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] text-white font-medium"
               >
-                {loading ? "Mise à jour..." : "Mettre à jour le mot de passe"}
-              </button>
-            </div>
-          </div>
-
-          {/* Bloc 4 - Photo de profil & Déconnexion */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-              <h2 className="text-xl font-semibold text-white mb-6">Photo de profil</h2>
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-32 h-32 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center">
-                  <span className="text-4xl font-bold text-white">{getInitials()}</span>
-                </div>
-                <button className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-4 py-2 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer text-white text-sm flex items-center gap-2">
-                  <Upload className="w-4 h-4" />
-                  Téléverser une image
-                </button>
-                <button className="text-white/40 hover:text-white/60 text-xs transition-colors">
-                  Supprimer la photo
-                </button>
-              </div>
-            </div>
-
-            <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] flex flex-col justify-center">
-              <h2 className="text-xl font-semibold text-white mb-6">Déconnexion</h2>
-              <button
-                onClick={handleLogout}
-                className="backdrop-blur-xl bg-red-500/[0.1] border border-red-500/[0.2] rounded-2xl px-6 py-3 hover:bg-red-500/[0.15] hover:border-red-500/[0.3] hover:-translate-y-0.5 transition-all cursor-pointer text-red-400 font-medium flex items-center justify-center gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                Se déconnecter
+                {loading ? t.updating : t.updatePassword}
               </button>
             </div>
           </div>
