@@ -1,11 +1,10 @@
 import { Card } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useDomainColors } from "@/hooks/useDomainColors";
-import { subDays, subMonths, format as formatDate } from "date-fns";
-import { fr } from "date-fns/locale";
+import { useDomainPerformanceData } from "@/hooks/useDomainPerformanceData";
 
 interface Category {
   id: string;
@@ -22,82 +21,6 @@ interface DomainScoreChartProps {
   categories?: Category[];
 }
 
-const generateMockData = (days: number, categories?: Category[]) => {
-  const data = [];
-  const today = new Date();
-  
-  if (days === 365) {
-    // 12 mois: 1 point par mois
-    for (let i = 11; i >= 0; i--) {
-      const date = subMonths(today, i);
-      const monthLabel = formatDate(date, "MMM", { locale: fr });
-      
-      const hasData = Math.random() > 0.2;
-      const scoreValue = hasData ? Math.floor(Math.random() * 30) + 70 : null;
-      
-      const dataPoint: any = {
-        date: monthLabel,
-        score: scoreValue,
-        hasData,
-      };
-      
-      categories?.forEach(cat => {
-        const catHasData = Math.random() > 0.2;
-        dataPoint[cat.id] = catHasData ? Math.floor(Math.random() * 30) + 65 : null;
-      });
-      
-      data.push(dataPoint);
-    }
-  } else if (days === 90) {
-    // 90 jours: 1 point par semaine (13 semaines)
-    for (let i = 12; i >= 0; i--) {
-      const date = subDays(today, i * 7);
-      const weekLabel = `S${13 - i}`;
-      
-      const hasData = Math.random() > 0.2;
-      const scoreValue = hasData ? Math.floor(Math.random() * 30) + 70 : null;
-      
-      const dataPoint: any = {
-        date: weekLabel,
-        score: scoreValue,
-        hasData,
-      };
-      
-      categories?.forEach(cat => {
-        const catHasData = Math.random() > 0.2;
-        dataPoint[cat.id] = catHasData ? Math.floor(Math.random() * 30) + 65 : null;
-      });
-      
-      data.push(dataPoint);
-    }
-  } else {
-    // 7, 14 ou 30 jours: 1 point par jour
-    for (let i = days - 1; i >= 0; i--) {
-      const date = subDays(today, i);
-      const dayLabel = days <= 7 
-        ? formatDate(date, "EEE", { locale: fr }).slice(0, 3)
-        : formatDate(date, "d MMM", { locale: fr });
-      
-      const hasData = Math.random() > 0.2;
-      const scoreValue = hasData ? Math.floor(Math.random() * 30) + 70 : null;
-      
-      const dataPoint: any = {
-        date: dayLabel,
-        score: scoreValue,
-        hasData,
-      };
-      
-      categories?.forEach(cat => {
-        const catHasData = Math.random() > 0.2;
-        dataPoint[cat.id] = catHasData ? Math.floor(Math.random() * 30) + 65 : null;
-      });
-      
-      data.push(dataPoint);
-    }
-  }
-  
-  return data;
-};
 
 const periods = [
   { label: "7j", value: "7d" },
@@ -171,7 +94,8 @@ export const DomainScoreChart = ({ domainName, domainSlug, score, variation, cat
   const [comparedCategories, setComparedCategories] = useState<string[]>([]);
   
   const days = selectedPeriod === "7d" ? 7 : selectedPeriod === "30d" ? 30 : selectedPeriod === "90d" ? 90 : 365;
-  const data = useMemo(() => generateMockData(days, categories), [days, categories]);
+  
+  const { data, isLoading } = useDomainPerformanceData(domainSlug, days, categories);
 
   const toggleCategory = (categoryId: string) => {
     setActiveCategories(prev => ({ ...prev, [categoryId]: !prev[categoryId] }));
@@ -255,7 +179,12 @@ export const DomainScoreChart = ({ domainName, domainSlug, score, variation, cat
       </div>
 
       <div className="animate-fade-in transition-all duration-500">
-        <ResponsiveContainer width="100%" height={200}>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[200px] text-white/60">
+            Chargement des données...
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={200}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis
@@ -306,6 +235,7 @@ export const DomainScoreChart = ({ domainName, domainSlug, score, variation, cat
             />
           </LineChart>
         </ResponsiveContainer>
+        )}
       </div>
 
       {/* Category and domain filters */}

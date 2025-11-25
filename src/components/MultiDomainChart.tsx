@@ -3,83 +3,7 @@ import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useState, useMemo } from "react";
 import { useDomainColors } from "@/hooks/useDomainColors";
-import { subDays, subMonths, format } from "date-fns";
-import { fr } from "date-fns/locale";
-
-// Generate mock data for different periods
-const generateMockData = (days: number) => {
-  const data = [];
-  const today = new Date();
-  
-  if (days === 365) {
-    // 12 mois: 1 point par mois
-    for (let i = 11; i >= 0; i--) {
-      const date = subMonths(today, i);
-      const monthLabel = format(date, "MMM", { locale: fr });
-      
-      const business = Math.floor(Math.random() * 30) + 70;
-      const sport = Math.floor(Math.random() * 30) + 65;
-      const social = Math.floor(Math.random() * 30) + 60;
-      const sante = Math.floor(Math.random() * 30) + 75;
-      const general = Math.round((business + sport + social + sante) / 4);
-      
-      data.push({
-        day: monthLabel,
-        Business: business,
-        Sport: sport,
-        Social: social,
-        Santé: sante,
-        Général: general,
-      });
-    }
-  } else if (days === 90) {
-    // 90 jours: 1 point par semaine (13 semaines)
-    for (let i = 12; i >= 0; i--) {
-      const date = subDays(today, i * 7);
-      const weekLabel = `S${13 - i}`;
-      
-      const business = Math.floor(Math.random() * 30) + 70;
-      const sport = Math.floor(Math.random() * 30) + 65;
-      const social = Math.floor(Math.random() * 30) + 60;
-      const sante = Math.floor(Math.random() * 30) + 75;
-      const general = Math.round((business + sport + social + sante) / 4);
-      
-      data.push({
-        day: weekLabel,
-        Business: business,
-        Sport: sport,
-        Social: social,
-        Santé: sante,
-        Général: general,
-      });
-    }
-  } else {
-    // 7 ou 30 jours: 1 point par jour
-    for (let i = days - 1; i >= 0; i--) {
-      const date = subDays(today, i);
-      const dayLabel = days <= 7 
-        ? format(date, "EEE", { locale: fr }).slice(0, 3)
-        : format(date, "d MMM", { locale: fr });
-      
-      const business = Math.floor(Math.random() * 30) + 70;
-      const sport = Math.floor(Math.random() * 30) + 65;
-      const social = Math.floor(Math.random() * 30) + 60;
-      const sante = Math.floor(Math.random() * 30) + 75;
-      const general = Math.round((business + sport + social + sante) / 4);
-      
-      data.push({
-        day: dayLabel,
-        Business: business,
-        Sport: sport,
-        Social: social,
-        Santé: sante,
-        Général: general,
-      });
-    }
-  }
-  
-  return data;
-};
+import { useMultiDomainPerformanceData } from "@/hooks/useMultiDomainPerformanceData";
 
 const domainMapping: Record<string, string> = {
   "Business": "business",
@@ -110,16 +34,31 @@ export const MultiDomainChart = () => {
   const [comparedDomains, setComparedDomains] = useState<string[]>([]);
   const [mouseX, setMouseX] = useState<number | null>(null);
   
-  // Generate data based on selected period
+  const daysMap: Record<string, number> = {
+    "7d": 7,
+    "30d": 30,
+    "90d": 90,
+    "12m": 365,
+  };
+  
+  const days = daysMap[selectedPeriod] || 7;
+  const domainSlugs = ["business", "sport", "social", "sante"];
+  
+  const { data: rawData, isLoading } = useMultiDomainPerformanceData(days, domainSlugs);
+  
+  // Transform data to match expected format
   const chartData = useMemo(() => {
-    const daysMap: Record<string, number> = {
-      "7d": 7,
-      "30d": 30,
-      "90d": 90,
-      "12m": 365,
-    };
-    return generateMockData(daysMap[selectedPeriod] || 7);
-  }, [selectedPeriod]);
+    if (!rawData) return [];
+    
+    return rawData.map((point: any) => ({
+      day: point.date,
+      Business: point.business,
+      Sport: point.sport,
+      Social: point.social,
+      Santé: point.sante,
+      Général: point.general,
+    }));
+  }, [rawData]);
   
   // Calculate week variation for "Général"
   const weekVariation = useMemo(() => {
@@ -285,7 +224,12 @@ export const MultiDomainChart = () => {
           const rect = e.currentTarget.getBoundingClientRect();
           setMouseX(e.clientX - rect.left);
         }} onMouseLeave={() => setMouseX(null)}>
-          <ResponsiveContainer width="100%" height={300}>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-[300px] text-white/60">
+              Chargement des données...
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--glass-border) / 0.1)" />
               <XAxis 
@@ -322,6 +266,7 @@ export const MultiDomainChart = () => {
               })}
             </LineChart>
           </ResponsiveContainer>
+          )}
         </div>
       </div>
     </Card>
