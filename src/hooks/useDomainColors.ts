@@ -58,6 +58,10 @@ export const useDomainColors = () => {
   };
 
   const getDomainColor = (domain: string): string => {
+    // Force white for "general" domain if no custom color is set
+    if (domain === 'general' && !domainColors[domain]) {
+      return '0 0% 100%'; // White
+    }
     return domainColors[domain] || DEFAULT_COLORS[domain] || '210 100% 60%';
   };
 
