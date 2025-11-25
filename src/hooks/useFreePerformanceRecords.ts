@@ -107,6 +107,8 @@ export const useFreePerformanceRecords = (
       queryClient.invalidateQueries({ queryKey: ["free_performances"] });
       queryClient.invalidateQueries({ queryKey: ["domain_stats"] });
       queryClient.invalidateQueries({ queryKey: ["category_stats"] });
+      queryClient.invalidateQueries({ queryKey: ["domain-performance"] });
+      queryClient.invalidateQueries({ queryKey: ["category-performance"] });
       toast({
         title: "Performance enregistrée",
         description: "La performance libre a été ajoutée avec succès.",
@@ -132,8 +134,11 @@ export const useFreePerformanceRecords = (
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["free_performance_records"] });
+      queryClient.invalidateQueries({ queryKey: ["free_performances"] });
       queryClient.invalidateQueries({ queryKey: ["domain_stats"] });
       queryClient.invalidateQueries({ queryKey: ["category_stats"] });
+      queryClient.invalidateQueries({ queryKey: ["domain-performance"] });
+      queryClient.invalidateQueries({ queryKey: ["category-performance"] });
       toast({
         title: "Performance supprimée",
         description: "L'enregistrement a été supprimé.",
