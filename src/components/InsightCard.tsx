@@ -79,17 +79,16 @@ export const InsightCard = ({ id, text, date, highlightColor, category = "Busine
             <Button 
               className="flex-1 backdrop-blur-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.15] text-white"
               onClick={() => {
-                console.log("Button clicked, entry_id:", entry_id);
-                if (entry_id) {
-                  setOpen(false);
-                  setTimeout(() => {
-                    navigate(`/journal/entry/${entry_id}`);
-                  }, 100);
-                } else {
-                  console.error("No entry_id available");
-                }
+                console.log("Navigating to journal for domain:", domain_id);
+                setOpen(false);
+                setTimeout(() => {
+                  if (domain_id === 'general') {
+                    navigate('/journal');
+                  } else {
+                    navigate(`/journal/${domain_id}`);
+                  }
+                }, 100);
               }}
-              disabled={!entry_id}
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               Voir dans Journal
