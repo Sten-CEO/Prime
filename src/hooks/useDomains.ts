@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 export interface Domain {
   id: string;
@@ -29,6 +30,26 @@ export const useDomains = () => {
       return data as Domain[];
     },
   });
+
+  // Créer les domaines par défaut si aucun domaine n'existe
+  useEffect(() => {
+    const initializeDefaultDomains = async () => {
+      if (!isLoading && domains.length === 0) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { error } = await supabase.rpc('create_default_domains', {
+            user_id_param: user.id
+          });
+          
+          if (!error) {
+            queryClient.invalidateQueries({ queryKey: ["domains"] });
+          }
+        }
+      }
+    };
+
+    initializeDefaultDomains();
+  }, [isLoading, domains.length, queryClient]);
 
   const createDomain = useMutation({
     mutationFn: async (domain: { name: string; slug: string; icon?: string; color?: string }) => {
