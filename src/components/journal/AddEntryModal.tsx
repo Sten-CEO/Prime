@@ -33,8 +33,6 @@ const domains = [
   { id: "sport", label: "Sport" },
   { id: "social", label: "Social" },
   { id: "sante", label: "Santé" },
-  { id: "developpement", label: "Développement" },
-  { id: "finance", label: "Finance" },
 ];
 
 export const AddEntryModal = ({ 
