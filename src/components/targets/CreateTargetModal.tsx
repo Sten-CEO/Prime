@@ -173,7 +173,7 @@ export const CreateTargetModal = ({
                 </SelectTrigger>
                 <SelectContent className="bg-black/90 border-white/[0.1]">
                   {isLoadingDomains ? (
-                    <SelectItem value="" disabled className="text-white/50">
+                    <SelectItem value="loading" disabled className="text-white/50">
                       Chargement...
                     </SelectItem>
                   ) : (
