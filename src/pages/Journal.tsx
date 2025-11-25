@@ -72,74 +72,6 @@ const Journal = () => {
           style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
         />
 
-      {/* Sidebar */}
-      <div className="fixed left-0 top-0 bottom-0 z-20 w-32 backdrop-blur-xl bg-white/[0.01] border-r border-white/[0.08] flex flex-col items-center py-8">
-        <div className="flex-none mb-8">
-          <h1 className="text-2xl font-bold text-white mb-4">Prime.</h1>
-          <Separator className="w-16 bg-white/20 mx-auto" />
-        </div>
-
-        <div className="flex-none">
-          <button 
-            onClick={() => navigate("/accueil")}
-            className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
-          >
-            <Home className="w-5 h-5 text-gray-400 opacity-70" />
-          </button>
-          <Separator className="w-10 bg-white/20 mx-auto my-4" />
-        </div>
-        
-        <div className="flex-1 flex flex-col gap-4">
-          <button 
-            onClick={() => navigate("/domaines/business")}
-            className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
-          >
-            <Award className="w-5 h-5 text-gray-400 opacity-70" />
-          </button>
-          <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/[0.08] transition-colors">
-            <BookOpen className="w-5 h-5 text-gray-400 opacity-70" />
-          </button>
-          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
-            <Target className="w-5 h-5 text-gray-400 opacity-70" />
-          </button>
-          <Separator className="w-10 bg-white/20 mx-auto my-2" />
-        </div>
-        
-        <div className="flex-none flex flex-col gap-4 mt-8">
-          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
-            <User className="w-5 h-5 text-gray-400 opacity-70" />
-          </button>
-          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
-            <Settings className="w-5 h-5 text-gray-400 opacity-70" />
-          </button>
-        </div>
-      </div>
-
-        <div className="relative z-10 ml-32 p-8">
-          <EntryDetailView
-            id={selectedEntry.id}
-            title={selectedEntry.title}
-            content={selectedEntry.content}
-            domain={selectedEntry.domain_id}
-            date={new Date(selectedEntry.entry_date)}
-            onBack={() => setSelectedEntry(null)}
-            onDeleted={() => {
-              setSelectedEntry(null);
-              fetchEntries();
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-black relative">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
-      />
-
         {/* Sidebar */}
         <div className="fixed left-0 top-0 bottom-0 z-20 w-32 backdrop-blur-xl bg-white/[0.01] border-r border-white/[0.08] flex flex-col items-center py-8">
           <div className="flex-none mb-8">
@@ -182,19 +114,88 @@ const Journal = () => {
             </button>
           </div>
         </div>
+
+        <div className="relative z-10 ml-32 p-8">
+          <EntryDetailView
+            id={selectedEntry.id}
+            title={selectedEntry.title}
+            content={selectedEntry.content}
+            domain={selectedEntry.domain_id}
+            date={new Date(selectedEntry.entry_date)}
+            onBack={() => setSelectedEntry(null)}
+            onDeleted={() => {
+              setSelectedEntry(null);
+              fetchEntries();
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black relative">
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/src/assets/black-shapes-bg.jpg')" }}
+      />
+
+      {/* Sidebar */}
+      <div className="fixed left-0 top-0 bottom-0 z-20 w-32 backdrop-blur-xl bg-white/[0.01] border-r border-white/[0.08] flex flex-col items-center py-8">
+        <div className="flex-none mb-8">
+          <h1 className="text-2xl font-bold text-white mb-4">Prime.</h1>
+          <Separator className="w-16 bg-white/20 mx-auto" />
+        </div>
+
+        <div className="flex-none">
+          <button 
+            onClick={() => navigate("/accueil")}
+            className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+          >
+            <Home className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
+          <Separator className="w-10 bg-white/20 mx-auto my-4" />
+        </div>
+        
+        <div className="flex-1 flex flex-col gap-4">
+          <button 
+            onClick={() => navigate("/domaines/business")}
+            className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer"
+          >
+            <Award className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/[0.08] transition-colors">
+            <BookOpen className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
+            <Target className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
+          <Separator className="w-10 bg-white/20 mx-auto my-2" />
+        </div>
+        
+        <div className="flex-none flex flex-col gap-4 mt-8">
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
+            <User className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
+          <button className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/[0.08] transition-colors">
+            <Settings className="w-5 h-5 text-gray-400 opacity-70" />
+          </button>
+        </div>
+      </div>
       
-      <div className="relative z-10 ml-32 p-8">
-        <div className="max-w-5xl mx-auto space-y-8">
+      {/* Content */}
+      <div className="relative z-10 ml-32 min-h-screen">
+        <div className="max-w-5xl mx-auto p-8 space-y-8">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold text-white">Journal</h1>
             
-            <Button
+            <button
               onClick={() => setShowAddModal(true)}
-              className="bg-primary hover:bg-primary/90"
+              className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-6 py-3 hover:bg-white/[0.04] hover:border-white/[0.12] hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] flex items-center gap-2"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Nouvelle entrée
-            </Button>
+              <Plus className="w-4 h-4 text-white/70" />
+              <span className="text-white text-sm font-medium">Nouvelle entrée</span>
+            </button>
           </div>
 
           <div
