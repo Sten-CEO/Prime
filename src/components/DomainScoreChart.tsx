@@ -166,6 +166,7 @@ export const DomainScoreChart = ({ domainName, domainSlug, score, variation, cat
   const [activeCategories, setActiveCategories] = useState<Record<string, boolean>>(
     categories.reduce((acc, cat) => ({ ...acc, [cat.id]: true }), {})
   );
+  const [activeDomain, setActiveDomain] = useState(true);
   const [compareMode, setCompareMode] = useState(false);
   const [comparedCategories, setComparedCategories] = useState<string[]>([]);
   
@@ -267,7 +268,6 @@ export const DomainScoreChart = ({ domainName, domainSlug, score, variation, cat
               tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10 }}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend />
             
             {/* Category lines */}
             {categories.map((cat) => {
@@ -299,6 +299,7 @@ export const DomainScoreChart = ({ domainName, domainSlug, score, variation, cat
               dataKey="score"
               stroke={`hsl(${domainHslColor})`}
               strokeWidth={3}
+              opacity={activeDomain ? 1 : 0.15}
               dot={{ fill: `hsl(${domainHslColor})`, r: 2, filter: `drop-shadow(0 0 4px hsl(${domainHslColor}))` }}
               activeDot={{ r: 4 }}
               connectNulls={false}
@@ -307,10 +308,26 @@ export const DomainScoreChart = ({ domainName, domainSlug, score, variation, cat
         </ResponsiveContainer>
       </div>
 
-      {/* Category filters */}
-      {categories.length > 0 && (
-        <div className="flex gap-2 mt-4 justify-center flex-wrap">
-          {categories.map((cat) => {
+      {/* Category and domain filters */}
+      <div className="flex gap-2 mt-4 justify-center flex-wrap">
+        {/* Main domain button */}
+        <button
+          onClick={() => setActiveDomain(!activeDomain)}
+          className="flex items-center gap-2 transition-all cursor-pointer"
+          style={{ opacity: activeDomain ? 1 : 0.3 }}
+        >
+          <div 
+            className="w-3 h-3 rounded-full"
+            style={{ 
+              backgroundColor: `hsl(${domainHslColor})`,
+              boxShadow: activeDomain ? `0 0 6px hsl(${domainHslColor})` : 'none'
+            }}
+          />
+          <span className="text-white text-xs">{domainName}</span>
+        </button>
+
+        {/* Category buttons */}
+        {categories.length > 0 && categories.map((cat) => {
             const color = cat.color || defaultCategoryColors[cat.id] || "rgba(100, 100, 100, 0.8)";
             const isActive = activeCategories[cat.id];
             const isCompared = compareMode && comparedCategories.includes(cat.id);
@@ -339,8 +356,7 @@ export const DomainScoreChart = ({ domainName, domainSlug, score, variation, cat
               </button>
             );
           })}
-        </div>
-      )}
+      </div>
     </Card>
   );
 };
