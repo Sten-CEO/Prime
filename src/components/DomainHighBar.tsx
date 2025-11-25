@@ -23,9 +23,10 @@ const ICON_MAP: Record<string, any> = {
 
 interface DomainHighBarProps {
   currentDomain: string;
+  isPerformancePage?: boolean;
 }
 
-export const DomainHighBar = ({ currentDomain }: DomainHighBarProps) => {
+export const DomainHighBar = ({ currentDomain, isPerformancePage = false }: DomainHighBarProps) => {
   const navigate = useNavigate();
   const { domains, isLoading } = useDomains();
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -44,7 +45,7 @@ export const DomainHighBar = ({ currentDomain }: DomainHighBarProps) => {
                 return (
                   <button
                     key={domain.id}
-                    onClick={() => navigate(`/domaines/${domain.slug}`)}
+                    onClick={() => navigate(isPerformancePage ? `/domaines/${domain.slug}/performances` : `/domaines/${domain.slug}`)}
                     className={`group relative w-10 h-10 rounded-full backdrop-blur-xl transition-all ${
                       isActive
                         ? "bg-white/[0.15] border border-white/[0.3] shadow-[0_0_20px_rgba(255,255,255,0.3)]"
