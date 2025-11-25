@@ -5,10 +5,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Home, Award, BookOpen, Target, User, Settings, Bell, Calendar, Crosshair, Sparkles, TrendingUp, Focus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Language } from "@/locales/translations";
 
 const Parametres = () => {
   const navigate = useNavigate();
-  const [language, setLanguage] = useState("fr");
+  const { language, setLanguage, t } = useLanguage();
   const [timezone, setTimezone] = useState("Europe/Paris");
   const [dateFormat, setDateFormat] = useState("DD/MM/YYYY");
   
@@ -23,7 +25,7 @@ const Parametres = () => {
 
   const handleSavePreferences = () => {
     toast({
-      title: "Préférences mises à jour",
+      title: t.preferencesUpdated,
       description: "Vos préférences ont été enregistrées avec succès",
     });
   };
@@ -90,27 +92,27 @@ const Parametres = () => {
       {/* Content */}
       <div className="relative z-10 ml-32 min-h-screen">
         <div className="max-w-4xl mx-auto p-8 space-y-6">
-          <h1 className="text-4xl font-bold text-white mb-8">Paramètres</h1>
+          <h1 className="text-4xl font-bold text-white mb-8">{t.settingsTitle}</h1>
 
           {/* Bloc 1 - Préférences générales */}
           <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-            <h2 className="text-2xl font-semibold text-white mb-6">Préférences générales</h2>
+            <h2 className="text-2xl font-semibold text-white mb-6">{t.generalPreferences}</h2>
             <div className="space-y-6">
               <div>
-                <label className="text-sm text-white/70 mb-2 block">Langue de l'interface</label>
-                <Select value={language} onValueChange={setLanguage}>
+                <label className="text-sm text-white/70 mb-2 block">{t.language}</label>
+                <Select value={language} onValueChange={(val) => setLanguage(val as Language)}>
                   <SelectTrigger className="bg-white/[0.05] border-white/[0.1] text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-black/90 border-white/[0.1]">
-                    <SelectItem value="fr" className="text-white">Français</SelectItem>
-                    <SelectItem value="en" className="text-white">English</SelectItem>
+                    <SelectItem value="fr" className="text-white">{t.french}</SelectItem>
+                    <SelectItem value="en" className="text-white">{t.english}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <label className="text-sm text-white/70 mb-2 block">Fuseau horaire</label>
+                <label className="text-sm text-white/70 mb-2 block">{t.timezone}</label>
                 <Select value={timezone} onValueChange={setTimezone}>
                   <SelectTrigger className="bg-white/[0.05] border-white/[0.1] text-white">
                     <SelectValue />
@@ -125,7 +127,7 @@ const Parametres = () => {
               </div>
 
               <div>
-                <label className="text-sm text-white/70 mb-2 block">Format de date</label>
+                <label className="text-sm text-white/70 mb-2 block">{t.dateFormat}</label>
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <input
@@ -154,22 +156,22 @@ const Parametres = () => {
                 onClick={handleSavePreferences}
                 className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl px-6 py-3 hover:bg-white/[0.04] hover:border-white/[0.12] hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all cursor-pointer shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] text-white font-medium"
               >
-                Enregistrer
+                {t.save}
               </button>
             </div>
           </div>
 
           {/* Bloc 2 - Rappels & notifications */}
           <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-            <h2 className="text-2xl font-semibold text-white mb-6">Rappels & notifications</h2>
+            <h2 className="text-2xl font-semibold text-white mb-6">{t.remindersNotifications}</h2>
             <div className="space-y-4">
               <div className="backdrop-blur-xl bg-white/[0.01] border border-white/[0.05] rounded-2xl p-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 flex-1">
                     <Bell className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-white font-medium">Rappel quotidien de saisie</p>
-                      <p className="text-white/60 text-sm">Te rappeler de remplir tes métriques et ton journal.</p>
+                      <p className="text-white font-medium">{t.dailyReminder}</p>
+                      <p className="text-white/60 text-sm">{t.dailyReminderDesc}</p>
                     </div>
                   </div>
                   <Switch checked={dailyReminder} onCheckedChange={setDailyReminder} />
@@ -195,8 +197,8 @@ const Parametres = () => {
                   <div className="flex items-center gap-4">
                     <Calendar className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-white font-medium">Résumé hebdomadaire Prime</p>
-                      <p className="text-white/60 text-sm">Un résumé de la semaine : scores, objectifs, insights.</p>
+                      <p className="text-white font-medium">{t.weeklyReport}</p>
+                      <p className="text-white/60 text-sm">{t.weeklyReportDesc}</p>
                     </div>
                   </div>
                   <Switch checked={weeklyReport} onCheckedChange={setWeeklyReport} />
@@ -208,8 +210,8 @@ const Parametres = () => {
                   <div className="flex items-center gap-4">
                     <Crosshair className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-white font-medium">Alertes Prime Targets</p>
-                      <p className="text-white/60 text-sm">Te prévenir quand un objectif approche de la deadline.</p>
+                      <p className="text-white font-medium">{t.targetAlerts}</p>
+                      <p className="text-white/60 text-sm">{t.targetAlertsDesc}</p>
                     </div>
                   </div>
                   <Switch checked={targetAlerts} onCheckedChange={setTargetAlerts} />
@@ -220,15 +222,15 @@ const Parametres = () => {
 
           {/* Bloc 3 - Affichage & expérience */}
           <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-3xl p-8 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]">
-            <h2 className="text-2xl font-semibold text-white mb-6">Affichage & expérience</h2>
+            <h2 className="text-2xl font-semibold text-white mb-6">{t.displayExperience}</h2>
             <div className="space-y-4">
               <div className="backdrop-blur-xl bg-white/[0.01] border border-white/[0.05] rounded-2xl p-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <Sparkles className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-white font-medium">Animations visuelles</p>
-                      <p className="text-white/60 text-sm">Activer les animations légères (transitions, slides).</p>
+                      <p className="text-white font-medium">{t.visualAnimations}</p>
+                      <p className="text-white/60 text-sm">{t.visualAnimationsDesc}</p>
                     </div>
                   </div>
                   <Switch checked={animations} onCheckedChange={setAnimations} />
@@ -240,8 +242,8 @@ const Parametres = () => {
                   <div className="flex items-center gap-4">
                     <TrendingUp className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-white font-medium">Montrer les jours non remplis dans les courbes</p>
-                      <p className="text-white/60 text-sm">Afficher les jours non remplis en pointillés.</p>
+                      <p className="text-white font-medium">{t.showEmptyDays}</p>
+                      <p className="text-white/60 text-sm">{t.showEmptyDaysDesc}</p>
                     </div>
                   </div>
                   <Switch checked={showEmptyDays} onCheckedChange={setShowEmptyDays} />
@@ -253,8 +255,8 @@ const Parametres = () => {
                   <div className="flex items-center gap-4">
                     <Focus className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-white font-medium">Mode focus</p>
-                      <p className="text-white/60 text-sm">Réduire les éléments secondaires pour se concentrer sur les scores.</p>
+                      <p className="text-white font-medium">{t.focusMode}</p>
+                      <p className="text-white/60 text-sm">{t.focusModeDesc}</p>
                     </div>
                   </div>
                   <Switch checked={focusMode} onCheckedChange={setFocusMode} />
@@ -262,7 +264,7 @@ const Parametres = () => {
               </div>
             </div>
             <p className="text-xs text-white/40 mt-4 text-center">
-              Les modifications sont enregistrées automatiquement.
+              {t.autoSave}
             </p>
           </div>
         </div>
