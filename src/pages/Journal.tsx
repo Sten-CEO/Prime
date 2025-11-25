@@ -146,10 +146,6 @@ const Journal = () => {
             />
           </div>
 
-          <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-2">
-            <h2 className="text-sm font-medium text-white/70">Journal général</h2>
-          </div>
-
           <div className="space-y-4">
             {loading ? (
               <div className="text-center text-white/60 py-12">
@@ -183,29 +179,58 @@ const Journal = () => {
                   return domains[domainId] || domainId;
                 };
 
-                return Object.entries(entriesByDomain).map(([domainId, domainEntries]) => (
-                  <div
-                    key={domainId}
-                    onClick={() => navigate(`/journal/${domainId}`)}
-                    className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h2 className="text-xl font-semibold text-white">
-                        Journal {getDomainLabel(domainId)}
-                      </h2>
-                      <span className="text-sm text-white/40">
-                        {domainEntries.length} {domainEntries.length === 1 ? "entrée" : "entrées"}
-                      </span>
-                    </div>
-                    <p className="text-sm text-white/60">
-                      Dernière entrée le {new Date(domainEntries[0].entry_date).toLocaleDateString("fr-FR", { 
-                        day: "numeric", 
-                        month: "long", 
-                        year: "numeric" 
-                      })}
-                    </p>
-                  </div>
-                ));
+                // Separate general entries from other domains
+                const generalEntries = entriesByDomain["general"] || [];
+                const otherDomains = Object.entries(entriesByDomain).filter(([domainId]) => domainId !== "general");
+
+                return (
+                  <>
+                    {/* Journal général bloc */}
+                    {generalEntries.length > 0 ? (
+                      <div
+                        onClick={() => navigate(`/journal/general`)}
+                        className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3 cursor-pointer hover:bg-white/[0.04] hover:border-white/[0.12] transition-all"
+                      >
+                        <div className="flex items-center justify-between">
+                          <h2 className="text-sm font-medium text-white/70">Journal général</h2>
+                          <span className="text-xs text-white/40">
+                            {generalEntries.length} {generalEntries.length === 1 ? "entrée" : "entrées"}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3">
+                        <h2 className="text-sm font-medium text-white/70">Journal général</h2>
+                        <p className="text-xs text-white/40 mt-1">Aucune entrée générale</p>
+                      </div>
+                    )}
+
+                    {/* Other domain entries */}
+                    {otherDomains.map(([domainId, domainEntries]) => (
+                      <div
+                        key={domainId}
+                        onClick={() => navigate(`/journal/${domainId}`)}
+                        className="backdrop-blur-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer group"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h2 className="text-xl font-semibold text-white">
+                            Journal {getDomainLabel(domainId)}
+                          </h2>
+                          <span className="text-sm text-white/40">
+                            {domainEntries.length} {domainEntries.length === 1 ? "entrée" : "entrées"}
+                          </span>
+                        </div>
+                        <p className="text-sm text-white/60">
+                          Dernière entrée le {new Date(domainEntries[0].entry_date).toLocaleDateString("fr-FR", { 
+                            day: "numeric", 
+                            month: "long", 
+                            year: "numeric" 
+                          })}
+                        </p>
+                      </div>
+                    ))}
+                  </>
+                );
               })()
             )}
           </div>
