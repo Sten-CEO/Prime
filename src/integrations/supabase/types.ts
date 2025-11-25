@@ -61,6 +61,7 @@ export type Database = {
           created_at: string
           domain_id: string
           entry_date: string
+          has_insight: boolean | null
           id: string
           title: string
           updated_at: string
@@ -71,6 +72,7 @@ export type Database = {
           created_at?: string
           domain_id: string
           entry_date?: string
+          has_insight?: boolean | null
           id?: string
           title: string
           updated_at?: string
@@ -81,6 +83,7 @@ export type Database = {
           created_at?: string
           domain_id?: string
           entry_date?: string
+          has_insight?: boolean | null
           id?: string
           title?: string
           updated_at?: string

@@ -18,6 +18,7 @@ interface JournalEntry {
   domain_id: string;
   entry_date: string;
   created_at: string;
+  has_insight: boolean;
 }
 
 const JournalMonth = () => {
@@ -306,6 +307,7 @@ const JournalMonth = () => {
                     domain={entry.domain_id}
                     date={new Date(entry.entry_date)}
                     onClick={() => setSelectedEntry(entry)}
+                    hasInsight={entry.has_insight}
                   />
                 </div>
               ))

@@ -10,6 +10,7 @@ interface JournalEntryCardProps {
   domain: string;
   date: Date;
   onClick: () => void;
+  hasInsight?: boolean;
 }
 
 export const JournalEntryCard = ({
@@ -18,6 +19,7 @@ export const JournalEntryCard = ({
   domain,
   date,
   onClick,
+  hasInsight = false,
 }: JournalEntryCardProps) => {
   const truncatedContent = content.length > 120 ? content.substring(0, 120) + "..." : content;
   
@@ -44,6 +46,9 @@ export const JournalEntryCard = ({
             <span className="text-sm font-semibold text-white px-4 py-1.5 rounded-full bg-gradient-to-br from-white/[0.15] to-white/[0.08] border border-white/[0.25] shadow-[0_0_15px_rgba(255,255,255,0.1)] backdrop-blur-sm">
               {getDomainLabel(domain)}
             </span>
+            {hasInsight && (
+              <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(139,92,246,0.6)]" />
+            )}
             <span className="text-xs text-white/40">
               {format(date, "d MMMM yyyy", { locale: fr })}
             </span>

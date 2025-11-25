@@ -34,6 +34,43 @@ export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: 
   const [domain, setDomain] = useState(defaultDomain || "");
   const [date, setDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(false);
+  const [insightMode, setInsightMode] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+  const [showInsightPopup, setShowInsightPopup] = useState(false);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [insights, setInsights] = useState<string[]>([]);
+  const [tempInsights, setTempInsights] = useState<string[]>([]);
+
+  const handleTextSelection = () => {
+    if (!insightMode) return;
+    
+    const selection = window.getSelection();
+    const text = selection?.toString().trim();
+
+    if (text && text.length > 0) {
+      setSelectedText(text);
+      
+      const range = selection?.getRangeAt(0);
+      const rect = range?.getBoundingClientRect();
+      
+      if (rect) {
+        setPopupPosition({
+          x: rect.left + rect.width / 2,
+          y: rect.top - 60,
+        });
+        setShowInsightPopup(true);
+      }
+    }
+  };
+
+  const handleConfirmInsight = () => {
+    if (selectedText && !tempInsights.includes(selectedText)) {
+      setTempInsights(prev => [...prev, selectedText]);
+    }
+    setShowInsightPopup(false);
+    setSelectedText("");
+    window.getSelection()?.removeAllRanges();
+  };
 
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim() || !domain) {
@@ -59,25 +96,53 @@ export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: 
         return;
       }
 
-      const { error } = await supabase.from("journal_entries").insert({
-        user_id: user.id,
-        title: title.trim(),
-        content: content.trim(),
-        domain_id: domain,
-        entry_date: format(date, "yyyy-MM-dd"),
-      });
+      const { data: entryData, error: entryError } = await supabase
+        .from("journal_entries")
+        .insert({
+          user_id: user.id,
+          title: title.trim(),
+          content: content.trim(),
+          domain_id: domain,
+          entry_date: format(date, "yyyy-MM-dd"),
+          has_insight: tempInsights.length > 0,
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (entryError) throw entryError;
+
+      // Insert insights if any
+      if (tempInsights.length > 0 && entryData) {
+        const insightRecords = tempInsights.map(phrase => ({
+          user_id: user.id,
+          entry_id: entryData.id,
+          domain_id: domain,
+          phrase,
+          insight_date: format(date, "yyyy-MM-dd"),
+        }));
+
+        const { error: insightsError } = await supabase
+          .from("insights")
+          .insert(insightRecords);
+
+        if (insightsError) throw insightsError;
+      }
 
       toast({
         title: "Entrée créée",
-        description: "Votre entrée de journal a été enregistrée",
+        description: tempInsights.length > 0 
+          ? `Votre entrée avec ${tempInsights.length} insight(s) a été enregistrée`
+          : "Votre entrée de journal a été enregistrée",
       });
 
       setTitle("");
       setContent("");
       setDomain(defaultDomain || "");
       setDate(new Date());
+      setInsightMode(false);
+      setSelectedText("");
+      setShowInsightPopup(false);
+      setTempInsights([]);
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -112,14 +177,64 @@ export const AddEntryModal = ({ open, onOpenChange, defaultDomain, onSuccess }: 
             />
           </div>
 
-          <div>
-            <label className="text-sm text-white/70 mb-2 block">Contenu</label>
+          <div className="relative">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm text-white/70">Contenu</label>
+              <button
+                type="button"
+                onClick={() => setInsightMode(!insightMode)}
+                className={`text-xs px-3 py-1 rounded-full transition-all ${
+                  insightMode 
+                    ? 'bg-primary/20 text-primary border border-primary/30' 
+                    : 'bg-white/[0.05] text-white/60 border border-white/[0.1] hover:bg-white/[0.08]'
+                }`}
+              >
+                ✨ Insight
+              </button>
+            </div>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
+              onMouseUp={handleTextSelection}
+              onTouchEnd={handleTextSelection}
               placeholder="Écrivez votre entrée..."
-              className="bg-white/[0.05] border-white/[0.1] text-white min-h-[200px]"
+              className={`bg-white/[0.05] border-white/[0.1] text-white min-h-[200px] ${
+                insightMode ? 'cursor-text ring-1 ring-primary/30' : ''
+              }`}
             />
+            
+            {showInsightPopup && insightMode && (
+              <div
+                className="fixed z-[100] animate-scale-in"
+                style={{
+                  left: `${popupPosition.x}px`,
+                  top: `${popupPosition.y}px`,
+                  transform: "translateX(-50%)",
+                }}
+              >
+                <div className="backdrop-blur-xl bg-primary/20 border border-primary/30 rounded-xl px-4 py-3 shadow-[0_0_20px_rgba(139,92,246,0.3)] min-w-[200px]">
+                  <p className="text-white text-xs mb-2">Ajouter en Insight ?</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleConfirmInsight}
+                      className="flex-1 bg-primary/30 hover:bg-primary/40 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Confirmer
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowInsightPopup(false);
+                        setSelectedText("");
+                        window.getSelection()?.removeAllRanges();
+                      }}
+                      className="flex-1 bg-white/[0.05] hover:bg-white/[0.08] text-white/70 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">

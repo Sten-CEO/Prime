@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Highlighter, ArrowLeft, Edit, Trash2 } from "lucide-react";
+import { Highlighter, ArrowLeft, Edit, Trash2, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +29,26 @@ export const EntryDetailView = ({
   const [selectedText, setSelectedText] = useState("");
   const [showHighlightButton, setShowHighlightButton] = useState(false);
   const [highlightPosition, setHighlightPosition] = useState({ x: 0, y: 0 });
+  const [insights, setInsights] = useState<string[]>([]);
+
+  const fetchInsights = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("insights")
+        .select("phrase")
+        .eq("entry_id", id);
+
+      if (error) throw error;
+
+      setInsights(data?.map(i => i.phrase) || []);
+    } catch (error) {
+      console.error("Error fetching insights:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchInsights();
+  }, [id]);
 
   const getDomainLabel = (domainId: string) => {
     const domains: Record<string, string> = {
@@ -40,6 +60,22 @@ export const EntryDetailView = ({
       finance: "Finance",
     };
     return domains[domainId] || domainId;
+  };
+
+  const highlightInsights = (text: string) => {
+    if (insights.length === 0) return text;
+
+    let highlightedText = text;
+    insights.forEach((insight, index) => {
+      const escapedInsight = insight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedInsight})`, 'gi');
+      highlightedText = highlightedText.replace(
+        regex,
+        `<mark class="bg-primary/20 text-white rounded px-1 shadow-[0_0_8px_rgba(139,92,246,0.3)]">$1</mark>`
+      );
+    });
+
+    return highlightedText;
   };
 
   const handleTextSelection = () => {
@@ -163,6 +199,12 @@ export const EntryDetailView = ({
             <span className="text-xs font-medium text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
               {getDomainLabel(domain)}
             </span>
+            {insights.length > 0 && (
+              <span className="text-xs font-medium text-primary/80 px-3 py-1 rounded-full bg-primary/5 border border-primary/15 flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3" />
+                Insight
+              </span>
+            )}
             <span className="text-sm text-white/40">
               {format(date, "d MMMM yyyy", { locale: fr })}
             </span>
@@ -175,9 +217,8 @@ export const EntryDetailView = ({
               className="text-white/80 leading-relaxed whitespace-pre-wrap"
               onMouseUp={handleTextSelection}
               onTouchEnd={handleTextSelection}
-            >
-              {content}
-            </div>
+              dangerouslySetInnerHTML={{ __html: highlightInsights(content) }}
+            />
 
             {showHighlightButton && (
               <div
