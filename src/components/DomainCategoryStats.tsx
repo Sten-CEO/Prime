@@ -1,60 +1,41 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, TrendingUp, Check, X, Star, Target, Flame, Trophy } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-
-interface CategoryStat {
-  categoryId: string;
-  categoryName: string;
-  avgScore7d: number;
-  avgScore30d: number;
-  filledDaysPercent: number;
-  emptyDaysPercent: number;
-  bestDay: { day: string; score: number };
-  worstDay: { day: string; score: number };
-  metricsCompletionRate: number;
-  performancesCount: number;
-  currentStreak: number;
-  maxStreak: number;
-  disciplineBonus: number;
-}
+import { useNavigate, useParams } from "react-router-dom";
+import { useCategoryStats } from "@/hooks/useCategoryStats";
+import { useDomainSlugToId } from "@/hooks/useDomainSlugToId";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const DomainCategoryStats = () => {
   const navigate = useNavigate();
+  const { slug } = useParams<{ slug: string }>();
 
-  // TODO: Remplacer par données réelles depuis Supabase
-  const categories: CategoryStat[] = [
-    {
-      categoryId: "strategie",
-      categoryName: "Stratégie",
-      avgScore7d: 142,
-      avgScore30d: 138,
-      filledDaysPercent: 86,
-      emptyDaysPercent: 14,
-      bestDay: { day: "Lun", score: 180 },
-      worstDay: { day: "Mer", score: 95 },
-      metricsCompletionRate: 92,
-      performancesCount: 8,
-      currentStreak: 5,
-      maxStreak: 12,
-      disciplineBonus: 2,
-    },
-    {
-      categoryId: "execution",
-      categoryName: "Exécution",
-      avgScore7d: 165,
-      avgScore30d: 158,
-      filledDaysPercent: 93,
-      emptyDaysPercent: 7,
-      bestDay: { day: "Mar", score: 200 },
-      worstDay: { day: "Sam", score: 110 },
-      metricsCompletionRate: 88,
-      performancesCount: 12,
-      currentStreak: 7,
-      maxStreak: 15,
-      disciplineBonus: 4,
-    },
-  ];
+  // Convertir slug en domain_id
+  const { data: domainId, isLoading: isLoadingDomain } = useDomainSlugToId(slug || "");
+  const { data: categories, isLoading: isLoadingStats } = useCategoryStats(domainId || "");
+  
+  const isLoading = isLoadingDomain || isLoadingStats;
+
+  if (isLoading) {
+    return (
+      <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] h-full flex flex-col">
+        <h3 className="text-lg font-semibold text-white mb-4">Statistiques Catégorie</h3>
+        <div className="space-y-4">
+          <Skeleton className="h-40 bg-white/[0.05]" />
+          <Skeleton className="h-40 bg-white/[0.05]" />
+        </div>
+      </Card>
+    );
+  }
+
+  if (!categories || categories.length === 0) {
+    return (
+      <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] h-full flex flex-col">
+        <h3 className="text-lg font-semibold text-white mb-4">Statistiques Catégorie</h3>
+        <p className="text-sm text-white/60">Aucune catégorie trouvée pour ce domaine.</p>
+      </Card>
+    );
+  }
 
   return (
     <Card className="backdrop-blur-3xl bg-white/[0.01] border border-white/[0.18] rounded-2xl p-6 shadow-[inset_0_2px_0_0_rgba(255,255,255,0.15),inset_0_-1px_0_0_rgba(255,255,255,0.05)] hover:bg-white/[0.03] hover:border-white/[0.25] transition-all h-full flex flex-col">
@@ -131,20 +112,29 @@ export const DomainCategoryStats = () => {
 
               <div className="p-2 rounded-lg bg-white/[0.02] border border-white/[0.08] col-span-2">
                 <div className="flex items-center gap-1 mb-0.5">
-                  <Flame className="w-2.5 h-2.5 text-orange-500" />
+                  <Flame className={`w-2.5 h-2.5 ${cat.currentStreak >= 3 ? "text-orange-500" : "text-white/40"}`} />
                   <p className="text-[9px] text-white/60 uppercase tracking-wide">Discipline</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <p className="text-xs text-white/80">
-                    Série: <span className="font-bold text-orange-500">{cat.currentStreak >= 3 ? cat.currentStreak : 0}</span>j
+                    Série: <span className={`font-bold ${cat.currentStreak >= 3 ? "text-orange-500" : "text-white/50"}`}>
+                      {cat.currentStreak >= 3 ? cat.currentStreak : 0}
+                    </span>j
                   </p>
                   <p className="text-xs text-white/80">
                     Max: <span className="font-bold text-white">{cat.maxStreak}</span>j
                   </p>
                   <p className="text-xs text-white/80">
-                    Bonus: <span className="font-bold text-success">+{cat.disciplineBonus}</span>
+                    Bonus: <span className={`font-bold ${cat.disciplineBonus > 0 ? "text-success" : "text-white/50"}`}>
+                      +{cat.disciplineBonus}
+                    </span>
                   </p>
                 </div>
+                {cat.currentStreak > 0 && cat.currentStreak < 3 && (
+                  <p className="text-[9px] text-white/40 mt-1">
+                    Encore {3 - cat.currentStreak}j pour activer le bonus
+                  </p>
+                )}
               </div>
             </div>
           </div>

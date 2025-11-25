@@ -66,13 +66,17 @@ export const useOverviewData = () => {
           previousPeriodEnd
         );
 
+        // Get discipline streak and bonus
+        const streakData = await calculateDomainStreak(user.id, domain.id);
+        const scoreWithBonus = currentScore + streakData.disciplineBonus;
+
         // Calculate trend
-        const trend = calculateTrend(currentScore, previousScore);
+        const trend = calculateTrend(scoreWithBonus, previousScore);
 
         overviewItems.push({
           name: domainNames[domain.slug] || domain.name,
           icon: domainIcons[domain.slug] || Briefcase,
-          score: Math.round(currentScore),
+          score: Math.round(scoreWithBonus),
           trend,
           slug: domain.slug,
         });
@@ -159,4 +163,76 @@ function calculateTrend(currentScore: number, previousScore: number): string {
   const percentChange = ((currentScore - previousScore) / previousScore) * 100;
   const sign = percentChange >= 0 ? "+" : "";
   return `${sign}${Math.round(percentChange)}%`;
+}
+
+async function calculateDomainStreak(
+  userId: string,
+  domainId: string
+): Promise<{ currentStreak: number; maxStreak: number; disciplineBonus: number }> {
+  const startDate = subDays(new Date(), 365).toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0];
+
+  // Get all dates with data for this domain
+  const { data: metricRecords } = await supabase
+    .from("metric_records")
+    .select("recorded_date, metrics!inner(domain_id)")
+    .eq("user_id", userId)
+    .eq("metrics.domain_id", domainId)
+    .gte("recorded_date", startDate);
+
+  const { data: perfRecords } = await supabase
+    .from("free_performance_records")
+    .select("recorded_date, free_performances!inner(domain_id)")
+    .eq("user_id", userId)
+    .eq("free_performances.domain_id", domainId)
+    .gte("recorded_date", startDate);
+
+  const allDates = new Set<string>();
+  metricRecords?.forEach((r: any) => allDates.add(r.recorded_date));
+  perfRecords?.forEach((r: any) => allDates.add(r.recorded_date));
+
+  const sortedDates = Array.from(allDates).sort((a, b) => b.localeCompare(a));
+
+  if (sortedDates.length === 0) {
+    return { currentStreak: 0, maxStreak: 0, disciplineBonus: 0 };
+  }
+
+  // Calculate current streak
+  let currentStreak = 0;
+  let expectedDate = today;
+  const hasDataToday = sortedDates.includes(today);
+
+  for (const date of sortedDates) {
+    if (date === expectedDate) {
+      currentStreak++;
+      expectedDate = subDays(new Date(expectedDate), 1).toISOString().split("T")[0];
+    } else if (!hasDataToday && currentStreak === 0) {
+      currentStreak++;
+      expectedDate = subDays(new Date(date), 1).toISOString().split("T")[0];
+    } else {
+      break;
+    }
+  }
+
+  // Calculate max streak
+  let maxStreak = currentStreak;
+  let tempStreak = 1;
+
+  for (let i = 1; i < sortedDates.length; i++) {
+    const prevDate = new Date(sortedDates[i - 1]);
+    const currDate = new Date(sortedDates[i]);
+    const diffDays = Math.round((prevDate.getTime() - currDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) {
+      tempStreak++;
+      maxStreak = Math.max(maxStreak, tempStreak);
+    } else {
+      tempStreak = 1;
+    }
+  }
+
+  // Calculate discipline bonus: starts at 3 consecutive days, bonus = streak - 2
+  const disciplineBonus = currentStreak >= 3 ? currentStreak - 2 : 0;
+
+  return { currentStreak, maxStreak, disciplineBonus };
 }
