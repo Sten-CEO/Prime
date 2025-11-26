@@ -1,4 +1,5 @@
-// Service Worker minimal pour activer l'installation PWA
+// Service Worker minimal juste pour activer la PWA
+
 self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
@@ -7,5 +8,5 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// On laisse la requête passer sans cache spécial (c'est suffisant pour install)
+// On laisse passer les requêtes sans gestion de cache compliquée
 self.addEventListener("fetch", () => {});
